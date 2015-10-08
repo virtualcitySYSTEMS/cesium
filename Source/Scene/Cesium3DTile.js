@@ -354,7 +354,31 @@ define([
     Cesium3DTile.prototype.isDestroyed = function() {
         return false;
     };
+    /**
+     * DOC_TBA
+     */
+    Cesium3DTile.prototype.unload = function() {
+        if(this.isReady() && !(this._content instanceof Empty3DTileContentProvider)){
+            this._content.unload();
+            this.readyPromise = when.defer();
+            for(var i = 0; i < this.children.length; i++){
+                this.children[i].unload();
+            }
+            this.parent.numberOfChildrenWithoutContent++;
+            this["b3dmlayer_LastUpdated"] = null;
+            var that = this;
 
+            // Content enters the READY state
+            when(this._content.readyPromise).then(function(content) {
+                if (defined(that.parent)) {
+                    --that.parent.numberOfChildrenWithoutContent;
+                }
+                that.readyPromise.resolve(that);
+            }).otherwise(function(error) {
+                that.readyPromise.reject(error);
+            });
+        }
+    };
     /**
      * DOC_TBA
      */

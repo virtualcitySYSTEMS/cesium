@@ -317,6 +317,13 @@ define([
             selectedTiles.push(tile);
         }
     }
+    function unloadTiles(tiles){
+        for(var i = 0; i < tiles.length; i++){
+            if(tiles[i].isReady()){
+                tiles[i].unload();
+            }
+        }
+    }
 
     var scratchStack = [];
 
@@ -468,6 +475,80 @@ define([
             }
         }
     }
+    function selectTilesToUnload(selectedTiles, tilesToUnload){
+        for(var i = 0; i < selectedTiles.length; i++){
+            var tileVisible = selectedTiles[i];
+            for(var j = 0; j < tilesToUnload.length; j++){
+                if(tilesToUnload[j] == tileVisible){
+                    tilesToUnload.splice(j, 1);
+                    break;
+                }
+            }
+        }
+        // keep parents
+
+        for(var i = tilesToUnload.length - 1; i >= 0; i--){
+            var tileToUnload = tilesToUnload[i];
+            var keepParent = false;
+            var stack = [];
+            stack.push(tileToUnload);
+            while(stack.length > 0 && !keepParent){
+                var tile = stack.pop();
+                for(var k = 0; k < selectedTiles.length; k++){
+                    if(tile == selectedTiles[k]){
+                        keepParent = true;
+                        break;
+                    }
+                }
+                for (var j = 0; j < tile.children.length; j++){
+                    var child = tile.children[j];
+                    stack.push(child);
+                }
+            }
+            if(keepParent){
+                tilesToUnload.splice(i, 1);
+            }
+        }
+        //keepsiblings // until a parent with refine === add
+        for(var i = tilesToUnload.length - 1; i >= 0; i--){
+            var tileToUnload = tilesToUnload[i];
+            var keepSiblings = false;
+            // go up the parent CHAIN until first tile with replace ADD
+            var parent = tileToUnload.parent;
+
+            if(parent && !parent.refine == Cesium3DTileRefine.ADD){  // PARENT IS ALREADY ROOT ELEMENT
+
+                // go up the chain
+                while(parent.parent && parent.parent.refine != Cesium3DTileRefine.ADD){
+                    parent = parent.parent
+                }
+
+
+                if(parent){
+                    var stack = parent.children.slice();
+                    while(stack.length > 0 && !keepSiblings){
+                        var child = stack.pop();
+                        for(var k = 0; k < selectedTiles.length; k++){
+                            if(child == selectedTiles[k]){
+                                keepSiblings = true;
+                                break;
+                            }
+                        }
+                        if(!keepSiblings){
+                            for(var k = 0; k < child.children.length; k++){
+                                stack.push(child.children[k]);
+                            }
+                        }
+                    }
+                }
+                if(keepSiblings){
+                    tilesToUnload.splice(i, 1);
+                }
+            }
+        }
+    }
+
+
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -621,8 +702,22 @@ define([
         if (outOfCore) {
             processTiles(this, context, frameState);
         }
+
+        var tilesToUnload = [];
+        if(outOfCore){
+            for(var i = 0; i < this._selectedTiles.length; i++){
+                tilesToUnload.push(this._selectedTiles[i]);
+            }
+        }
+
         selectTiles(this, context, frameState, commandList, outOfCore);
+        if(outOfCore){
+            selectTilesToUnload(this._selectedTiles, tilesToUnload);
+        }
+
         updateTiles(this, context, frameState, commandList);
+
+        unloadTiles(tilesToUnload);
 
         // Events are raised (added to the afterRender queue) here since promises
         // may resolve outside of the update loop that then raise events, e.g.,

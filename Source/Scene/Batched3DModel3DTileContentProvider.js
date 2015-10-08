@@ -936,6 +936,25 @@ define([
     /**
      * DOC_TBA
      */
+    Batched3DModel3DTileContentProvider.prototype.unload = function() {
+        this._model = this._model && this._model.destroy();
+        this._batchValues = undefined;  // Per-model show/color
+        this._batchTexture = this._batchTexture && this._batchTexture.destroy();
+        this._pickTexture = this._pickTexture && this._pickTexture.destroy();
+        this._models = undefined;
+        this._batchTable = undefined;
+        var pickIds = this._pickIds;
+        var length = pickIds.length;
+        for (var i = 0; i < length; ++i) {
+            pickIds[i].destroy();
+        }
+        this.processingPromise = when.defer();
+        this.readyPromise = when.defer();
+        this.state = Cesium3DTileContentState.UNLOADED;
+    };
+    /**
+     * DOC_TBA
+     */
     Batched3DModel3DTileContentProvider.prototype.destroy = function() {
         this._model = this._model && this._model.destroy();
         this._batchTexture = this._batchTexture && this._batchTexture.destroy();
