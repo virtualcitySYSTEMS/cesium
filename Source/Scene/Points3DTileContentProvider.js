@@ -149,7 +149,16 @@ define([
     Points3DTileContentProvider.prototype.isDestroyed = function() {
         return false;
     };
+    /**
+     * DOC_TBA
+     */
+    Points3DTileContentProvider.prototype.unload = function() {
+        this._primitive = this._primitive && this._primitive.destroy();
 
+        this.processingPromise = when.defer();
+        this.readyPromise = when.defer();
+        this.state = Cesium3DTileContentState.UNLOADED;
+    };
     Points3DTileContentProvider.prototype.destroy = function() {
         this._primitive = this._primitive && this._primitive.destroy();
 

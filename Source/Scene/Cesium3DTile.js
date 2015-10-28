@@ -364,7 +364,10 @@ define([
             for(var i = 0; i < this.children.length; i++){
                 this.children[i].unload();
             }
-            this.parent.numberOfChildrenWithoutContent++;
+
+            if(this.parent){
+                this.parent.numberOfChildrenWithoutContent++;
+              }
             this["b3dmlayer_LastUpdated"] = null;
             var that = this;
 
