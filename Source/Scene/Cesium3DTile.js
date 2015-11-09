@@ -369,6 +369,7 @@ define([
                 this.parent.numberOfChildrenWithoutContent++;
               }
             this["b3dmlayer_LastUpdated"] = null;
+            this["style_lastUpdated"] = null;
             var that = this;
 
             // Content enters the READY state
