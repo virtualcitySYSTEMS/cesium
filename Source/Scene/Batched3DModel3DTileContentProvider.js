@@ -247,10 +247,12 @@ define([
 
         if ((batchValues[offset] !== newValue[0]) ||
                 (batchValues[offset + 1] !== newValue[1]) ||
-                (batchValues[offset + 2] !== newValue[2])) {
+                (batchValues[offset + 2] !== newValue[2]) ||
+                (batchValues[offset + 3] !== newValue[3])) {
             batchValues[offset] = newValue[0];
             batchValues[offset + 1] = newValue[1];
             batchValues[offset + 2] = newValue[2];
+            batchValues[offset + 3] = newValue[3];
             this._batchValuesDirty = true;
         }
     };
@@ -503,15 +505,15 @@ define([
                 // When VTF is supported, perform per patched model (e.g., building) show/hide in the vertex shader
                 newMain =
                     'uniform sampler2D tiles3d_batchTexture; \n' +
-                    'varying vec3 tiles3d_modelColor; \n' +
+                    'varying vec4 modelProperties; \n' +
                     'void main() \n' +
                     '{ \n' +
                     '    gltf_main(); \n' +
                     '    vec2 st = computeSt(a_batchId); \n' +
-                    '    vec4 modelProperties = texture2D(tiles3d_batchTexture, st); \n' +
-                    '    float show = modelProperties.a; \n' +
-                    '    gl_Position *= show; \n' +                        // Per batched model show/hide
-                    '    tiles3d_modelColor = modelProperties.rgb; \n' +   // Pass batched model color to fragment shader
+                    '    vec4 _modelProperties = texture2D(tiles3d_batchTexture, st); \n' +
+                    '    float show = _modelProperties.a; \n' +
+                    '    if(_modelProperties.a == 0.0) {gl_Position *= show; } \n' +                        // Per batched model show/hide
+                    '    modelProperties = _modelProperties; \n' +   // Pass batched model color to fragment shader
                     '}';
             } else {
                 newMain =
@@ -567,11 +569,11 @@ define([
                 // When VTF is supported, per patched model (e.g., building) show/hide already
                 // happened in the fragment shader
                 newMain =
-                    'varying vec3 tiles3d_modelColor; \n' +
+                	'varying vec4 modelProperties; \n' +
                     'void main() \n' +
                     '{ \n' +
                     '    gltf_main(); \n' +
-                    '    gl_FragColor.rgb *= tiles3d_modelColor; \n' +
+                    '    gl_FragColor *= modelProperties; \n' +
                     '}';
             } else {
                 newMain =
