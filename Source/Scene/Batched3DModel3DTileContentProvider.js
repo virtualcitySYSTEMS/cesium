@@ -291,6 +291,17 @@ define([
         return false;
     };
 
+    Batched3DModel3DTileContentProvider.prototype.unload = function() {
+          this._model = this._model && this._model.destroy();
+          this._batchTableResources = this._batchTableResources && this._batchTableResources.destroy();
+          this._featuresLength = 0;
+          this._batchTableResources = undefined;
+          this._models = undefined;
+    
+          this.processingPromise = when.defer();
+          this.readyPromise = when.defer();
+          this.state = Cesium3DTileContentState.UNLOADED;
+        };
     /**
      * Part of the {@link Cesium3DTileContentProvider} interface.
      *

@@ -270,6 +270,12 @@ define([
         return false;
     };
 
+    Points3DTileContentProvider.prototype.unload = function() {
+         this._primitive = this._primitive && this._primitive.destroy();
+         this.processingPromise = when.defer();
+         this.readyPromise = when.defer();
+         this.state = Cesium3DTileContentState.UNLOADED;
+     };
     /**
      * Part of the {@link Cesium3DTileContentProvider} interface.
      *

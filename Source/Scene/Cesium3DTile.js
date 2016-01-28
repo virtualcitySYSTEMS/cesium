@@ -552,6 +552,31 @@ define([
         return false;
     };
 
+    Cesium3DTile.prototype.unload = function() {
+          if(this.isReady() && !(this._content instanceof Empty3DTileContentProvider)){
+            this._content.unload();
+            this.readyPromise = when.defer();
+            for(var i = 0; i < this.children.length; i++){
+              this.children[i].unload();
+            }
+            if(this.parent){
+              this.parent.numberOfChildrenWithoutContent++;
+            }
+            this["_lastUpdated"] = null;
+            var that = this;
+            // Content enters the READY state
+            when(this._content.readyPromise).then(function(content) {
+                if (defined(that.parent)) {
+                  --that.parent.numberOfChildrenWithoutContent;
+                }
+                that.readyPromise.resolve(that);
+              }).otherwise(function(error) {
+                that.readyPromise.reject(error);
+              });
+            }
+          };
+
+
     /**
      * @private
      */
