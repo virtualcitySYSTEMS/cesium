@@ -567,5 +567,28 @@ define([
         return destroyObject(this);
     };
 
+    Cesium3DTile.prototype.unload = function() {
+        if (this.contentReady && !(this._content instanceof Empty3DTileContent)) {
+            this._content.unload();
+            this.contentReadyPromise = when.defer();
+            for (var i = 0; i < this.children.length; i++) {
+                this.children[i].unload();
+            }
+            if (this.parent) {
+                this.parent.numberOfChildrenWithoutContent++;
+            }
+            this["_lastUpdated"] = null;
+            var that = this;
+            // Content enters the READY state
+            when(this._content.readyPromise).then(function (content) {
+                if (defined(that.parent)) {
+                    --that.parent.numberOfChildrenWithoutContent;
+                }
+                that.contentReadyPromise.resolve(that);
+            }).otherwise(function (error) {
+                that.contentReadyPromise.reject(error);
+            });
+        }
+    };
     return Cesium3DTile;
 });
