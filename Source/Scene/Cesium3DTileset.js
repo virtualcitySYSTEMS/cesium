@@ -93,6 +93,7 @@ define([
             baseUrl = url;
             tilesetUrl = joinUrls(baseUrl, 'tileset.json');
         }
+        this._id = 0;
 
         this._url = url;
         this._baseUrl = baseUrl;
@@ -103,6 +104,8 @@ define([
         this._geometricError = undefined; // Geometric error when the tree is not rendered at all
         this._processingQueue = [];
         this._selectedTiles = [];
+
+        this._tilesToUnload = {};
 
         /**
          * Determines if the tileset will be shown.
@@ -403,6 +406,10 @@ define([
         }
     });
 
+    Cesium3DTileset.prototype.getNextId = function() {
+        this._id++;
+        return this._id;
+    }
     /**
      * Loads the main tileset.json or a tileset.json referenced from a tile.
      *
@@ -537,7 +544,8 @@ define([
 
     ///////////////////////////////////////////////////////////////////////////
 
-    function requestContent(tileset, tile, outOfCore) {
+    function requestContent(tileset, tile, outOfCore, tilesToUnselect) {
+
         if (!outOfCore) {
             return;
         }
@@ -555,9 +563,12 @@ define([
             when(tile.contentReadyToProcessPromise).then(addToProcessingQueue(tileset, tile)).otherwise(removeFunction);
             when(tile.contentReadyPromise).then(removeFunction).otherwise(removeFunction);
         }
+        if(tile.hasContent) {
+            tilesToUnselect[tile._id] = tile;
+        }
     }
 
-    function selectTile(selectedTiles, tile, fullyVisible, frameState) {
+    function selectTile(selectedTiles, tile, fullyVisible, frameState, tilesToUnselect) {
         // There may also be a tight box around just the tile's contents, e.g., for a city, we may be
         // zoomed into a neighborhood and can cull the skyscrapers in the root node.
         if (tile.contentReady && (fullyVisible || (tile.contentsVisibility(frameState.cullingVolume) !== Intersect.OUTSIDE))) {
@@ -592,7 +603,7 @@ define([
         }
 
         if (root.contentUnloaded) {
-            requestContent(tileset, root, outOfCore);
+            requestContent(tileset, root, outOfCore, this._tilesToUnload);
             return;
         }
 
@@ -633,7 +644,7 @@ define([
                     child.parentPlaneMask = t.parentPlaneMask;
                     child.distanceToCamera = t.distanceToCamera;
                     if (child.contentUnloaded) {
-                        requestContent(tileset, child, outOfCore);
+                        requestContent(tileset, child, outOfCore, tileset._tilesToUnload);
                     } else {
                         stack.push(child);
                     }
@@ -644,7 +655,7 @@ define([
             if (additiveRefinement) {
                 // With additive refinement, the tile is rendered
                 // regardless of if its SSE is sufficient.
-                selectTile(selectedTiles, t, fullyVisible, frameState);
+                selectTile(selectedTiles, t, fullyVisible, frameState, tileset._tilesToUnload);
 
 // TODO: experiment with prefetching children
                 if (sse > maximumScreenSpaceError) {
@@ -673,7 +684,7 @@ define([
                             if (getScreenSpaceError(t.geometricError, child, frameState) > maximumScreenSpaceError) {
                                 if (child.contentUnloaded) {
                                     if (child.visibility(cullingVolume) !== CullingVolume.MASK_OUTSIDE) {
-                                        requestContent(tileset, child, outOfCore);
+                                        requestContent(tileset, child, outOfCore, tileset._tilesToUnload);
                                     }
                                 } else {
                                     stack.push(child);
@@ -692,7 +703,7 @@ define([
                 if ((sse <= maximumScreenSpaceError) || (childrenLength === 0)) {
                     // This tile meets the SSE so add its commands.
                     // Select tile if it's a leaf (childrenLength === 0)
-                    selectTile(selectedTiles, t, fullyVisible, frameState);
+                    selectTile(selectedTiles, t, fullyVisible, frameState, tileset._tilesToUnload);
                 } else {
                     // Tile does not meet SSE.
 
@@ -720,7 +731,7 @@ define([
                                 child = children[k];
 // TODO: we could spin a bit less CPU here and probably above by keeping separate lists for unloaded/ready children.
                                 if (child.contentUnloaded) {
-                                    requestContent(tileset, child, outOfCore);
+                                    requestContent(tileset, child, outOfCore, tileset._tilesToUnload);
                                 }
                             }
                         }
@@ -767,7 +778,7 @@ define([
             }
             if (!refinable) {
                 var fullyVisible = refiningTile.visibility(frameState.cullingVolume) === CullingVolume.MASK_INSIDE;
-                selectTile(tileset._selectedTiles, refiningTile, fullyVisible, frameState);
+                selectTile(tileset._selectedTiles, refiningTile, fullyVisible, frameState, tileset._tilesToUnload);
                 for (j = 0; j < descendantsLength; ++j) {
                     descendant = refiningTile.descendantsWithContent[j];
                     descendant.selected = false;
@@ -956,6 +967,7 @@ define([
              }
          }
     }
+    /*
     function unloadTiles(tiles){
         //console.log("UNLOADING: " + tiles.length);
         for(var i = 0; i < tiles.length; i++){
@@ -964,7 +976,71 @@ define([
             }
         }
     }
-
+    */
+    function unloadTiles(tilesToUnload, selectedTiles){
+        var unloadTile = true;
+        for(var key in tilesToUnload){
+            unloadTile = true;
+            for(var i = 0; i < selectedTiles.length; i++){
+                if(selectedTiles[i]._id === tilesToUnload[key]._id){
+                    unloadTile = false;
+                    break;
+                }
+            }
+            if(unloadTile){
+                if(!checkForVisibleChildren(tilesToUnload[key], selectedTiles)){
+                    if(!checkForVisibleSiblings(tilesToUnload[key], selectedTiles)){
+                        if(tilesToUnload[key].unload()) {
+                            delete tilesToUnload[key];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    function checkForVisibleSiblings(tile, selectedTiles){
+        // go up the parent CHAIN until first tile with replace ADD
+        var parent = tile.parent;
+        if(parent && !parent.refine == Cesium3DTileRefine.ADD){  // PARENT IS ALREADY ROOT ELEMENT
+            // go up the chain
+            while(parent.parent && parent.parent.refine != Cesium3DTileRefine.ADD){
+                parent = parent.parent
+            }
+            if(parent){
+                var stack = parent.children.slice();
+                while(stack.length > 0){
+                    var child = stack.pop();
+                    for(var k = 0; k < selectedTiles.length; k++){
+                        if(child == selectedTiles[k]){
+                            return true;
+                        }
+                    }
+                    for(var k = 0; k < child.children.length; k++){
+                        stack.push(child.children[k]);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    function checkForVisibleChildren(tile, selectedTiles){
+        var keepParent = false;
+        var stack = [];
+        stack.push(tile);
+        while(stack.length > 0 && !keepParent){
+            var tile = stack.pop();
+            for(var k = 0; k < selectedTiles.length; k++){
+                if(tile == selectedTiles[k]){
+                    return true;
+                }
+            }
+            for (var j = 0; j < tile.children.length; j++){
+                var child = tile.children[j];
+                stack.push(child);
+            }
+        }
+        return false;
+    }
     ///////////////////////////////////////////////////////////////////////////
 
     /**
@@ -994,20 +1070,14 @@ define([
         if (outOfCore) {
             processTiles(this, frameState);
         }
-        var tilesToUnload = [];
-        if(outOfCore){
-            for(var i = 0; i < this._selectedTiles.length; i++){
-                tilesToUnload.push(this._selectedTiles[i]);
-            }
-        }
+
         selectTiles(this, frameState, outOfCore);
-        if(outOfCore){
-            selectTilesToUnload(this._selectedTiles, tilesToUnload);
+        if (outOfCore) {
+            unloadTiles(this._tilesToUnload, this._selectedTiles);
         }
+
         updateTiles(this, frameState);
-        //console.log("TILES SELECTED: " + this._selectedTiles.length);
-        //console.log("TILES TO Unselect: " + tilesToUnload.length);
-        unloadTiles(tilesToUnload);
+
 
         // Events are raised (added to the afterRender queue) here since promises
         // may resolve outside of the update loop that then raise events, e.g.,

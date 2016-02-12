@@ -133,7 +133,6 @@ define([
      * Part of the {@link Cesium3DTileContent} interface.
      */
     Batched3DModel3DTileContent.prototype.request = function() {
-        window.requestCounter++;
         var that = this;
 
         var distance = this._tile.distanceToCamera;
@@ -215,14 +214,15 @@ define([
             gltf : gltfView,
             cull : false,           // The model is already culled by the 3D tiles
             releaseGltfJson : true, // Models are unique and will not benefit from caching so save memory
-            incrementallyLoadTextures : false,
             vertexShaderLoaded : batchTableResources.getVertexShaderCallback(),
             fragmentShaderLoaded : batchTableResources.getFragmentShaderCallback(),
             uniformMapLoaded : batchTableResources.getUniformMapCallback(),
             pickVertexShaderLoaded : batchTableResources.getPickVertexShaderCallback(),
             pickFragmentShaderLoaded : batchTableResources.getPickFragmentShaderCallback(),
             pickUniformMapLoaded : batchTableResources.getPickUniformMapCallback(),
-            basePath : this._url
+            basePath : this._url,
+            incrementallyLoadTextures:defaultValue(this._tileset.modelOptions.incrementallyLoadTextures , true),
+            allowPicking:defaultValue(this._tileset.modelOptions.allowPicking, true)
         });
 
         this._model = model;
@@ -279,7 +279,6 @@ define([
      * Part of the {@link Cesium3DTileContent} interface.
      */
     Batched3DModel3DTileContent.prototype.unload = function() {
-        window.requestCounter--;
         this._model = this._model && this._model.destroy();
         this._batchTableResources = this._batchTableResources && this._batchTableResources.destroy();
         this._featuresLength = 0;

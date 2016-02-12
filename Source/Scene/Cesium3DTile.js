@@ -83,7 +83,7 @@ define([
         var contentHeader = header.content;
 
         this._boundingVolume = createBoundingVolume(header.boundingVolume);
-
+        this._id = tileset.getNextId();
 // TODO: if the content type has pixel size, like points or billboards, the bounding volume needs
 // to dynamic size bigger like BillboardCollection and PointCollection
 
@@ -569,11 +569,50 @@ define([
 
     Cesium3DTile.prototype.unload = function() {
         if (this.contentReady && !(this._content instanceof Empty3DTileContent)) {
+            // wait until children are unloaded....
+
+            var stack = [];
+            for(var i = 0; i < this.children.length; i++) {
+                stack.push(this.children[i]);
+            }
+            while(stack.length > 0){
+                var tile = stack.pop();
+                if(tile._content.state !== Cesium3DTileContentState.UNLOADED) {
+                    return false;
+                }else {
+                    for(var i = 0; i < tile.children.length; i++) {
+                        stack.push(tile.children[i]);
+                    }
+                }
+            }
+
+            // check for loading siblings...
+            var parent = this.parent;
+            if(parent && !parent.refine == Cesium3DTileRefine.ADD){  // PARENT IS ALREADY ROOT ELEMENT
+                // go up the chain
+                while(parent.parent && parent.parent.refine != Cesium3DTileRefine.ADD){
+                    parent = parent.parent
+                }
+                if(parent){
+                    var stack = parent.children.slice();
+                    while(stack.length > 0){
+                        var child = stack.pop();
+                        if(child._content.state === Cesium3DTileContentState.LOADING || child._content.state === Cesium3DTileContentState.PROCESSING){
+                            return false;
+                        }
+                        for(var k = 0; k < child.children.length; k++){
+                            stack.push(child.children[k]);
+                        }
+                    }
+                }
+            }
+
+
             this._content.unload();
             this.contentReadyPromise = when.defer();
-            for (var i = 0; i < this.children.length; i++) {
-                this.children[i].unload();
-            }
+            //for (var i = 0; i < this.children.length; i++) {
+              //  this.children[i].unload();
+            //}
             if (this.parent) {
                 this.parent.numberOfChildrenWithoutContent++;
             }
@@ -588,7 +627,11 @@ define([
             }).otherwise(function (error) {
                 that.contentReadyPromise.reject(error);
             });
+            return true;
+        }else if(this._content.state === Cesium3DTileContentState.UNLOADED){
+            return true; // already unloaded;
         }
+        return false;
     };
     return Cesium3DTile;
 });
