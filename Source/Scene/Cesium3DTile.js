@@ -571,6 +571,7 @@ define([
         if (this.contentReady && !(this._content instanceof Empty3DTileContent)) {
             // wait until children are unloaded....
 
+            /*
             var stack = [];
             for(var i = 0; i < this.children.length; i++) {
                 stack.push(this.children[i]);
@@ -606,7 +607,7 @@ define([
                     }
                 }
             }
-
+            */
 
             this._content.unload();
             this.contentReadyPromise = when.defer();
