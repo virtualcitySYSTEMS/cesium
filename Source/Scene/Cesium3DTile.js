@@ -608,6 +608,14 @@ define([
                 }
             }
             */
+            // get first tile
+            var tile = this;
+            while(tile.parent && tile.parent.refine !== Cesium3DTileRefine.ADD){
+                tile = tile.parent;
+            }
+            if(tile != this && tile._content.state !== Cesium3DTileContentState.UNLOADED){
+                return false;
+            }
 
             this._content.unload();
             this.contentReadyPromise = when.defer();
