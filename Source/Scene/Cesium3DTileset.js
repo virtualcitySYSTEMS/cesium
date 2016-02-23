@@ -108,6 +108,8 @@ define([
         this._tilesToUnload = {};
         this._tilesVisited = {};
 
+        this._unloadTiles = true;
+
         /**
          * Determines if the tileset will be shown.
          *
@@ -1103,7 +1105,9 @@ define([
 
         selectTiles(this, frameState, outOfCore);
         if (outOfCore) {
-            unloadTiles(this._tilesToUnload, this._tilesVisited);
+            if(this._unloadTiles) {
+                unloadTiles(this._tilesToUnload, this._tilesVisited);
+            }
             this._tilesVisited = {};
         }
 
