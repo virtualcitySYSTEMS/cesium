@@ -253,6 +253,17 @@ define([
         this._primitive = this._primitive && this._primitive.destroy();
         return destroyObject(this);
     };
+    /**
+     * Part of the {@link Cesium3DTileContent} interface.
+     */
+    Points3DTileContent.prototype.unload = function() {
+        this._primitive = this._primitive && this._primitive.destroy();
+        this._primitive = undefined;
+        this.contentReadyToProcessPromise = when.defer();
+        this.readyPromise = when.defer();
+        this.state = Cesium3DTileContentState.UNLOADED;
+    };
+
 
     return Points3DTileContent;
 });
