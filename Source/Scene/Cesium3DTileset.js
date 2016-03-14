@@ -608,7 +608,7 @@ define([
         }
 
         if (root.contentUnloaded) {
-            requestContent(tileset, root, outOfCore, this._tilesToUnload);
+            requestContent(tileset, root, outOfCore, tileset._tilesToUnload);
             return;
         }
 
