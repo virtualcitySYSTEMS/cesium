@@ -213,8 +213,11 @@ define([
             pickVertexShaderLoaded : batchTableResources.getPickVertexShaderCallback(),
             pickFragmentShaderLoaded : batchTableResources.getPickFragmentShaderCallback(),
             pickUniformMapLoaded : batchTableResources.getPickUniformMapCallback(),
-            basePath : this._url
-        });
+            basePath : this._url,
+            incrementallyLoadTextures:defaultValue(this._tileset.modelOptions.incrementallyLoadTextures , true),
+            allowPicking:defaultValue(this._tileset.modelOptions.allowPicking, true)
+
+    });
 
         this._model = model;
         this.state = Cesium3DTileContentState.PROCESSING;
