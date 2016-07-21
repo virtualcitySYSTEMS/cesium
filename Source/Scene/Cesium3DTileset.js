@@ -100,7 +100,7 @@ define([
             baseUrl = url;
             tilesetUrl = joinUrls(baseUrl, 'tileset.json');
         }
-
+        this._id = 0;
         this._url = url;
         this._baseUrl = baseUrl;
         this._tilesetUrl = tilesetUrl;
@@ -299,6 +299,10 @@ define([
         this.tileVisible = new Event();
 
         this._readyPromise = when.defer();
+
+        /** VCS UNloading CoDE */
+        this._tilesToUnload = {};
+        this._tilesVisited = {};
 
         var that = this;
 
@@ -786,7 +790,7 @@ define([
 
     ///////////////////////////////////////////////////////////////////////////
 
-    function requestContent(tileset, tile, outOfCore) {
+    function requestContent(tileset, tile, outOfCore,  tilesToUnselect) {
         if (!outOfCore) {
             return;
         }
@@ -803,6 +807,9 @@ define([
             var removeFunction = removeFromProcessingQueue(tileset, tile);
             when(tile.content.contentReadyToProcessPromise).then(addToProcessingQueue(tileset, tile)).otherwise(removeFunction);
             when(tile.content.readyPromise).then(removeFunction).otherwise(removeFunction);
+        }
+        if(tile.hasContent) {
+            tilesToUnselect[tile._id] = tile;
         }
     }
 
@@ -866,7 +873,7 @@ define([
         }
 
         if (root.contentUnloaded) {
-            requestContent(tileset, root, outOfCore);
+            requestContent(tileset, root, outOfCore, tileset._tilesToUnload);
             return;
         }
 
@@ -880,6 +887,11 @@ define([
             t.selected = false;
             t.replaced = false;
             ++stats.visited;
+
+            if(t.hasContent){
+                tileset._tilesVisited[t._id] = true;
+            }
+
 
             var planeMask = t.visibility(cullingVolume);
             if (planeMask === CullingVolume.MASK_OUTSIDE) {
@@ -910,7 +922,7 @@ define([
                     child.parentPlaneMask = t.parentPlaneMask;
                     child.distanceToCamera = t.distanceToCamera;
                     if (child.contentUnloaded) {
-                        requestContent(tileset, child, outOfCore);
+                        requestContent(tileset, child, outOfCore, tileset._tilesToUnload);
                     } else {
                         stack.push(child);
                     }
@@ -947,7 +959,7 @@ define([
                             if (getScreenSpaceError(t.geometricError, child, frameState) > maximumScreenSpaceError) {
                                 if (child.contentUnloaded) {
                                     if (child.visibility(cullingVolume) !== CullingVolume.MASK_OUTSIDE) {
-                                        requestContent(tileset, child, outOfCore);
+                                        requestContent(tileset, child, outOfCore, tileset._tilesToUnload);
                                     }
                                 } else {
                                     stack.push(child);
@@ -994,7 +1006,7 @@ define([
                                 child = children[k];
                                 // PERFORMANCE_IDEA: we could spin a bit less CPU here by keeping separate lists for unloaded/ready children.
                                 if (child.contentUnloaded) {
-                                    requestContent(tileset, child, outOfCore);
+                                    requestContent(tileset, child, outOfCore, tileset._tilesToUnload);
                                 } else {
                                     // Touch loaded child even though it is not selected this frame since
                                     // we want to keep it in the cache for when all children are loaded
@@ -1260,6 +1272,17 @@ define([
         }
     }
 
+    function unloadTilesVCS(tilesToUnload, tilesVisited) {
+        var unloadTile = true;
+        for (var key in tilesToUnload) {
+            if (!tilesVisited[key]) {
+                if (tilesToUnload[key].unloadVCS()) {
+                    delete tilesToUnload[key];
+                }
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     /**
@@ -1294,7 +1317,11 @@ define([
         updateTiles(this, frameState);
 
         if (outOfCore) {
-            unloadTiles(this, frameState);
+            //unloadTiles(this, frameState);
+            if(this._unloadTiles) {
+                unloadTilesVCS(this._tilesToUnload, this._tilesVisited);
+            }
+            this._tilesVisited = {};
         }
 
         // Events are raised (added to the afterRender queue) here since promises
@@ -1318,6 +1345,11 @@ define([
     Cesium3DTileset.prototype.isDestroyed = function() {
         return false;
     };
+
+    Cesium3DTileset.prototype.getNextId = function() {
+        this._id++;
+        return this._id;
+    }
 
     /**
      * Destroys the WebGL resources held by this object.  Destroying an object allows for deterministic

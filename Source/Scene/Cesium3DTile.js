@@ -83,6 +83,8 @@ define([
         var contentHeader = header.content;
 
         this._boundingVolume = createBoundingVolume(header.boundingVolume);
+        this._id = tileset.getNextId();
+
 
         var contentBoundingVolume;
 
@@ -457,6 +459,41 @@ define([
         this._debugContentBoundingVolume = this._debugContentBoundingVolume && this._debugContentBoundingVolume.destroy();
     };
 
+    Cesium3DTile.prototype.unloadVCS = function() {
+        if (this.contentReady && !(this._content instanceof Empty3DTileContent)) {
+            var tile = this;
+            while(tile.parent && tile.parent.refine !== Cesium3DTileRefine.ADD){
+                tile = tile.parent;
+            }
+            if(tile != this && tile._content.state !== Cesium3DTileContentState.UNLOADED){
+                return false;
+            }
+
+            this._content.unloadVCS();
+            this.contentReadyPromise = when.defer();
+            //for (var i = 0; i < this.children.length; i++) {
+            //  this.children[i].unload();
+            //}
+            if (this.parent) {
+                this.parent.numberOfChildrenWithoutContent++;
+            }
+            this["_lastUpdated"] = null;
+            var that = this;
+            // Content enters the READY state
+            when(this._content.readyPromise).then(function (content) {
+                if (defined(that.parent)) {
+                    --that.parent.numberOfChildrenWithoutContent;
+                }
+                that.contentReadyPromise.resolve(that);
+            }).otherwise(function (error) {
+                that.contentReadyPromise.reject(error);
+            });
+            return true;
+        }else if(this._content.state === Cesium3DTileContentState.UNLOADED){
+            return true; // already unloaded;
+        }
+        return false;
+    };
     /**
      * Determines whether the tile's bounding volume intersects the culling volume.
      *

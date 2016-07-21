@@ -277,5 +277,20 @@ define([
         return destroyObject(this);
     };
 
+    /**
+     * Part of the {@link Cesium3DTileContent} interface.
+     */
+    Batched3DModel3DTileContent.prototype.unloadVCS = function() {
+        this._model = this._model && this._model.destroy();
+        this.batchTableResources = this.batchTableResources && this.batchTableResources.destroy();
+        this._featuresLength = 0;
+        this.batchTableResources = undefined;
+        this._features = undefined;
+        this._model = undefined;
+        this.contentReadyToProcessPromise = when.defer();
+        this.readyPromise = when.defer();
+        this.state = Cesium3DTileContentState.UNLOADED;
+    };
+
     return Batched3DModel3DTileContent;
 });
