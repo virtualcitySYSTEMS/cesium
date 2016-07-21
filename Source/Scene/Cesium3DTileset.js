@@ -303,6 +303,7 @@ define([
         /** VCS UNloading CoDE */
         this._tilesToUnload = {};
         this._tilesVisited = {};
+        this._unloadTiles = true;
 
         var that = this;
 
