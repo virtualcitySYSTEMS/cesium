@@ -1,5 +1,6 @@
 /*global define*/
 define([
+        '../Core/createGuid',
         '../Core/Cartesian2',
         '../Core/defaultValue',
         '../Core/defined',
@@ -16,7 +17,8 @@ define([
         './TextureMinificationFilter',
         './TextureWrap',
         './WebGLConstants'
-    ], function(
+    ], function (
+        createGuid,
         Cartesian2,
         defaultValue,
         defined,
@@ -34,7 +36,10 @@ define([
         TextureWrap,
         WebGLConstants) {
     'use strict';
-    
+
+    Texture.memory = 0;
+    Texture.loaded = 0;
+
     function Texture(options) {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
 
@@ -167,6 +172,9 @@ define([
         } else {
             gl.texImage2D(textureTarget, 0, internalFormat, width, height, 0, pixelFormat, pixelDatatype, null);
         }
+
+        Texture.memory += width * height * 3;
+        Texture.loaded += 1;
         gl.bindTexture(textureTarget, null);
 
         this._context = context;
@@ -181,7 +189,7 @@ define([
         this._preMultiplyAlpha = preMultiplyAlpha;
         this._flipY = flipY;
         this._sampler = undefined;
-
+        this._id = createGuid();
         this.sampler = defined(options.sampler) ? options.sampler : new Sampler();
     }
 
@@ -543,6 +551,8 @@ define([
     };
 
     Texture.prototype.destroy = function() {
+        Texture.memory -= this._width * this._height * 3;
+        Texture.loaded -= 1;
         this._context._gl.deleteTexture(this._texture);
         return destroyObject(this);
     };

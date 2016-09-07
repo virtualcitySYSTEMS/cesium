@@ -129,6 +129,7 @@ define([
         ShadowMode) {
     'use strict';
 
+    Model.loaded = 0;
     // Bail out if the browser doesn't support typed arrays, to prevent the setup function
     // from failing, since we won't be able to create a WebGL context anyway.
     if (!FeatureDetection.supportsTypedArrays()) {
@@ -218,6 +219,14 @@ define([
     LoadResources.prototype.finished = function() {
         return this.finishedTextureCreation() && this.finishedEverythingButTextureCreation();
     };
+
+    LoadResources.prototype.destroy = function(){
+        this.vertexBuffersToCreate.clear();
+        this.indexBuffersToCreate.clear();
+        this.programsToCreate.clear();
+        this.texturesToCreate.clear();
+        this.texturesToCreateFromBufferView.clear();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -514,7 +523,7 @@ define([
         this.activeAnimations = new ModelAnimationCollection(this);
 
         this._defaultTexture = undefined;
-        this._incrementallyLoadTextures = defaultValue(options.incrementallyLoadTextures, true);
+        this._incrementallyLoadTextures = defaultValue(options.incrementallyLoadTextures, false);
         this._asynchronous = defaultValue(options.asynchronous, true);
 
         // Deprecated options
@@ -622,6 +631,7 @@ define([
         // CESIUM_RTC extension
         this._rtcCenter = undefined;    // in world coordinates
         this._rtcCenterEye = undefined; // in eye coordinates
+        Model.loaded += 1;
     }
 
     defineProperties(Model.prototype, {
@@ -2036,6 +2046,9 @@ define([
     ///////////////////////////////////////////////////////////////////////////
 
     function createTexture(gltfTexture, model, context) {
+        if(model.isDestroyed()){
+           return;
+        }
         var textures = model.gltf.textures;
         var texture = textures[gltfTexture.id];
 
@@ -2084,6 +2097,9 @@ define([
             tx.generateMipmap();
         }
 
+        if(model._rendererResources.textures[gltfTexture.id]){
+            console.log("DASD");
+        }
         model._rendererResources.textures[gltfTexture.id] = tx;
     }
 
@@ -4029,7 +4045,10 @@ define([
         if (defined(this._precreatedAttributes)) {
             destroy(this._rendererResources.vertexArrays);
         }
-
+        if(this._loadResources) {
+            this._loadResources.destroy();
+            this._loadResources = undefined;
+        }
         this._rendererResources = undefined;
         this._cachedRendererResources = this._cachedRendererResources && this._cachedRendererResources.release();
 
@@ -4040,7 +4059,7 @@ define([
         }
 
         releaseCachedGltf(this);
-
+        Model.loaded -= 1;
         return destroyObject(this);
     };
 

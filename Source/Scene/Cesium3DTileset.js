@@ -18,13 +18,17 @@ define([
         '../Core/Request',
         '../Core/RequestScheduler',
         '../Core/RequestType',
+        '../Renderer/Buffer',
+        '../Renderer/Texture',
         '../ThirdParty/Uri',
         '../ThirdParty/when',
         './Cesium3DTile',
         './Cesium3DTileRefine',
         './Cesium3DTileStyleEngine',
         './CullingVolume',
-        './SceneMode'
+        './SceneMode',
+        './Model'
+
     ], function(
         defaultValue,
         defined,
@@ -44,13 +48,16 @@ define([
         Request,
         RequestScheduler,
         RequestType,
+        Buffer,
+        Texture,
         Uri,
         when,
         Cesium3DTile,
         Cesium3DTileRefine,
         Cesium3DTileStyleEngine,
         CullingVolume,
-        SceneMode) {
+        SceneMode,
+        Model) {
     'use strict';
 
     /**
@@ -1174,9 +1181,14 @@ define([
                 // "Total."  Total also will increase when a tile with a tileset.json content is loaded.
                 ', Total: ' + stats.numberTotal +
 
+                ', Texture Memory (MB): ' + (Texture.memory / 1000000) +
+                ', Models count : ' + (Model.loaded ) +
+                ', Textures count : ' + (Texture.loaded );
+
+
                 // --- Styling stats
-                ' | Tiles styled: ' + stats.numberOfTilesStyled +
-                ', Features styled: ' + stats.numberOfFeaturesStyled;
+                //' | Tiles styled: ' + stats.numberOfTilesStyled +
+                //', Features styled: ' + stats.numberOfFeaturesStyled;
 
             /*global console*/
             console.log(s);
