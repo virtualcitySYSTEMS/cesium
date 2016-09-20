@@ -10,7 +10,15 @@ Change Log
    * `Cesium3DTileContent`
    * `Cesium3DTileFeature`
 
+### 1.26 - 2016-10-03
+
+* Fixed billboard rotation when sized in meters. [#3979](https://github.com/AnalyticalGraphicsInc/cesium/issues/3979)
+* Added `DebugCameraPrimitive` to visualize the view frustum of a camera.
+* Fixed touch events for the timeline [#4305](https://github.com/AnalyticalGraphicsInc/cesium/pull/4305)
+* Removed the default gamma correction for Bing Maps aerial imagery, because we no longer think it is an improvement in current versions of the tiles.  To restore the previous look, set the `defaultGamma` property of your `BingMapsImageryProvider` instance to 1.3.
+
 ### 1.25 - 2016-09-01
+
 * Breaking changes
     * The number and order of arguments passed to `KmlDataSource` `unsupportedNodeEvent` listeners have changed to allow better handling of unsupported KML Features.
     * Changed billboards and labels that are clamped to terrain to have the `verticalOrigin` set to `CENTER` by default instead of `BOTTOM`.

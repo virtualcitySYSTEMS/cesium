@@ -86,17 +86,18 @@ define([
          */
         this.transform = defined(header.transform) ? Matrix4.unpack(header.transform) : Matrix4.clone(Matrix4.IDENTITY);
 
+        var parentTransform = defined(parent) ? parent.computedTransform : tileset.modelMatrix;
+        var computedTransform = Matrix4.multiply(parentTransform, this.transform, new Matrix4());
+
         /**
          * The final computed transform of this tile
          * @type {Matrix4}
          */
-        var parentTransform = defined(parent) ? parent.computedTransform : tileset.modelMatrix;
-        this.computedTransform = Matrix4.multiply(parentTransform, this.transform, new Matrix4());
-        this._computedTransform = Matrix4.clone(this.computedTransform);
+        this.computedTransform = computedTransform;
 
         this._transformDirty = true;
 
-        this._boundingVolume = this.createBoundingVolume(header.boundingVolume, this.computedTransform);
+        this._boundingVolume = this.createBoundingVolume(header.boundingVolume, computedTransform);
 
         var contentBoundingVolume;
 
@@ -106,7 +107,7 @@ define([
             // but not for culling for traversing the tree since it is not spatial coherence, i.e.,
             // since it only bounds models in the tile, not the entire tile, children may be
             // outside of this box.
-            contentBoundingVolume = this.createBoundingVolume(contentHeader.boundingVolume, this.computedTransform);
+            contentBoundingVolume = this.createBoundingVolume(contentHeader.boundingVolume, computedTransform);
         }
         this._contentBoundingVolume = contentBoundingVolume;
 
@@ -269,15 +270,6 @@ define([
         this.distanceToCamera = 0;
 
         /**
-         * The plane mask of the parent for use with {@link CullingVolume#computeVisibilityWithPlaneMask}).
-         *
-         * @type {Number}
-         *
-         * @private
-         */
-        this.parentPlaneMask = 0;
-
-        /**
          * Marks if the tile is selected this frame.
          *
          * @type {Boolean}
@@ -290,8 +282,19 @@ define([
          * Marks if the tile is replaced this frame.
          *
          * @type {Boolean}
+         *
+         * @private
          */
         this.replaced = false;
+
+        /**
+         * The stored plane mask from the visibility check during tree traversal.
+         *
+         * @type {Number}
+         *
+         * @private
+         */
+        this.visibilityPlaneMask = true;
 
         /**
          * The last frame number the tile was selected in.
@@ -482,7 +485,7 @@ define([
 
         // Restore properties set per frame to their defaults
         this.distanceToCamera = 0;
-        this.parentPlaneMask = 0;
+        this.visibilityPlaneMask = 0;
         this.selected = false;
         this.lastSelectedFrameNumber = 0;
         this.lastStyleTime = 0;
@@ -495,17 +498,18 @@ define([
      * Determines whether the tile's bounding volume intersects the culling volume.
      *
      * @param {CullingVolume} cullingVolume The culling volume whose intersection with the tile is to be tested.
+     * @param {Number} parentVisibilityPlaneMask The parent's plane mask to speed up the visibility check.
      * @returns {Number} A plane mask as described above in {@link CullingVolume#computeVisibilityWithPlaneMask}.
      *
      * @private
      */
-    Cesium3DTile.prototype.visibility = function(cullingVolume) {
-        return cullingVolume.computeVisibilityWithPlaneMask(this._boundingVolume, this.parentPlaneMask);
+    Cesium3DTile.prototype.visibility = function(cullingVolume, parentVisibilityPlaneMask) {
+        return cullingVolume.computeVisibilityWithPlaneMask(this._boundingVolume, parentVisibilityPlaneMask);
     };
 
     /**
-     * Determines whether the tile's content's bounding volume intersects the culling volume. If the tile doesn't
-     * have content it checks the tile's bounding volume instead.
+     * Assuming the tile's bounding volume intersects the culling volume, determines
+     * whether the tile's content's bounding volume intersects the culling volume.
      *
      * @param {CullingVolume} cullingVolume The culling volume whose intersection with the tile's content is to be tested.
      * @returns {Intersect} The result of the intersection: the tile's content is completely outside, completely inside, or intersecting the culling volume.
@@ -513,9 +517,15 @@ define([
      * @private
      */
     Cesium3DTile.prototype.contentsVisibility = function(cullingVolume) {
+        // Assumes the tile's bounding volume intersects the culling volume already, so
+        // just return Intersect.INSIDE if there is no content bounding volume.
+        var boundingVolume = this._contentBoundingVolume;
+        if (!defined(boundingVolume)) {
+            return Intersect.INSIDE;
+        }
         // PERFORMANCE_IDEA: is it possible to burn less CPU on this test since we know the
         // tile's (not the content's) bounding volume intersects the culling volume?
-        return cullingVolume.computeVisibility(this.contentBoundingVolume);
+        return cullingVolume.computeVisibility(boundingVolume);
     };
 
     /**
@@ -596,6 +606,35 @@ define([
         }
     };
 
+    var scratchTransform = new Matrix4();
+
+    /**
+     * Update the tile's transform. The transform is applied to the tile's bounding volumes.
+     *
+     * @private
+     */
+    Cesium3DTile.prototype.updateTransform = function(parentTransform) {
+        parentTransform = defaultValue(parentTransform, Matrix4.IDENTITY);
+        var computedTransform = Matrix4.multiply(parentTransform, this.transform, scratchTransform);
+        var transformDirty = !Matrix4.equals(computedTransform, this.computedTransform);
+        if (transformDirty) {
+            this._transformDirty = true;
+            Matrix4.clone(computedTransform, this.computedTransform);
+
+            // Update the bounding volumes
+            var header = this._header;
+            var content = this._header.content;
+            this._boundingVolume = this.createBoundingVolume(header.boundingVolume, computedTransform, this._boundingVolume);
+            if (defined(this._contentBoundingVolume)) {
+                this._contentBoundingVolume = this.createBoundingVolume(content.boundingVolume, computedTransform, this._contentBoundingVolume);
+            }
+
+            // Destroy the debug bounding volumes. They will be generated fresh.
+            this._debugBoundingVolume = this._debugBoundingVolume && this._debugBoundingVolume.destroy();
+            this._debugContentBoundingVolume = this._debugContentBoundingVolume && this._debugContentBoundingVolume.destroy();
+        }
+    };
+
     function applyDebugSettings(tile, tileset, frameState) {
         // Tiles do not have a content.boundingVolume if it is the same as the tile's boundingVolume.
         var hasContentBoundingVolume = defined(tile._header.content) && defined(tile._header.content.boundingVolume);
@@ -628,35 +667,15 @@ define([
         }
     }
 
-    function updateTransform(tile) {
-        var transformDirty = !Matrix4.equals(tile.computedTransform, tile._computedTransform);
-        if (transformDirty) {
-            Matrix4.clone(tile.computedTransform, tile._computedTransform);
-
-            // Update the bounding volumes
-            var header = tile._header;
-            var content = tile._header.content;
-            tile._boundingVolume = tile.createBoundingVolume(header.boundingVolume, tile.computedTransform, tile._boundingVolume);
-            if (defined(tile._contentBoundingVolume)) {
-                tile._contentBoundingVolume = tile.createBoundingVolume(content.boundingVolume, tile.computedTransform, tile._contentBoundingVolume);
-            }
-
-            // Destroy the debug bounding volumes. They will be generated fresh.
-            tile._debugBoundingVolume = tile._debugBoundingVolume && tile._debugBoundingVolume.destroy();
-            tile._debugContentBoundingVolume = tile._debugContentBoundingVolume && tile._debugContentBoundingVolume.destroy();
-        }
-        tile._transformDirty = transformDirty;
-    }
-
     /**
      * Get the draw commands needed to render this tile.
      *
      * @private
      */
     Cesium3DTile.prototype.update = function(tileset, frameState) {
-        updateTransform(this);
         applyDebugSettings(this, tileset, frameState);
         this._content.update(tileset, frameState);
+        this._transformDirty = false;
     };
 
     var scratchCommandList = [];
