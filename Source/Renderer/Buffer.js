@@ -21,6 +21,7 @@ define([
 
 
     Buffer.memory = 0;
+    Buffer.loaded = 0;
 
     /**
      * @private
@@ -62,6 +63,8 @@ define([
         }
 
         Buffer.memory += sizeInBytes;
+        Buffer.loaded += 1;
+
 
         //>>includeStart('debug', pragmas.debug);
         if (sizeInBytes <= 0) {
@@ -276,6 +279,7 @@ define([
 
     Buffer.prototype.destroy = function() {
         Buffer.memory -= this._sizeInBytes;
+        Buffer.loaded -= 1;
         this._gl.deleteBuffer(this._buffer);
         return destroyObject(this);
     };
