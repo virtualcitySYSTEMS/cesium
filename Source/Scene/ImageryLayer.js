@@ -827,6 +827,7 @@ define([
                 });
                 this._reprojectComputeCommands.push(computeCommand);
         } else {
+            imagery.texture = texture;
             finalizeReprojectTexture(this, context, imagery, texture);
         }
     };
