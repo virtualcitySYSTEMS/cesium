@@ -276,6 +276,10 @@ defineSuite([
     });
 
     it('assigns texture property when reprojection is skipped because the tile is very small', function() {
+        loadImage.createImage = function(url, crossOrigin, deferred) {
+            loadImage.defaultCreateImage('Data/Images/Red256x256.png', crossOrigin, deferred);
+        };
+
         var provider = new UrlTemplateImageryProvider({
             url : 'http://example.com/{z}/{x}/{y}.png',
             minimumLevel : 13,
@@ -287,7 +291,7 @@ defineSuite([
         return pollToPromise(function() {
             return provider.ready;
         }).then(function() {
-            var imagery = new Imagery(layer, x, y, 13);
+            var imagery = new Imagery(layer, 4400, 2686, 13);
             imagery.addReference();
             layer._requestImagery(imagery);
 
@@ -302,7 +306,7 @@ defineSuite([
                     var textureBeforeReprojection = imagery.textureWebMercator;
                     layer._reprojectTexture(scene.frameState, imagery, true);
                     layer.queueReprojectionCommands(scene.frameState);
-                    scene.frameState.commandList[0].execute(computeEngine);
+                    expect(scene.frameState.commandList.length).toBe(0);
 
                     return pollToPromise(function() {
                         return imagery.state === ImageryState.READY;
