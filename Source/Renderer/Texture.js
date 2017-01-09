@@ -33,6 +33,10 @@ define([
         TextureMinificationFilter) {
     'use strict';
 
+
+    Texture.memory = 0;
+    Texture.loaded = 0;
+
     function Texture(options) {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
 
@@ -187,6 +191,9 @@ define([
         } else {
             gl.texImage2D(textureTarget, 0, internalFormat, width, height, 0, pixelFormat, pixelDatatype, null);
         }
+
+        Texture.memory += width * height * 3;
+        Texture.loaded += 1;
         gl.bindTexture(textureTarget, null);
 
         var sizeInBytes;
@@ -588,6 +595,8 @@ define([
     };
 
     Texture.prototype.destroy = function() {
+        Texture.memory -= this._width * this._height * 3;
+        Texture.loaded -= 1;
         this._context._gl.deleteTexture(this._texture);
         return destroyObject(this);
     };

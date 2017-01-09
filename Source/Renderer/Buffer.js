@@ -19,6 +19,9 @@ define([
         BufferUsage) {
     'use strict';
 
+
+    Buffer.memory = 0;
+
     /**
      * @private
      */
@@ -57,6 +60,8 @@ define([
         if (hasArray) {
             sizeInBytes = typedArray.byteLength;
         }
+
+        Buffer.memory += sizeInBytes;
 
         //>>includeStart('debug', pragmas.debug);
         if (sizeInBytes <= 0) {
@@ -270,6 +275,7 @@ define([
     };
 
     Buffer.prototype.destroy = function() {
+        Buffer.memory -= this._sizeInBytes;
         this._gl.deleteBuffer(this._buffer);
         return destroyObject(this);
     };
