@@ -101,7 +101,20 @@ define([
          */
         featuresLength : {
             get : function() {
-                return this._modelInstanceCollection.length;
+                if (defined(this._modelInstanceCollection)) {
+                    return this._modelInstanceCollection.length;
+                } else {
+                    return 0;
+                }
+            }
+        },
+
+        /**
+         * Part of the {@link Cesium3DTileContent} interface.
+         */
+        pointsLength : {
+            get : function() {
+                return 0;
             }
         },
 
@@ -310,11 +323,10 @@ define([
 
         if (gltfFormat === 0) {
             var gltfUrl = getStringFromTypedArray(gltfView);
-            var baseUrl = defaultValue(this._tileset.baseUrl, '');
-            collectionOptions.url = joinUrls(baseUrl, gltfUrl);
+            collectionOptions.url = joinUrls(getBaseUri(this._url, true), gltfUrl);
         } else {
             collectionOptions.gltf = gltfView;
-            collectionOptions.basePath = getBaseUri(this._url);
+            collectionOptions.basePath = getBaseUri(this._url, true);
         }
 
         var eastNorthUp = featureTable.getGlobalProperty('EAST_NORTH_UP');
