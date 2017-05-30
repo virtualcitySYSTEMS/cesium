@@ -14,7 +14,9 @@ define([
         './OrientedBoundingBox',
         './TaskProcessor',
         './TerrainEncoding',
-        './TerrainMesh'
+        './TerrainMesh',
+        './createVerticesFromQuantizedTerrainMesh',
+        './upsampleQuantizedTerrainMesh',
     ], function(
         when,
         BoundingSphere,
@@ -30,7 +32,9 @@ define([
         OrientedBoundingBox,
         TaskProcessor,
         TerrainEncoding,
-        TerrainMesh) {
+        TerrainMesh,
+        createVerticesFromQuantizedTerrainMesh,
+        upsampleQuantizedTerrainMesh) {
     'use strict';
 
     /**
@@ -232,8 +236,6 @@ define([
         }
     }
 
-    var createMeshTaskProcessor = new TaskProcessor('createVerticesFromQuantizedTerrainMesh');
-
     /**
      * Creates a {@link TerrainMesh} from this terrain data.
      *
@@ -268,7 +270,7 @@ define([
         var rectangle = tilingScheme.tileXYToRectangle(x, y, level);
         exaggeration = defaultValue(exaggeration, 1.0);
 
-        var verticesPromise = createMeshTaskProcessor.scheduleTask({
+        var result = createVerticesFromQuantizedTerrainMesh({
             minimumHeight : this._minimumHeight,
             maximumHeight : this._maximumHeight,
             quantizedVertices : this._quantizedVertices,
@@ -289,31 +291,24 @@ define([
             exaggeration : exaggeration
         });
 
-        if (!defined(verticesPromise)) {
-            // Postponed
-            return undefined;
-        }
+        var vertexCount = this._quantizedVertices.length / 3;
+        vertexCount += this._westIndices.length + this._southIndices.length + this._eastIndices.length + this._northIndices.length;
+        var indicesTypedArray = IndexDatatype.createTypedArray(vertexCount, result.indices);
 
-        var that = this;
-        return when(verticesPromise, function(result) {
-            var vertexCount = that._quantizedVertices.length / 3;
-            vertexCount += that._westIndices.length + that._southIndices.length + that._eastIndices.length + that._northIndices.length;
-            var indicesTypedArray = IndexDatatype.createTypedArray(vertexCount, result.indices);
+        var vertices = new Float32Array(result.vertices);
+        var rtc = result.center;
+        var minimumHeight = result.minimumHeight;
+        var maximumHeight = result.maximumHeight;
+        var boundingSphere = defaultValue(result.boundingSphere, this._boundingSphere);
+        var obb = defaultValue(result.orientedBoundingBox, this._orientedBoundingBox);
+        var occlusionPoint = this._horizonOcclusionPoint;
+        var stride = result.vertexStride;
+        var terrainEncoding = TerrainEncoding.clone(result.encoding);
 
-            var vertices = new Float32Array(result.vertices);
-            var rtc = result.center;
-            var minimumHeight = result.minimumHeight;
-            var maximumHeight = result.maximumHeight;
-            var boundingSphere = defaultValue(result.boundingSphere, that._boundingSphere);
-            var obb = defaultValue(result.orientedBoundingBox, that._orientedBoundingBox);
-            var occlusionPoint = that._horizonOcclusionPoint;
-            var stride = result.vertexStride;
-            var terrainEncoding = TerrainEncoding.clone(result.encoding);
+        this._skirtIndex = result.skirtIndex;
+        this._vertexCountWithoutSkirts = this._quantizedVertices.length / 3;
 
-            that._skirtIndex = result.skirtIndex;
-            that._vertexCountWithoutSkirts = that._quantizedVertices.length / 3;
-
-            that._mesh = new TerrainMesh(
+        this._mesh = new TerrainMesh(
                     rtc,
                     vertices,
                     indicesTypedArray,
@@ -326,25 +321,23 @@ define([
                     terrainEncoding,
                     exaggeration);
 
-            // Free memory received from server after mesh is created.
-            that._quantizedVertices = undefined;
-            that._encodedNormals = undefined;
-            that._indices = undefined;
+        // Free memory received from server after mesh is created.
+        this._quantizedVertices = undefined;
+        this._encodedNormals = undefined;
+        this._indices = undefined;
 
-            that._uValues = undefined;
-            that._vValues = undefined;
-            that._heightValues = undefined;
+        this._uValues = undefined;
+        this._vValues = undefined;
+        this._heightValues = undefined;
 
-            that._westIndices = undefined;
-            that._southIndices = undefined;
-            that._eastIndices = undefined;
-            that._northIndices = undefined;
+        this._westIndices = undefined;
+        this._southIndices = undefined;
+        this._eastIndices = undefined;
+        this._northIndices = undefined;
 
-            return that._mesh;
-        });
+        return when.resolve(this._mesh);
     };
 
-    var upsampleTaskProcessor = new TaskProcessor('upsampleQuantizedTerrainMesh');
 
     /**
      * Upsamples this terrain data for use by a descendant tile.  The resulting instance will contain a subset of the
@@ -401,7 +394,7 @@ define([
         var ellipsoid = tilingScheme.ellipsoid;
         var childRectangle = tilingScheme.tileXYToRectangle(descendantX, descendantY, descendantLevel);
 
-        var upsamplePromise = upsampleTaskProcessor.scheduleTask({
+        var result = upsampleQuantizedTerrainMesh({
             vertices : mesh.vertices,
             vertexCountWithoutSkirts : this._vertexCountWithoutSkirts,
             indices : mesh.indices,
@@ -416,11 +409,6 @@ define([
             exaggeration : mesh.exaggeration
         });
 
-        if (!defined(upsamplePromise)) {
-            // Postponed
-            return undefined;
-        }
-
         var shortestSkirt = Math.min(this._westSkirtHeight, this._eastSkirtHeight);
         shortestSkirt = Math.min(shortestSkirt, this._southSkirtHeight);
         shortestSkirt = Math.min(shortestSkirt, this._northSkirtHeight);
@@ -430,15 +418,14 @@ define([
         var eastSkirtHeight = isEastChild ? this._eastSkirtHeight : (shortestSkirt * 0.5);
         var northSkirtHeight = isNorthChild ? this._northSkirtHeight : (shortestSkirt * 0.5);
 
-        return when(upsamplePromise, function(result) {
-            var quantizedVertices = new Uint16Array(result.vertices);
-            var indicesTypedArray = IndexDatatype.createTypedArray(quantizedVertices.length / 3, result.indices);
-            var encodedNormals;
-            if (defined(result.encodedNormals)) {
-                encodedNormals = new Uint8Array(result.encodedNormals);
-            }
-
-            return new QuantizedMeshTerrainData({
+        var quantizedVertices = new Uint16Array(result.vertices);
+        var indicesTypedArray = IndexDatatype.createTypedArray(quantizedVertices.length / 3, result.indices);
+        var encodedNormals;
+        if (defined(result.encodedNormals)) {
+            encodedNormals = new Uint8Array(result.encodedNormals);
+        }
+        return when.resolve(
+            new QuantizedMeshTerrainData({
                 quantizedVertices : quantizedVertices,
                 indices : indicesTypedArray,
                 encodedNormals : encodedNormals,
@@ -457,8 +444,8 @@ define([
                 northSkirtHeight : northSkirtHeight,
                 childTileMask : 0,
                 createdByUpsampling : true
-            });
-        });
+            })
+        );
     };
 
     var maxShort = 32767;
