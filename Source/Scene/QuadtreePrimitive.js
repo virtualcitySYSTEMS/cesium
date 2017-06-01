@@ -127,7 +127,7 @@ define([
          * @type {Number}
          * @default 100
          */
-        this.tileCacheSize = defaultValue(options.tileCacheSize, 100);
+        this.tileCacheSize = defaultValue(options.tileCacheSize, 20);
 
         this._occluders = new QuadtreeOccluders({
             ellipsoid : ellipsoid
