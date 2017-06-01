@@ -402,7 +402,7 @@ define([
                 surfaceTile.loadedTerrain = undefined;
             }
         }
-
+        suspendUpsampling = suspendUpsampling || terrainProvider.getTileDataAvailable(tile.x, tile.y, tile.level);
         if (!suspendUpsampling && defined(upsampled)) {
             upsampled.processUpsampleStateMachine(frameState, terrainProvider, tile.x, tile.y, tile.level);
 
@@ -449,6 +449,8 @@ define([
 
     function getUpsampleTileDetails(tile) {
         // Find the nearest ancestor with loaded terrain.
+
+
         var sourceTile = tile.parent;
         while (defined(sourceTile) && defined(sourceTile.data) && !defined(sourceTile.data.terrainData)) {
             sourceTile = sourceTile.parent;
