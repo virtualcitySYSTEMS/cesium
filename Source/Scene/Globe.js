@@ -138,7 +138,7 @@ define([
          * @type {Number}
          * @default 100
          */
-        this.tileCacheSize = 100;
+        this.tileCacheSize = 20;
 
         /**
          * Enable lighting the globe with the sun as a light source.
