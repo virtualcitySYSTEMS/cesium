@@ -398,7 +398,7 @@ define([
                 surfaceTile.loadedTerrain = undefined;
             }
         }
-        suspendUpsampling = suspendUpsampling || terrainProvider.getTileDataAvailable(tile.x, tile.y, tile.level);
+        //suspendUpsampling = suspendUpsampling || terrainProvider.getTileDataAvailable(tile.x, tile.y, tile.level);
         if (!suspendUpsampling && defined(upsampled)) {
             upsampled.processUpsampleStateMachine(frameState, terrainProvider, tile.x, tile.y, tile.level);
 
