@@ -889,6 +889,8 @@ define([
                     this.setImage(value.url, value);
                 } else if (defined(value.src)) {
                     this.setImage(value.src, value);
+                } else if (defined(value.id) && value.id !== '') {
+                    this.setImage(value.id, value);
                 } else {
                     this.setImage(createGuid(), value);
                 }
