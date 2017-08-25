@@ -84,7 +84,7 @@ define([
             updateVersion(gltf);
             // Remove the KHR_binary_glTF extension
             removeExtensionsUsed(gltf, 'KHR_binary_glTF');
-            addPipelineExtras(gltf);
+            //addPipelineExtras(gltf);
         }
 
         // Load binary glTF version 2
