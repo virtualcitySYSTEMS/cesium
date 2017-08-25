@@ -62,7 +62,8 @@ define([
             gltf = JSON.parse(contentString);
 
             // Clone just the binary chunk so the underlying buffer can be freed
-            var binaryData = new Uint8Array(data.subarray(binaryStart, length));
+            // do not clone, major performance problems in ie11
+            var binaryData = data.subarray(binaryStart, length);
 
             buffers = gltf.buffers;
             if (defined(buffers) && Object.keys(buffers).length > 0) {
