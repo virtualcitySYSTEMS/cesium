@@ -645,10 +645,8 @@ define([
 
     function loadTile(tileset, tile, frameState) {
         if ((tile.contentUnloaded || tile.contentExpired) && tile._requestedFrame !== frameState.frameNumber) {
-            if (isVisible(tile._visibilityPlaneMask)) {
-                tile._requestedFrame = frameState.frameNumber;
-                tileset._requestedTiles.push(tile);
-            }
+            tile._requestedFrame = frameState.frameNumber;
+            tileset._requestedTiles.push(tile);
         }
     }
 
