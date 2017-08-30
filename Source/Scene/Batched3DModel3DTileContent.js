@@ -348,7 +348,7 @@ define([
         } else {
             // Create a copy of the glb so that it is 4-byte aligned
             Batched3DModel3DTileContent._deprecationWarning('b3dm-glb-unaligned', 'The embedded glb is not aligned to a 4-byte boundary.');
-            gltfView = uint8Array.subarray(byteOffset, byteOffset + gltfByteLength);
+            gltfView = new Uint8Array(uint8Array.subarray(byteOffset, byteOffset + gltfByteLength));
         }
 
         var pickObject = {
