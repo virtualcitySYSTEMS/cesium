@@ -26,13 +26,15 @@ define([
         for (var rootArrayId in gltf) {
             if (gltf.hasOwnProperty(rootArrayId)) {
                 var rootArray = gltf[rootArrayId];
-                var rootArrayLength = rootArray.length;
-                for (var i = 0; i < rootArrayLength; i++) {
-                    var rootObject = rootArray[i];
-                    if (defined(rootObject) && typeof rootObject === 'object') {
-                        rootObject.extras = defaultValue(rootObject.extras, {});
-                        rootObject.extras._pipeline = defaultValue(rootObject.extras._pipeline, {});
-                        objectStack.push(rootObject);
+                if(defined(rootArray)) {
+                    var rootArrayLength = rootArray.length;
+                    for (var i = 0; i < rootArrayLength; i++) {
+                        var rootObject = rootArray[i];
+                        if (defined(rootObject) && typeof rootObject === 'object') {
+                            rootObject.extras = defaultValue(rootObject.extras, {});
+                            rootObject.extras._pipeline = defaultValue(rootObject.extras._pipeline, {});
+                            objectStack.push(rootObject);
+                        }
                     }
                 }
             }
