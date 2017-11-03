@@ -13,7 +13,10 @@ define([
         './OrientedBoundingBox',
         './TaskProcessor',
         './TerrainEncoding',
-        './TerrainMesh'
+        './TerrainMesh',
+        './createVerticesFromQuantizedTerrainMesh',
+        './upsampleQuantizedTerrainMesh',
+        './FeatureDetection'
     ], function(
         when,
         BoundingSphere,
@@ -29,7 +32,10 @@ define([
         OrientedBoundingBox,
         TaskProcessor,
         TerrainEncoding,
-        TerrainMesh) {
+        TerrainMesh,
+        createVerticesFromQuantizedTerrainMesh,
+        upsampleQuantizedTerrainMesh,
+        FeatureDetection) {
     'use strict';
 
     /**
@@ -277,8 +283,7 @@ define([
         var ellipsoid = tilingScheme.ellipsoid;
         var rectangle = tilingScheme.tileXYToRectangle(x, y, level);
         exaggeration = defaultValue(exaggeration, 1.0);
-
-        var verticesPromise = createMeshTaskProcessor.scheduleTask({
+        var parameters = {
             minimumHeight : this._minimumHeight,
             maximumHeight : this._maximumHeight,
             quantizedVertices : this._quantizedVertices,
@@ -297,7 +302,9 @@ define([
             relativeToCenter : this._boundingSphere.center,
             ellipsoid : ellipsoid,
             exaggeration : exaggeration
-        });
+        };
+
+        var verticesPromise = FeatureDetection.isInternetExplorer() ? createVerticesFromQuantizedTerrainMesh(parameters) : createMeshTaskProcessor.scheduleTask(parameters);
 
         if (!defined(verticesPromise)) {
             // Postponed
@@ -411,7 +418,7 @@ define([
         var ellipsoid = tilingScheme.ellipsoid;
         var childRectangle = tilingScheme.tileXYToRectangle(descendantX, descendantY, descendantLevel);
 
-        var upsamplePromise = upsampleTaskProcessor.scheduleTask({
+        var parameters = {
             vertices : mesh.vertices,
             vertexCountWithoutSkirts : this._vertexCountWithoutSkirts,
             indices : mesh.indices,
@@ -424,7 +431,8 @@ define([
             childRectangle : childRectangle,
             ellipsoid : ellipsoid,
             exaggeration : mesh.exaggeration
-        });
+        };
+        var upsamplePromise = FeatureDetection.isInternetExplorer() ? upsampleQuantizedTerrainMesh(parameters) : upsampleTaskProcessor.scheduleTask(parameters);
 
         if (!defined(upsamplePromise)) {
             // Postponed
