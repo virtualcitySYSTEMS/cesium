@@ -883,7 +883,7 @@ define([
         if (!defined(gltf.asset)) {
             gltf.asset = {};
         }
-        if (!defined(gltf.asset.extras)) {
+        if (!defined(gltf.asset.extras) || typeof(gltf.asset.extras) !== 'object') {
             gltf.asset.extras = {};
         }
         var asset = gltf.asset;
