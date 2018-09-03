@@ -299,6 +299,7 @@ define([
         function parseMetadataFailure(data) {
             var message = 'An error occurred while accessing ' + metadataResource.url + '.';
             metadataError = TileProviderError.handleError(metadataError, that, that._errorEvent, message, undefined, undefined, undefined, requestMetadata);
+            deferred.reject(data);
         }
 
         function metadataSuccess(data) {
