@@ -1,5 +1,6 @@
 import when from '../ThirdParty/when.js';
 import Check from './Check.js';
+import Cache from './Cache.js';
 
     /**
      * Initiates a terrain height query for an array of {@link Cartographic} positions by
@@ -47,6 +48,10 @@ import Check from './Check.js';
         return terrainProvider.readyPromise.then(function() { return doSampling(terrainProvider, level, positions); });
     }
 
+
+
+    var cache = new Cache();
+
     function doSampling(terrainProvider, level, positions) {
         var tilingScheme = terrainProvider.tilingScheme;
 
@@ -62,6 +67,7 @@ import Check from './Check.js';
             if (!tileRequestSet.hasOwnProperty(key)) {
                 // When tile is requested for the first time
                 var value = {
+                    key: key,
                     x : xy.x,
                     y : xy.y,
                     level : level,
@@ -80,17 +86,27 @@ import Check from './Check.js';
         // Send request for each required tile
         var tilePromises = [];
         for (i = 0; i < tileRequests.length; ++i) {
-            var tileRequest = tileRequests[i];
-            var requestPromise = tileRequest.terrainProvider.requestTileGeometry(tileRequest.x, tileRequest.y, tileRequest.level);
-            var tilePromise = requestPromise
-                .then(createInterpolateFunction(tileRequest))
-                .otherwise(createMarkFailedFunction(tileRequest));
-            tilePromises.push(tilePromise);
+            if(cache.has(tileRequests[i].key)){
+                var terraindata = cache.get(tileRequests[i].key);
+                var interpolate = createInterpolateFunction(tileRequests[i]);
+                tilePromises.push(when(interpolate(terraindata)));
+            } else {
+                var tileRequest = tileRequests[i];
+                var requestPromise = tileRequest.terrainProvider.requestTileGeometry(tileRequest.x, tileRequest.y, tileRequest.level);
+                var tilePromise = requestPromise
+                    .then(createInterpolateFunction(tileRequest))
+                    .otherwise(createMarkFailedFunction(tileRequest));
+                tilePromises.push(tilePromise);
+            }
         }
 
         return when.all(tilePromises, function() {
             return positions;
         });
+    }
+
+    function trimTileCache() {
+
     }
 
     function createInterpolateFunction(tileRequest) {
@@ -100,6 +116,9 @@ import Check from './Check.js';
             for (var i = 0; i < tilePositions.length; ++i) {
                 var position = tilePositions[i];
                 position.height = terrainData.interpolateHeight(rectangle, position.longitude, position.latitude);
+            }
+            if(!cache.has(tileRequest.key)){
+                cache.add(tileRequest.key, terrainData);
             }
         };
     }
