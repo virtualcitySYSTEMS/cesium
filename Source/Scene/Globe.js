@@ -94,7 +94,7 @@ import TileSelectionResult from './TileSelectionResult.js';
          * @type {Number}
          * @default 100
          */
-        this.tileCacheSize = 100;
+        this.tileCacheSize = 20;
 
         /**
          * Gets or sets the number of loading descendant tiles that is considered "too many".
