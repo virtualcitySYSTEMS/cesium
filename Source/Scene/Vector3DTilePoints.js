@@ -393,6 +393,10 @@ define([
                 feature.scaleByDistance = undefined;
             }
 
+            if (defined(style.scale)) {
+                feature.scale = style.scale.evaluate(feature);
+            }
+
             if (defined(style.translucencyByDistance)) {
                 var translucencyByDistanceCart4 = style.translucencyByDistance.evaluate(feature);
                 scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;

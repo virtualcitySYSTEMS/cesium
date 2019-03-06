@@ -367,6 +367,16 @@ define([
             }
         },
 
+        scale: {
+            get : function() {
+                return this._billboard.scale;
+            },
+            set : function(value) {
+                this._label.scale = value;
+                this._billboard.scale = value;
+            }
+        },
+
         /**
          * Gets or sets the near and far translucency properties for this feature.
          *
