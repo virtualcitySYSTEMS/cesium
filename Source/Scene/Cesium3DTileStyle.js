@@ -1012,7 +1012,7 @@ define([
                 return this._scale;
             },
             set : function(value) {
-                this._scale = getExpression(this, value);
+                this._scale = getExpression(this, value, 'scale');
             }
         },
 
