@@ -159,16 +159,29 @@ define([
         that._ready = true;
     }
 
-    function getExpression(tileStyle, value) {
+    function getExpression(tileStyle, value, key) {
         var defines = defaultValue(tileStyle._style, defaultValue.EMPTY_OBJECT).defines;
+        if (!defined(tileStyle._style)) {
+            tileStyle._style = {};
+        }
         if (!defined(value)) {
+            delete tileStyle._style[key];
             return undefined;
         } else if (typeof value === 'boolean' || typeof value === 'number') {
+            tileStyle._style[key] = value;
             return new Expression(String(value));
         } else if (typeof value === 'string') {
+            tileStyle._style[key] = value;
             return new Expression(value, defines);
         } else if (defined(value.conditions)) {
+            tileStyle._style[key] = clone(value, true);
             return new ConditionsExpression(value, defines);
+        } else if (defined(value.expression)) {
+            tileStyle._style[key] = value.expression;
+            return value;
+        } else if (defined(value.conditionsExpression)) {
+            tileStyle._style[key] = value.conditionsExpression;
+            return value;
         }
         return value;
     }
@@ -294,7 +307,7 @@ define([
                 return this._show;
             },
             set : function(value) {
-                this._show = getExpression(this, value);
+                this._show = getExpression(this, value, 'show');
                 this._showShaderFunctionReady = false;
             }
         },
@@ -356,7 +369,7 @@ define([
                 return this._color;
             },
             set : function(value) {
-                this._color = getExpression(this, value);
+                this._color = getExpression(this, value, 'color');
                 this._colorShaderFunctionReady = false;
             }
         },
@@ -423,7 +436,7 @@ define([
                 return this._pointSize;
             },
             set : function(value) {
-                this._pointSize = getExpression(this, value);
+                this._pointSize = getExpression(this, value, 'pointSize');
                 this._pointSizeShaderFunctionReady = false;
             }
         },
@@ -472,7 +485,7 @@ define([
                 return this._pointOutlineColor;
             },
             set : function(value) {
-                this._pointOutlineColor = getExpression(this, value);
+                this._pointOutlineColor = getExpression(this, value, 'pointOutlineColor');
             }
         },
 
@@ -520,7 +533,7 @@ define([
                 return this._pointOutlineWidth;
             },
             set : function(value) {
-                this._pointOutlineWidth = getExpression(this, value);
+                this._pointOutlineWidth = getExpression(this, value, 'pointOutlineWidth');
             }
         },
 
@@ -568,7 +581,7 @@ define([
                 return this._labelColor;
             },
             set : function(value) {
-                this._labelColor = getExpression(this, value);
+                this._labelColor = getExpression(this, value, 'labelColor');
             }
         },
 
@@ -616,7 +629,7 @@ define([
                 return this._labelOutlineColor;
             },
             set : function(value) {
-                this._labelOutlineColor = getExpression(this, value);
+                this._labelOutlineColor = getExpression(this, value, 'labelOutlineColor');
             }
         },
 
@@ -664,7 +677,7 @@ define([
                 return this._labelOutlineWidth;
             },
             set : function(value) {
-                this._labelOutlineWidth = getExpression(this, value);
+                this._labelOutlineWidth = getExpression(this, value, 'labelOutlineWidth');
             }
         },
 
@@ -712,7 +725,7 @@ define([
                 return this._font;
             },
             set : function(value) {
-                this._font = getExpression(this, value);
+                this._font = getExpression(this, value, 'font');
             }
         },
 
@@ -760,7 +773,7 @@ define([
                 return this._labelStyle;
             },
             set : function(value) {
-                this._labelStyle = getExpression(this, value);
+                this._labelStyle = getExpression(this, value, 'labelStyle');
             }
         },
 
@@ -808,7 +821,7 @@ define([
                 return this._labelText;
             },
             set : function(value) {
-                this._labelText = getExpression(this, value);
+                this._labelText = getExpression(this, value, 'labelText');
             }
         },
 
@@ -856,7 +869,7 @@ define([
                 return this._backgroundColor;
             },
             set : function(value) {
-                this._backgroundColor = getExpression(this, value);
+                this._backgroundColor = getExpression(this, value, 'backgroundColor');
             }
         },
 
@@ -895,7 +908,7 @@ define([
                 return this._backgroundPadding;
             },
             set : function(value) {
-                this._backgroundPadding = getExpression(this, value);
+                this._backgroundPadding = getExpression(this, value, 'backgroundPadding');
             }
         },
 
@@ -943,7 +956,7 @@ define([
                 return this._backgroundEnabled;
             },
             set : function(value) {
-                this._backgroundEnabled = getExpression(this, value);
+                this._backgroundEnabled = getExpression(this, value, 'backgroundEnabled');
             }
         },
 
@@ -982,7 +995,7 @@ define([
                 return this._scaleByDistance;
             },
             set : function(value) {
-                this._scaleByDistance = getExpression(this, value);
+                this._scaleByDistance = getExpression(this, value, 'scaleByDistance');
             }
         },
 
@@ -1021,7 +1034,7 @@ define([
                 return this._translucencyByDistance;
             },
             set : function(value) {
-                this._translucencyByDistance = getExpression(this, value);
+                this._translucencyByDistance = getExpression(this, value, 'translucencyByDistance');
             }
         },
 
@@ -1060,7 +1073,7 @@ define([
                 return this._distanceDisplayCondition;
             },
             set : function(value) {
-                this._distanceDisplayCondition = getExpression(this, value);
+                this._distanceDisplayCondition = getExpression(this, value, 'distanceDisplayCondition');
             }
         },
 
@@ -1108,7 +1121,7 @@ define([
                 return this._heightOffset;
             },
             set : function(value) {
-                this._heightOffset = getExpression(this, value);
+                this._heightOffset = getExpression(this, value, 'heightOffset');
             }
         },
 
@@ -1156,7 +1169,7 @@ define([
                 return this._anchorLineEnabled;
             },
             set : function(value) {
-                this._anchorLineEnabled = getExpression(this, value);
+                this._anchorLineEnabled = getExpression(this, value, 'anchorLineEnabled');
             }
         },
 
@@ -1204,7 +1217,7 @@ define([
                 return this._anchorLineColor;
             },
             set : function(value) {
-                this._anchorLineColor = getExpression(this, value);
+                this._anchorLineColor = getExpression(this, value, 'anchorLineColor');
             }
         },
 
@@ -1252,7 +1265,7 @@ define([
                 return this._image;
             },
             set : function(value) {
-                this._image = getExpression(this, value);
+                this._image = getExpression(this, value, 'image');
             }
         },
 
@@ -1291,7 +1304,7 @@ define([
                 return this._disableDepthTestDistance;
             },
             set : function(value) {
-                this._disableDepthTestDistance = getExpression(this, value);
+                this._disableDepthTestDistance = getExpression(this, value, 'disableDepthTestDistance');
             }
         },
 
@@ -1339,7 +1352,7 @@ define([
                 return this._horizontalOrigin;
             },
             set : function(value) {
-                this._horizontalOrigin = getExpression(this, value);
+                this._horizontalOrigin = getExpression(this, value, 'horizontalOrigin');
             }
         },
 
@@ -1387,7 +1400,7 @@ define([
                 return this._verticalOrigin;
             },
             set : function(value) {
-                this._verticalOrigin = getExpression(this, value);
+                this._verticalOrigin = getExpression(this, value, 'verticalOrigin');
             }
         },
 
@@ -1435,7 +1448,7 @@ define([
                 return this._labelHorizontalOrigin;
             },
             set : function(value) {
-                this._labelHorizontalOrigin = getExpression(this, value);
+                this._labelHorizontalOrigin = getExpression(this, value, 'labelHorizontalOrigin');
             }
         },
 
@@ -1483,7 +1496,7 @@ define([
                 return this._labelVerticalOrigin;
             },
             set : function(value) {
-                this._labelVerticalOrigin = getExpression(this, value);
+                this._labelVerticalOrigin = getExpression(this, value, 'labelVerticalOrigin');
             }
         },
 

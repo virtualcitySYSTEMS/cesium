@@ -6,6 +6,10 @@ Change Log
 ##### Fixes :wrench:
 * Fixed the value for `BlendFunction.ONE_MINUS_CONSTANT_COLOR`. [#7624](https://github.com/AnalyticalGraphicsInc/cesium/pull/7624)
 
+##### Additions :tada:
+* `Cesium3DTileStyle.style` reacts to updates and represents the current state of the style. [#7567](https://github.com/AnalyticalGraphicsInc/cesium/issues/7567)
+
+
 ### 1.55 - 2019-03-01
 
 ##### Breaking Changes :mega:
