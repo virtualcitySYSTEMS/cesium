@@ -702,19 +702,10 @@ define([
             headers = getRequestHeader(extensionList);
         }
 
-        var promise = resource.getDerivedResource({
-            url: url,
-            templateValues: {
-                version: layerToUse.version,
-                z: level,
-                x: x,
-                y: tmsY
-            },
-            queryParameters: query,
-            headers: headers,
-            request: request
-        }).fetchArrayBuffer();
-
+        var myUrl = `http://pc220/datasource-data/5d2c8614-d474-442d-8975-c2b4a4c0ae94/${level}/${x}/${tmsY}.terrain`;
+        var promise = fetch(myUrl).then(function(response) {
+         return response.arrayBuffer();
+        });
         if (!defined(promise)) {
             return undefined;
         }
