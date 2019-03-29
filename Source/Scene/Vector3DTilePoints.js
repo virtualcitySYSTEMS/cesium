@@ -282,6 +282,7 @@ define([
             feature.backgroundPadding = new Cartesian2(7, 5);
             feature.backgroundEnabled = false;
             feature.scaleByDistance = undefined;
+            feature.scale = 1.0;
             feature.translucencyByDistance = undefined;
             feature.distanceDisplayCondition = undefined;
             feature.heightOffset = 0.0;
@@ -326,42 +327,62 @@ define([
 
             if (defined(style.show)) {
                 feature.show = style.show.evaluate(feature);
+            } else {
+                feature.show = true;
             }
 
             if (defined(style.pointSize)) {
                 feature.pointSize = style.pointSize.evaluate(feature);
+            } else {
+                feature.pointSize = Cesium3DTilePointFeature.defaultPointSize;
             }
 
             if (defined(style.color)) {
                 feature.color = style.color.evaluateColor(feature, scratchColor);
+            } else {
+                feature.color = Cesium3DTilePointFeature.defaultColor;
             }
 
             if (defined(style.pointOutlineColor)) {
                 feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(feature, scratchColor2);
+            } else {
+                feature.pointOutlineColor = Cesium3DTilePointFeature.defaultPointOutlineColor;
             }
 
             if (defined(style.pointOutlineWidth)) {
                 feature.pointOutlineWidth = style.pointOutlineWidth.evaluate(feature);
+            } else {
+                feature.pointOutlineWidth = Cesium3DTilePointFeature.defaultPointOutlineWidth;
             }
 
             if (defined(style.labelColor)) {
                 feature.labelColor = style.labelColor.evaluateColor(feature, scratchColor3);
+            } else {
+                feature.labelColor = Color.WHITE;
             }
 
             if (defined(style.labelOutlineColor)) {
                 feature.labelOutlineColor = style.labelOutlineColor.evaluateColor(feature, scratchColor4);
+            } else {
+                feature.labelOutlineColor = Color.WHITE;
             }
 
             if (defined(style.labelOutlineWidth)) {
                 feature.labelOutlineWidth = style.labelOutlineWidth.evaluate(feature);
+            } else {
+                feature.labelOutlineWidth = 1.0;
             }
 
             if (defined(style.font)) {
                 feature.font = style.font.evaluate(feature);
+            } else {
+                feature.font = '30px sans-serif';
             }
 
             if (defined(style.labelStyle)) {
                 feature.labelStyle = style.labelStyle.evaluate(feature);
+            } else {
+                feature.labelStyle = LabelStyle.FILL;
             }
 
             if (defined(style.labelText)) {
@@ -372,14 +393,20 @@ define([
 
             if (defined(style.backgroundColor)) {
                 feature.backgroundColor = style.backgroundColor.evaluateColor(feature, scratchColor5);
+            } else {
+                feature.backgroundColor = new Color(0.165, 0.165, 0.165, 0.8);
             }
 
             if (defined(style.backgroundPadding)) {
                 feature.backgroundPadding = style.backgroundPadding.evaluate(feature);
+            } else {
+                feature.backgroundPadding = new Cartesian2(7, 5);
             }
 
             if (defined(style.backgroundEnabled)) {
                 feature.backgroundEnabled = style.backgroundEnabled.evaluate(feature);
+            } else {
+                feature.backgroundEnabled = false;
             }
 
             if (defined(style.scaleByDistance)) {
@@ -395,6 +422,8 @@ define([
 
             if (defined(style.scale)) {
                 feature.scale = style.scale.evaluate(feature);
+            } else {
+                feature.scale = 1.0
             }
 
             if (defined(style.translucencyByDistance)) {
@@ -419,14 +448,20 @@ define([
 
             if (defined(style.heightOffset)) {
                 feature.heightOffset = style.heightOffset.evaluate(feature);
+            } else {
+                feature.heightOffset = 0.0;
             }
 
             if (defined(style.anchorLineEnabled)) {
                 feature.anchorLineEnabled = style.anchorLineEnabled.evaluate(feature);
+            } else {
+                feature.anchorLineEnabled = false;
             }
 
             if (defined(style.anchorLineColor)) {
                 feature.anchorLineColor = style.anchorLineColor.evaluateColor(feature, scratchColor6);
+            } else {
+                feature.anchorLineColor = Color.WHITE;
             }
 
             if (defined(style.image)) {
@@ -437,22 +472,32 @@ define([
 
             if (defined(style.disableDepthTestDistance)) {
                 feature.disableDepthTestDistance = style.disableDepthTestDistance.evaluate(feature);
+            } else {
+                feature.disableDepthTestDistance = 0.0;
             }
 
             if (defined(style.horizontalOrigin)) {
                 feature.horizontalOrigin = style.horizontalOrigin.evaluate(feature);
+            } else {
+                feature.horizontalOrigin = HorizontalOrigin.CENTER;
             }
 
             if (defined(style.verticalOrigin)) {
                 feature.verticalOrigin = style.verticalOrigin.evaluate(feature);
+            } else {
+                feature.verticalOrigin = VerticalOrigin.CENTER;
             }
 
             if (defined(style.labelHorizontalOrigin)) {
                 feature.labelHorizontalOrigin = style.labelHorizontalOrigin.evaluate(feature);
+            } else {
+                feature.labelHorizontalOrigin = HorizontalOrigin.RIGHT;
             }
 
             if (defined(style.labelVerticalOrigin)) {
                 feature.labelVerticalOrigin = style.labelVerticalOrigin.evaluate(feature);
+            } else {
+                feature.labelVerticalOrigin = VerticalOrigin.BASELINE;
             }
         }
     };
