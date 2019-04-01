@@ -195,6 +195,7 @@ define([
             polylineCollection._useHighlightColor = true;
 
             var numberOfPoints = positions.length / 3;
+            var pixelOffset = new Cartesian2(0, -15);
             for (var i = 0; i < numberOfPoints; ++i) {
                 var id = batchIds[i];
 
@@ -208,6 +209,7 @@ define([
                 l.text = ' ';
                 l.position = position;
                 l._batchIndex = id;
+                l.pixelOffset = pixelOffset;
 
                 var p = polylineCollection.add();
                 p.positions = [Cartesian3.clone(position), Cartesian3.clone(position)];
