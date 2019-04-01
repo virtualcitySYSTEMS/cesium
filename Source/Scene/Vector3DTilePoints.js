@@ -330,174 +330,175 @@ define([
             } else {
                 feature.show = true;
             }
+            if (feature.show) {
+                if (defined(style.pointSize)) {
+                    feature.pointSize = style.pointSize.evaluate(feature);
+                } else {
+                    feature.pointSize = Cesium3DTilePointFeature.defaultPointSize;
+                }
 
-            if (defined(style.pointSize)) {
-                feature.pointSize = style.pointSize.evaluate(feature);
-            } else {
-                feature.pointSize = Cesium3DTilePointFeature.defaultPointSize;
-            }
+                if (defined(style.color)) {
+                    feature.color = style.color.evaluateColor(feature, scratchColor);
+                } else {
+                    feature.color = Cesium3DTilePointFeature.defaultColor;
+                }
 
-            if (defined(style.color)) {
-                feature.color = style.color.evaluateColor(feature, scratchColor);
-            } else {
-                feature.color = Cesium3DTilePointFeature.defaultColor;
-            }
+                if (defined(style.pointOutlineColor)) {
+                    feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(feature, scratchColor2);
+                } else {
+                    feature.pointOutlineColor = Cesium3DTilePointFeature.defaultPointOutlineColor;
+                }
 
-            if (defined(style.pointOutlineColor)) {
-                feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(feature, scratchColor2);
-            } else {
-                feature.pointOutlineColor = Cesium3DTilePointFeature.defaultPointOutlineColor;
-            }
+                if (defined(style.pointOutlineWidth)) {
+                    feature.pointOutlineWidth = style.pointOutlineWidth.evaluate(feature);
+                } else {
+                    feature.pointOutlineWidth = Cesium3DTilePointFeature.defaultPointOutlineWidth;
+                }
 
-            if (defined(style.pointOutlineWidth)) {
-                feature.pointOutlineWidth = style.pointOutlineWidth.evaluate(feature);
-            } else {
-                feature.pointOutlineWidth = Cesium3DTilePointFeature.defaultPointOutlineWidth;
-            }
+                if (defined(style.labelColor)) {
+                    feature.labelColor = style.labelColor.evaluateColor(feature, scratchColor3);
+                } else {
+                    feature.labelColor = Color.WHITE;
+                }
 
-            if (defined(style.labelColor)) {
-                feature.labelColor = style.labelColor.evaluateColor(feature, scratchColor3);
-            } else {
-                feature.labelColor = Color.WHITE;
-            }
+                if (defined(style.labelOutlineColor)) {
+                    feature.labelOutlineColor = style.labelOutlineColor.evaluateColor(feature, scratchColor4);
+                } else {
+                    feature.labelOutlineColor = Color.WHITE;
+                }
 
-            if (defined(style.labelOutlineColor)) {
-                feature.labelOutlineColor = style.labelOutlineColor.evaluateColor(feature, scratchColor4);
-            } else {
-                feature.labelOutlineColor = Color.WHITE;
-            }
+                if (defined(style.labelOutlineWidth)) {
+                    feature.labelOutlineWidth = style.labelOutlineWidth.evaluate(feature);
+                } else {
+                    feature.labelOutlineWidth = 1.0;
+                }
 
-            if (defined(style.labelOutlineWidth)) {
-                feature.labelOutlineWidth = style.labelOutlineWidth.evaluate(feature);
-            } else {
-                feature.labelOutlineWidth = 1.0;
-            }
+                if (defined(style.font)) {
+                    feature.font = style.font.evaluate(feature);
+                } else {
+                    feature.font = '30px sans-serif';
+                }
 
-            if (defined(style.font)) {
-                feature.font = style.font.evaluate(feature);
-            } else {
-                feature.font = '30px sans-serif';
-            }
+                if (defined(style.labelStyle)) {
+                    feature.labelStyle = style.labelStyle.evaluate(feature);
+                } else {
+                    feature.labelStyle = LabelStyle.FILL;
+                }
 
-            if (defined(style.labelStyle)) {
-                feature.labelStyle = style.labelStyle.evaluate(feature);
-            } else {
-                feature.labelStyle = LabelStyle.FILL;
-            }
+                if (defined(style.labelText)) {
+                    feature.labelText = style.labelText.evaluate(feature);
+                } else {
+                    feature.labelText = undefined;
+                }
 
-            if (defined(style.labelText)) {
-                feature.labelText = style.labelText.evaluate(feature);
-            } else {
-                feature.labelText = undefined;
-            }
+                if (defined(style.backgroundColor)) {
+                    feature.backgroundColor = style.backgroundColor.evaluateColor(feature, scratchColor5);
+                } else {
+                    feature.backgroundColor = new Color(0.165, 0.165, 0.165, 0.8);
+                }
 
-            if (defined(style.backgroundColor)) {
-                feature.backgroundColor = style.backgroundColor.evaluateColor(feature, scratchColor5);
-            } else {
-                feature.backgroundColor = new Color(0.165, 0.165, 0.165, 0.8);
-            }
+                if (defined(style.backgroundPadding)) {
+                    feature.backgroundPadding = style.backgroundPadding.evaluate(feature);
+                } else {
+                    feature.backgroundPadding = new Cartesian2(7, 5);
+                }
 
-            if (defined(style.backgroundPadding)) {
-                feature.backgroundPadding = style.backgroundPadding.evaluate(feature);
-            } else {
-                feature.backgroundPadding = new Cartesian2(7, 5);
-            }
+                if (defined(style.backgroundEnabled)) {
+                    feature.backgroundEnabled = style.backgroundEnabled.evaluate(feature);
+                } else {
+                    feature.backgroundEnabled = false;
+                }
 
-            if (defined(style.backgroundEnabled)) {
-                feature.backgroundEnabled = style.backgroundEnabled.evaluate(feature);
-            } else {
-                feature.backgroundEnabled = false;
-            }
+                if (defined(style.scaleByDistance)) {
+                    var scaleByDistanceCart4 = style.scaleByDistance.evaluate(feature);
+                    scratchScaleByDistance.near = scaleByDistanceCart4.x;
+                    scratchScaleByDistance.nearValue = scaleByDistanceCart4.y;
+                    scratchScaleByDistance.far = scaleByDistanceCart4.z;
+                    scratchScaleByDistance.farValue = scaleByDistanceCart4.w;
+                    feature.scaleByDistance = scratchScaleByDistance;
+                } else {
+                    feature.scaleByDistance = undefined;
+                }
 
-            if (defined(style.scaleByDistance)) {
-                var scaleByDistanceCart4 = style.scaleByDistance.evaluate(feature);
-                scratchScaleByDistance.near = scaleByDistanceCart4.x;
-                scratchScaleByDistance.nearValue = scaleByDistanceCart4.y;
-                scratchScaleByDistance.far = scaleByDistanceCart4.z;
-                scratchScaleByDistance.farValue = scaleByDistanceCart4.w;
-                feature.scaleByDistance = scratchScaleByDistance;
-            } else {
-                feature.scaleByDistance = undefined;
-            }
+                if (defined(style.scale)) {
+                    feature.scale = style.scale.evaluate(feature);
+                } else {
+                    feature.scale = 1.0
+                }
 
-            if (defined(style.scale)) {
-                feature.scale = style.scale.evaluate(feature);
-            } else {
-                feature.scale = 1.0
-            }
+                if (defined(style.translucencyByDistance)) {
+                    var translucencyByDistanceCart4 = style.translucencyByDistance.evaluate(feature);
+                    scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;
+                    scratchTranslucencyByDistance.nearValue = translucencyByDistanceCart4.y;
+                    scratchTranslucencyByDistance.far = translucencyByDistanceCart4.z;
+                    scratchTranslucencyByDistance.farValue = translucencyByDistanceCart4.w;
+                    feature.translucencyByDistance = scratchTranslucencyByDistance;
+                } else {
+                    feature.translucencyByDistance = undefined;
+                }
 
-            if (defined(style.translucencyByDistance)) {
-                var translucencyByDistanceCart4 = style.translucencyByDistance.evaluate(feature);
-                scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;
-                scratchTranslucencyByDistance.nearValue = translucencyByDistanceCart4.y;
-                scratchTranslucencyByDistance.far = translucencyByDistanceCart4.z;
-                scratchTranslucencyByDistance.farValue = translucencyByDistanceCart4.w;
-                feature.translucencyByDistance = scratchTranslucencyByDistance;
-            } else {
-                feature.translucencyByDistance = undefined;
-            }
+                if (defined(style.distanceDisplayCondition)) {
+                    var distanceDisplayConditionCart2 = style.distanceDisplayCondition.evaluate(feature);
+                    scratchDistanceDisplayCondition.near = distanceDisplayConditionCart2.x;
+                    scratchDistanceDisplayCondition.far = distanceDisplayConditionCart2.y;
+                    feature.distanceDisplayCondition = scratchDistanceDisplayCondition;
+                } else {
+                    feature.distanceDisplayCondition = undefined;
+                }
 
-            if (defined(style.distanceDisplayCondition)) {
-                var distanceDisplayConditionCart2 = style.distanceDisplayCondition.evaluate(feature);
-                scratchDistanceDisplayCondition.near = distanceDisplayConditionCart2.x;
-                scratchDistanceDisplayCondition.far = distanceDisplayConditionCart2.y;
-                feature.distanceDisplayCondition = scratchDistanceDisplayCondition;
-            } else {
-                feature.distanceDisplayCondition = undefined;
-            }
+                if (defined(style.heightOffset)) {
+                    feature.heightOffset = style.heightOffset.evaluate(feature);
+                } else {
+                    feature.heightOffset = 0.0;
+                }
 
-            if (defined(style.heightOffset)) {
-                feature.heightOffset = style.heightOffset.evaluate(feature);
-            } else {
-                feature.heightOffset = 0.0;
-            }
+                if (defined(style.anchorLineEnabled)) {
+                    feature.anchorLineEnabled = style.anchorLineEnabled.evaluate(feature);
+                } else {
+                    feature.anchorLineEnabled = false;
+                }
 
-            if (defined(style.anchorLineEnabled)) {
-                feature.anchorLineEnabled = style.anchorLineEnabled.evaluate(feature);
-            } else {
-                feature.anchorLineEnabled = false;
-            }
+                if (defined(style.anchorLineColor)) {
+                    feature.anchorLineColor = style.anchorLineColor.evaluateColor(feature, scratchColor6);
+                } else {
+                    feature.anchorLineColor = Color.WHITE;
+                }
 
-            if (defined(style.anchorLineColor)) {
-                feature.anchorLineColor = style.anchorLineColor.evaluateColor(feature, scratchColor6);
-            } else {
-                feature.anchorLineColor = Color.WHITE;
-            }
+                if (defined(style.image)) {
+                    feature.image = style.image.evaluate(feature);
+                } else {
+                    feature.image = undefined;
+                }
 
-            if (defined(style.image)) {
-                feature.image = style.image.evaluate(feature);
-            } else {
-                feature.image = undefined;
-            }
+                if (defined(style.disableDepthTestDistance)) {
+                    feature.disableDepthTestDistance = style.disableDepthTestDistance.evaluate(feature);
+                } else {
+                    feature.disableDepthTestDistance = 0.0;
+                }
 
-            if (defined(style.disableDepthTestDistance)) {
-                feature.disableDepthTestDistance = style.disableDepthTestDistance.evaluate(feature);
-            } else {
-                feature.disableDepthTestDistance = 0.0;
-            }
+                if (defined(style.horizontalOrigin)) {
+                    feature.horizontalOrigin = style.horizontalOrigin.evaluate(feature);
+                } else {
+                    feature.horizontalOrigin = HorizontalOrigin.CENTER;
+                }
 
-            if (defined(style.horizontalOrigin)) {
-                feature.horizontalOrigin = style.horizontalOrigin.evaluate(feature);
-            } else {
-                feature.horizontalOrigin = HorizontalOrigin.CENTER;
-            }
+                if (defined(style.verticalOrigin)) {
+                    feature.verticalOrigin = style.verticalOrigin.evaluate(feature);
+                } else {
+                    feature.verticalOrigin = VerticalOrigin.CENTER;
+                }
 
-            if (defined(style.verticalOrigin)) {
-                feature.verticalOrigin = style.verticalOrigin.evaluate(feature);
-            } else {
-                feature.verticalOrigin = VerticalOrigin.CENTER;
-            }
+                if (defined(style.labelHorizontalOrigin)) {
+                    feature.labelHorizontalOrigin = style.labelHorizontalOrigin.evaluate(feature);
+                } else {
+                    feature.labelHorizontalOrigin = HorizontalOrigin.RIGHT;
+                }
 
-            if (defined(style.labelHorizontalOrigin)) {
-                feature.labelHorizontalOrigin = style.labelHorizontalOrigin.evaluate(feature);
-            } else {
-                feature.labelHorizontalOrigin = HorizontalOrigin.RIGHT;
-            }
-
-            if (defined(style.labelVerticalOrigin)) {
-                feature.labelVerticalOrigin = style.labelVerticalOrigin.evaluate(feature);
-            } else {
-                feature.labelVerticalOrigin = VerticalOrigin.BASELINE;
+                if (defined(style.labelVerticalOrigin)) {
+                    feature.labelVerticalOrigin = style.labelVerticalOrigin.evaluate(feature);
+                } else {
+                    feature.labelVerticalOrigin = VerticalOrigin.BASELINE;
+                }
             }
         }
     };
