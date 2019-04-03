@@ -172,6 +172,7 @@ import VerticalOrigin from './VerticalOrigin.js';
             polylineCollection._useHighlightColor = true;
 
             var numberOfPoints = positions.length / 3;
+            var pixelOffset = new Cartesian2(0, -15);
             for (var i = 0; i < numberOfPoints; ++i) {
                 var id = batchIds[i];
 
@@ -185,6 +186,7 @@ import VerticalOrigin from './VerticalOrigin.js';
                 l.text = ' ';
                 l.position = position;
                 l._batchIndex = id;
+                l.pixelOffset = pixelOffset;
 
                 var p = polylineCollection.add();
                 p.positions = [Cartesian3.clone(position), Cartesian3.clone(position)];
@@ -259,6 +261,7 @@ import VerticalOrigin from './VerticalOrigin.js';
             feature.backgroundPadding = new Cartesian2(7, 5);
             feature.backgroundEnabled = false;
             feature.scaleByDistance = undefined;
+            feature.scale = 1.0;
             feature.translucencyByDistance = undefined;
             feature.distanceDisplayCondition = undefined;
             feature.heightOffset = 0.0;
@@ -268,7 +271,7 @@ import VerticalOrigin from './VerticalOrigin.js';
             feature.disableDepthTestDistance = 0.0;
             feature.horizontalOrigin = HorizontalOrigin.CENTER;
             feature.verticalOrigin = VerticalOrigin.CENTER;
-            feature.labelHorizontalOrigin = HorizontalOrigin.RIGHT;
+            feature.labelHorizontalOrigin = HorizontalOrigin.LEFT;
             feature.labelVerticalOrigin = VerticalOrigin.BASELINE;
         }
     }
@@ -303,129 +306,178 @@ import VerticalOrigin from './VerticalOrigin.js';
 
             if (defined(style.show)) {
                 feature.show = style.show.evaluate(feature);
-            }
-
-            if (defined(style.pointSize)) {
-                feature.pointSize = style.pointSize.evaluate(feature);
-            }
-
-            if (defined(style.color)) {
-                feature.color = style.color.evaluateColor(feature, scratchColor);
-            }
-
-            if (defined(style.pointOutlineColor)) {
-                feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(feature, scratchColor2);
-            }
-
-            if (defined(style.pointOutlineWidth)) {
-                feature.pointOutlineWidth = style.pointOutlineWidth.evaluate(feature);
-            }
-
-            if (defined(style.labelColor)) {
-                feature.labelColor = style.labelColor.evaluateColor(feature, scratchColor3);
-            }
-
-            if (defined(style.labelOutlineColor)) {
-                feature.labelOutlineColor = style.labelOutlineColor.evaluateColor(feature, scratchColor4);
-            }
-
-            if (defined(style.labelOutlineWidth)) {
-                feature.labelOutlineWidth = style.labelOutlineWidth.evaluate(feature);
-            }
-
-            if (defined(style.font)) {
-                feature.font = style.font.evaluate(feature);
-            }
-
-            if (defined(style.labelStyle)) {
-                feature.labelStyle = style.labelStyle.evaluate(feature);
-            }
-
-            if (defined(style.labelText)) {
-                feature.labelText = style.labelText.evaluate(feature);
             } else {
-                feature.labelText = undefined;
+                feature.show = true;
             }
+            if (feature.show) {
+                if (defined(style.pointSize)) {
+                    feature.pointSize = style.pointSize.evaluate(feature);
+                } else {
+                    feature.pointSize = Cesium3DTilePointFeature.defaultPointSize;
+                }
 
-            if (defined(style.backgroundColor)) {
-                feature.backgroundColor = style.backgroundColor.evaluateColor(feature, scratchColor5);
-            }
+                if (defined(style.color)) {
+                    feature.color = style.color.evaluateColor(feature, scratchColor);
+                } else {
+                    feature.color = Cesium3DTilePointFeature.defaultColor;
+                }
 
-            if (defined(style.backgroundPadding)) {
-                feature.backgroundPadding = style.backgroundPadding.evaluate(feature);
-            }
+                if (defined(style.pointOutlineColor)) {
+                    feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(feature, scratchColor2);
+                } else {
+                    feature.pointOutlineColor = Cesium3DTilePointFeature.defaultPointOutlineColor;
+                }
 
-            if (defined(style.backgroundEnabled)) {
-                feature.backgroundEnabled = style.backgroundEnabled.evaluate(feature);
-            }
+                if (defined(style.pointOutlineWidth)) {
+                    feature.pointOutlineWidth = style.pointOutlineWidth.evaluate(feature);
+                } else {
+                    feature.pointOutlineWidth = Cesium3DTilePointFeature.defaultPointOutlineWidth;
+                }
 
-            if (defined(style.scaleByDistance)) {
-                var scaleByDistanceCart4 = style.scaleByDistance.evaluate(feature);
-                scratchScaleByDistance.near = scaleByDistanceCart4.x;
-                scratchScaleByDistance.nearValue = scaleByDistanceCart4.y;
-                scratchScaleByDistance.far = scaleByDistanceCart4.z;
-                scratchScaleByDistance.farValue = scaleByDistanceCart4.w;
-                feature.scaleByDistance = scratchScaleByDistance;
-            } else {
-                feature.scaleByDistance = undefined;
-            }
+                if (defined(style.labelColor)) {
+                    feature.labelColor = style.labelColor.evaluateColor(feature, scratchColor3);
+                } else {
+                    feature.labelColor = Color.WHITE;
+                }
 
-            if (defined(style.translucencyByDistance)) {
-                var translucencyByDistanceCart4 = style.translucencyByDistance.evaluate(feature);
-                scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;
-                scratchTranslucencyByDistance.nearValue = translucencyByDistanceCart4.y;
-                scratchTranslucencyByDistance.far = translucencyByDistanceCart4.z;
-                scratchTranslucencyByDistance.farValue = translucencyByDistanceCart4.w;
-                feature.translucencyByDistance = scratchTranslucencyByDistance;
-            } else {
-                feature.translucencyByDistance = undefined;
-            }
+                if (defined(style.labelOutlineColor)) {
+                    feature.labelOutlineColor = style.labelOutlineColor.evaluateColor(feature, scratchColor4);
+                } else {
+                    feature.labelOutlineColor = Color.WHITE;
+                }
 
-            if (defined(style.distanceDisplayCondition)) {
-                var distanceDisplayConditionCart2 = style.distanceDisplayCondition.evaluate(feature);
-                scratchDistanceDisplayCondition.near = distanceDisplayConditionCart2.x;
-                scratchDistanceDisplayCondition.far = distanceDisplayConditionCart2.y;
-                feature.distanceDisplayCondition = scratchDistanceDisplayCondition;
-            } else {
-                feature.distanceDisplayCondition = undefined;
-            }
+                if (defined(style.labelOutlineWidth)) {
+                    feature.labelOutlineWidth = style.labelOutlineWidth.evaluate(feature);
+                } else {
+                    feature.labelOutlineWidth = 1.0;
+                }
 
-            if (defined(style.heightOffset)) {
-                feature.heightOffset = style.heightOffset.evaluate(feature);
-            }
+                if (defined(style.font)) {
+                    feature.font = style.font.evaluate(feature);
+                } else {
+                    feature.font = '30px sans-serif';
+                }
 
-            if (defined(style.anchorLineEnabled)) {
-                feature.anchorLineEnabled = style.anchorLineEnabled.evaluate(feature);
-            }
+                if (defined(style.labelStyle)) {
+                    feature.labelStyle = style.labelStyle.evaluate(feature);
+                } else {
+                    feature.labelStyle = LabelStyle.FILL;
+                }
 
-            if (defined(style.anchorLineColor)) {
-                feature.anchorLineColor = style.anchorLineColor.evaluateColor(feature, scratchColor6);
-            }
+                if (defined(style.labelText)) {
+                    feature.labelText = style.labelText.evaluate(feature);
+                } else {
+                    feature.labelText = undefined;
+                }
 
-            if (defined(style.image)) {
-                feature.image = style.image.evaluate(feature);
-            } else {
-                feature.image = undefined;
-            }
+                if (defined(style.backgroundColor)) {
+                    feature.backgroundColor = style.backgroundColor.evaluateColor(feature, scratchColor5);
+                } else {
+                    feature.backgroundColor = new Color(0.165, 0.165, 0.165, 0.8);
+                }
 
-            if (defined(style.disableDepthTestDistance)) {
-                feature.disableDepthTestDistance = style.disableDepthTestDistance.evaluate(feature);
-            }
+                if (defined(style.backgroundPadding)) {
+                    feature.backgroundPadding = style.backgroundPadding.evaluate(feature);
+                } else {
+                    feature.backgroundPadding = new Cartesian2(7, 5);
+                }
 
-            if (defined(style.horizontalOrigin)) {
-                feature.horizontalOrigin = style.horizontalOrigin.evaluate(feature);
-            }
+                if (defined(style.backgroundEnabled)) {
+                    feature.backgroundEnabled = style.backgroundEnabled.evaluate(feature);
+                } else {
+                    feature.backgroundEnabled = false;
+                }
 
-            if (defined(style.verticalOrigin)) {
-                feature.verticalOrigin = style.verticalOrigin.evaluate(feature);
-            }
+                if (defined(style.scaleByDistance)) {
+                    var scaleByDistanceCart4 = style.scaleByDistance.evaluate(feature);
+                    scratchScaleByDistance.near = scaleByDistanceCart4.x;
+                    scratchScaleByDistance.nearValue = scaleByDistanceCart4.y;
+                    scratchScaleByDistance.far = scaleByDistanceCart4.z;
+                    scratchScaleByDistance.farValue = scaleByDistanceCart4.w;
+                    feature.scaleByDistance = scratchScaleByDistance;
+                } else {
+                    feature.scaleByDistance = undefined;
+                }
 
-            if (defined(style.labelHorizontalOrigin)) {
-                feature.labelHorizontalOrigin = style.labelHorizontalOrigin.evaluate(feature);
-            }
+                if (defined(style.scale)) {
+                    feature.scale = style.scale.evaluate(feature);
+                } else {
+                    feature.scale = 1.0
+                }
 
-            if (defined(style.labelVerticalOrigin)) {
-                feature.labelVerticalOrigin = style.labelVerticalOrigin.evaluate(feature);
+                if (defined(style.translucencyByDistance)) {
+                    var translucencyByDistanceCart4 = style.translucencyByDistance.evaluate(feature);
+                    scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;
+                    scratchTranslucencyByDistance.nearValue = translucencyByDistanceCart4.y;
+                    scratchTranslucencyByDistance.far = translucencyByDistanceCart4.z;
+                    scratchTranslucencyByDistance.farValue = translucencyByDistanceCart4.w;
+                    feature.translucencyByDistance = scratchTranslucencyByDistance;
+                } else {
+                    feature.translucencyByDistance = undefined;
+                }
+
+                if (defined(style.distanceDisplayCondition)) {
+                    var distanceDisplayConditionCart2 = style.distanceDisplayCondition.evaluate(feature);
+                    scratchDistanceDisplayCondition.near = distanceDisplayConditionCart2.x;
+                    scratchDistanceDisplayCondition.far = distanceDisplayConditionCart2.y;
+                    feature.distanceDisplayCondition = scratchDistanceDisplayCondition;
+                } else {
+                    feature.distanceDisplayCondition = undefined;
+                }
+
+                if (defined(style.heightOffset)) {
+                    feature.heightOffset = style.heightOffset.evaluate(feature);
+                } else {
+                    feature.heightOffset = 0.0;
+                }
+
+                if (defined(style.anchorLineEnabled)) {
+                    feature.anchorLineEnabled = style.anchorLineEnabled.evaluate(feature);
+                } else {
+                    feature.anchorLineEnabled = false;
+                }
+
+                if (defined(style.anchorLineColor)) {
+                    feature.anchorLineColor = style.anchorLineColor.evaluateColor(feature, scratchColor6);
+                } else {
+                    feature.anchorLineColor = Color.WHITE;
+                }
+
+                if (defined(style.image)) {
+                    feature.image = style.image.evaluate(feature);
+                } else {
+                    feature.image = undefined;
+                }
+
+                if (defined(style.disableDepthTestDistance)) {
+                    feature.disableDepthTestDistance = style.disableDepthTestDistance.evaluate(feature);
+                } else {
+                    feature.disableDepthTestDistance = 0.0;
+                }
+
+                if (defined(style.horizontalOrigin)) {
+                    feature.horizontalOrigin = style.horizontalOrigin.evaluate(feature);
+                } else {
+                    feature.horizontalOrigin = HorizontalOrigin.CENTER;
+                }
+
+                if (defined(style.verticalOrigin)) {
+                    feature.verticalOrigin = style.verticalOrigin.evaluate(feature);
+                } else {
+                    feature.verticalOrigin = VerticalOrigin.CENTER;
+                }
+
+                if (defined(style.labelHorizontalOrigin)) {
+                    feature.labelHorizontalOrigin = style.labelHorizontalOrigin.evaluate(feature);
+                } else {
+                    feature.labelHorizontalOrigin = HorizontalOrigin.LEFT;
+                }
+
+                if (defined(style.labelVerticalOrigin)) {
+                    feature.labelVerticalOrigin = style.labelVerticalOrigin.evaluate(feature);
+                } else {
+                    feature.labelVerticalOrigin = VerticalOrigin.BASELINE;
+                }
             }
         }
     };
