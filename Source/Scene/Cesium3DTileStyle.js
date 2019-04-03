@@ -61,6 +61,7 @@ import Expression from './Expression.js';
         this._backgroundPadding = undefined;
         this._backgroundEnabled = undefined;
         this._scaleByDistance = undefined;
+        this._scale = undefined;
         this._translucencyByDistance = undefined;
         this._distanceDisplayCondition = undefined;
         this._heightOffset = undefined;
@@ -117,6 +118,7 @@ import Expression from './Expression.js';
         that.backgroundPadding = styleJson.backgroundPadding;
         that.backgroundEnabled = styleJson.backgroundEnabled;
         that.scaleByDistance = styleJson.scaleByDistance;
+        that.scale = styleJson.scale;
         that.translucencyByDistance = styleJson.translucencyByDistance;
         that.distanceDisplayCondition = styleJson.distanceDisplayCondition;
         that.heightOffset = styleJson.heightOffset;
@@ -998,6 +1000,22 @@ import Expression from './Expression.js';
                 this._style.scaleByDistance = getJsonFromExpression(this._scaleByDistance);
             }
         },
+
+        scale : {
+            get : function() {
+                //>>includeStart('debug', pragmas.debug);
+                if (!this._ready) {
+                    throw new DeveloperError('The style is not loaded.  Use Cesium3DTileStyle.readyPromise or wait for Cesium3DTileStyle.ready to be true.');
+                }
+                //>>includeEnd('debug');
+
+                return this._scale;
+            },
+            set : function(value) {
+                this._scale = getExpression(this, value, 'scale');
+            }
+        },
+
 
         /**
          * Gets or sets the {@link StyleExpression} object used to evaluate the style's <code>translucencyByDistance</code> property. Alternatively a string or object defining a vec4 style can be used.
