@@ -372,7 +372,6 @@ define([
                 return this._billboard.scale;
             },
             set : function(value) {
-                this._label.scale = value;
                 this._billboard.scale = value;
             }
         },
