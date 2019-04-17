@@ -3,68 +3,70 @@ define([], function() {
 
     /**
      * A queue that can enqueue items at the end, and dequeue items from the front.
-     *
      * @alias Queue
      * @constructor
      */
-    function Cache() {
-        this._array = [];
+    function Cache(maxSize) {
+        /** @type {number} */
+        this._maxSize = maxSize;
+        /** @type {Array<string>} */
+        this._array = new Array(maxSize);
+        /** @type {number} */
+        this._index = 0;
+        /** @type {Object} */
+        this._map = {};
+        /** @type {boolean} */
+        this._full = false;
     }
 
     /**
      * adds an Item to the cache
-     *
+     * @param {string} key
      * @param {Object} item The item to add.
      */
     Cache.prototype.add = function(key, item) {
-        this._array.push({key:key,item:item});
+        if (this._index === this._maxSize) {
+            this._full = true;
+            this._index = 0;
+        }
+        if (this._full) {
+            delete this._map[this._array[this._index]];
+        }
+        this._array[this._index] = key;
+        this._map[key] = item;
+        this._index += 1;
     };
 
     /**
      * returns an Item from the Cache if it exists.
-     *
-     *
-     * @returns {Object}
+     * @returns {Object|undefined}
      */
     Cache.prototype.get = function(key) {
-        var index = this._array.findIndex( function(entry) {
-            return entry.key === key;
-        });
-        if (index >= 0) {
-            var entry = this._array[index];
-            if(index !== this._array.length) {
-                this._array.splice(index, 1);
-                this._array.push(entry);
-            }
-            return entry.item;
-        }
-        return null;
-    }
+        return this._map[key];
+    };
 
     /**
      * returns an Item from the Cache if it exists.
-     *
-     *
      * @returns {boolean}
      */
     Cache.prototype.has = function(key) {
-        var index = this._array.findIndex( function(item) {
-            return item.key === key;
-        });
-        return index >= 0;
+        return !!this._map[key];
     };
 
-
     /**
-     * trims cache, only keeps the maxSize Items which have been accessed last.
      * @param {number} maxSize
      */
-    Cache.prototype.trim = function(maxSize) {
-        if (this._array.length > maxSize) {
-            this._array.reverse();
-            this._array.splice(maxSize, this._array.length  - maxSize);
-            this._array.reverse();
-        }
+    Cache.prototype.setMaxSize = function(maxSize) {
+        /** @type {number} */
+        this._maxSize = maxSize;
+        /** @type {Array<string>} */
+        this._array = new Array(maxSize);
+        /** @type {number} */
+        this._index = 0;
+        /** @type {Object} */
+        this._map = {};
+        /** @type {boolean} */
+        this._full = false;
     };
 
     return Cache;
