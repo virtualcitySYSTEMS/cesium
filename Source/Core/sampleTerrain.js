@@ -1,9 +1,9 @@
 define([
-        './Cache',
+        './SampleTerrainCache',
         '../ThirdParty/when',
         './Check'
     ], function(
-        Cache,
+        SampleTerrainCache,
         when,
         Check) {
     'use strict';
@@ -54,10 +54,6 @@ define([
         return terrainProvider.readyPromise.then(function() { return doSampling(terrainProvider, level, positions); });
     }
 
-
-
-    var cache = new Cache();
-
     function doSampling(terrainProvider, level, positions) {
         var tilingScheme = terrainProvider.tilingScheme;
 
@@ -92,8 +88,8 @@ define([
         // Send request for each required tile
         var tilePromises = [];
         for (i = 0; i < tileRequests.length; ++i) {
-            if(cache.has(tileRequests[i].key)){
-                var terraindata = cache.get(tileRequests[i].key);
+            if (SampleTerrainCache.has(tileRequests[i].key)) {
+                var terraindata = SampleTerrainCache.get(tileRequests[i].key);
                 var interpolate = createInterpolateFunction(tileRequests[i]);
                 tilePromises.push(when(interpolate(terraindata)));
             } else {
@@ -111,10 +107,6 @@ define([
         });
     }
 
-    function trimTileCache() {
-
-    }
-
     function createInterpolateFunction(tileRequest) {
         var tilePositions = tileRequest.positions;
         var rectangle = tileRequest.tilingScheme.tileXYToRectangle(tileRequest.x, tileRequest.y, tileRequest.level);
@@ -123,8 +115,8 @@ define([
                 var position = tilePositions[i];
                 position.height = terrainData.interpolateHeight(rectangle, position.longitude, position.latitude);
             }
-            if(!cache.has(tileRequest.key)){
-                cache.add(tileRequest.key, terrainData);
+            if (!SampleTerrainCache.has(tileRequest.key)) {
+                SampleTerrainCache.add(tileRequest.key, terrainData);
             }
         };
     }
