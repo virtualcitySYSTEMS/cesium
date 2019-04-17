@@ -25,6 +25,10 @@ define([], function() {
      * @param {Object} item The item to add.
      */
     Cache.prototype.add = function(key, item) {
+        if (this.has(key)){
+           this._map[key] = item;
+           return;
+        }
         if (this._index === this._maxSize) {
             this._full = true;
             this._index = 0;
