@@ -894,6 +894,10 @@ define([
     }
 
     function visitVisibleChildrenNearToFar(primitive, southwest, southeast, northwest, northeast, frameState, ancestorMeetsSse, traversalDetails) {
+        if (southwest.level >= traversalQuadsByLevel.length) {
+            return;
+        }
+
         var cameraPosition = frameState.camera.positionCartographic;
         var tileProvider = primitive._tileProvider;
         var occluders = primitive._occluders;
