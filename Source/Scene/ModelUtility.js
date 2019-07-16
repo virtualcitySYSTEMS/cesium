@@ -86,6 +86,7 @@ define([
         var accessors = gltf.accessors;
         var materials = gltf.materials;
         var primitiveInfoByMaterial = {};
+        var copiedMaterialCache = {};
         ForEach.mesh(gltf, function(mesh) {
             ForEach.meshPrimitive(mesh, function(primitive) {
                 var materialIndex = primitive.material;
@@ -131,26 +132,79 @@ define([
                     // * Isn't skinned
                     // * Uses a different type to store joints and weights
                     // * Doesn't have vertex colors, morph targets, normals, tangents, or texCoords
+
+                    // find cloned Material
+                    var found = false;
+                    if(copiedMaterialCache[materialIndex]) {
+
+                        for(var i = 0; i < copiedMaterialCache[materialIndex].primitiveInfos.length; i++) {
+                            var pInfo = copiedMaterialCache[materialIndex].primitiveInfos[i];
+                            if ((pInfo.skinning.skinned === isSkinned) &&
+                                (pInfo.skinning.type === type) &&
+                                (pInfo.hasVertexColors === hasVertexColors) &&
+                                (pInfo.hasMorphTargets === hasMorphTargets) &&
+                                (pInfo.hasNormals === hasNormals) &&
+                                (pInfo.hasTangents === hasTangents) &&
+                                (pInfo.hasTexCoords === hasTexCoords)) {
+                                copiedMaterialCache[materialIndex].primitives[i].push(primitive);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(!found ) {
+                            var clonedMaterial = clone(material, true);
+                            copiedMaterialCache[materialIndex].materials.push(clonedMaterial);
+                            var index = copiedMaterialCache[materialIndex].primitiveInfos.push({
+                                skinning: {
+                                    skinned: isSkinned,
+                                    componentType: componentType,
+                                    type: type
+                                },
+                                hasVertexColors: hasVertexColors,
+                                hasMorphTargets: hasMorphTargets,
+                                hasNormals: hasNormals,
+                                hasTangents: hasTangents,
+                                hasTexCoords: hasTexCoords
+                            });
+                            copiedMaterialCache[materialIndex].primitives[index] = [primitive];
+                        }
+                    }
+                    //else add cloned material//
+
                     var clonedMaterial = clone(material, true);
-                    // Split this off as a separate material
-                    materialIndex = addToArray(materials, clonedMaterial);
-                    primitive.material = materialIndex;
-                    primitiveInfoByMaterial[materialIndex] = {
-                        skinning: {
-                            skinned: isSkinned,
-                            componentType: componentType,
-                            type: type
-                        },
-                        hasVertexColors: hasVertexColors,
-                        hasMorphTargets: hasMorphTargets,
-                        hasNormals: hasNormals,
-                        hasTangents: hasTangents,
-                        hasTexCoords: hasTexCoords
+
+                    copiedMaterialCache[materialIndex] = {
+                        "materials": [clonedMaterial],
+                        "primitiveInfos": [{
+                            skinning: {
+                                skinned: isSkinned,
+                                componentType: componentType,
+                                type: type
+                            },
+                            hasVertexColors: hasVertexColors,
+                            hasMorphTargets: hasMorphTargets,
+                            hasNormals: hasNormals,
+                            hasTangents: hasTangents,
+                            hasTexCoords: hasTexCoords
+                        }],
+                        "primitives": {0: [primitive]},
                     };
+
                 }
             });
         });
 
+        for(var materialCacheId in copiedMaterialCache) {
+            var materialCache = copiedMaterialCache[materialCacheId];
+            for (var i = 0; i < materialCache.materials.length; i++ ) {
+                var material = materialCache.materials[i];
+                var materialIndex = addToArray(materials, material);
+                primitiveInfoByMaterial[materialIndex] = materialCache.primitiveInfos[i];
+                for (var j = 0; j < materialCache.primitives[i].length; j++) {
+                    materialCache.primitives[i][j].material = materialIndex;
+                }
+            }
+        }
         return primitiveInfoByMaterial;
     };
 
