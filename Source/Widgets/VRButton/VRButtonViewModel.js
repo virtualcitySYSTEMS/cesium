@@ -58,12 +58,20 @@ define([
         }
     }
 
-    function toggleVR(viewModel, scene, isVRMode, isOrthographic) {
-        if (isOrthographic()) {
-            return;
-        }
+    function onSessionStarted(scene, session) {
+        console.log(session);
+        //scene.useWebVR = session
+        scene.webVRSession = session;
+        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, scene.context._gl) });
 
-        if (isVRMode()) {
+        //scene.useWebVR = false;
+        scene.context.webVRSession = session;
+    }
+
+    function toggleVR(viewModel, scene, isVRMode, isOrthographic) {
+
+        navigator.xr.requestSession('immersive-vr').then(onSessionStarted.bind(null, scene));
+        /*if (isVRMode()) {
             scene.useWebVR = false;
             if (viewModel._locked) {
                 unlockScreen();
@@ -82,7 +90,7 @@ define([
             }
             scene.useWebVR = true;
             isVRMode(true);
-        }
+        }*/
     }
 
     /**

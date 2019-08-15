@@ -198,6 +198,7 @@ define([
         // Override select WebGL defaults
         webglOptions.alpha = defaultValue(webglOptions.alpha, false); // WebGL default is true
         webglOptions.stencil = defaultValue(webglOptions.stencil, true); // WebGL default is false
+        webglOptions.xrCompatible = true;
 
         var requestWebgl2 = defaultValue(options.requestWebgl2, false) && (typeof WebGL2RenderingContext !== 'undefined');
         var webgl2 = false;
@@ -213,6 +214,7 @@ define([
                 }
             }
             if (!defined(glContext)) {
+
                 glContext = canvas.getContext('webgl', webglOptions) || canvas.getContext('experimental-webgl', webglOptions) || undefined;
             }
             if (!defined(glContext)) {

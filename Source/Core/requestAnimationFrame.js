@@ -64,11 +64,15 @@ define([
      *
      * @see {@link https://www.w3.org/TR/html51/webappapis.html#animation-frames|The Web API Animation Frames interface}
      */
-    function requestAnimationFrame(callback) {
+    function requestAnimationFrame(callback, session) {
         // we need this extra wrapper function because the native requestAnimationFrame
         // functions must be invoked on the global scope (window), which is not the case
         // if invoked as Cesium.requestAnimationFrame(callback)
-        return implementation(callback);
+        if (session) {
+            return session.requestAnimationFrame(callback);
+        } else {
+            return implementation(callback);
+        }
     }
 
     /**

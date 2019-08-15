@@ -56,7 +56,8 @@ define([
         widget._renderLoopRunning = true;
 
         var lastFrameTime = 0;
-        function render(frameTime) {
+        function render(frameTime, xrFrame) {
+            //console.log(xrFrame);
             if (widget.isDestroyed()) {
                 return;
             }
@@ -67,7 +68,7 @@ define([
                     if (!defined(targetFrameRate)) {
                         widget.resize();
                         widget.render();
-                        requestAnimationFrame(render);
+                        requestAnimationFrame(render, widget.scene.webVRSession);
                     } else {
                         var interval = 1000.0 / targetFrameRate;
                         var delta = frameTime - lastFrameTime;
@@ -77,7 +78,7 @@ define([
                             widget.render();
                             lastFrameTime = frameTime - (delta % interval);
                         }
-                        requestAnimationFrame(render);
+                        requestAnimationFrame(render, widget.scene.webVRSession);
                     }
                 } catch (error) {
                     widget._useDefaultRenderLoop = false;
