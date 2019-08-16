@@ -1,4 +1,5 @@
 define([
+        '../../Core/Math',
         '../../Core/defaultValue',
         '../../Core/defined',
         '../../Core/defineProperties',
@@ -12,6 +13,7 @@ define([
         '../createCommand',
         '../getElement'
     ], function(
+        CesiumMath,
         defaultValue,
         defined,
         defineProperties,
@@ -73,14 +75,32 @@ define([
             Fullscreen.exitFullscreen();
             isVRMode(false);
         } else {
-            if (!Fullscreen.fullscreen) {
-                Fullscreen.requestFullscreen(viewModel._vrElement);
-            }
-            viewModel._noSleep.enable();
-            if (!viewModel._locked) {
-                viewModel._locked = lockScreen('landscape');
-            }
             scene.useWebVR = true;
+            viewModel._noSleep.enable();
+
+            if (viewModel._vrDevice){
+                viewModel._vrDevice.requestPresent([{ source: scene.canvas }]).then(function (ex) {
+                        scene.vr = viewModel._vrDevice;
+                        var right = scene.vr.getEyeParameters('right');
+                        var left = scene.vr.getEyeParameters('left');
+                        scene.eyeSeparation = Math.abs(left.offset[0]) +
+                            Math.abs(right.offset[0]);
+                        scene.focalLength = right.renderWidth / Math.tan(CesiumMath.toRadians(Math.abs(right.fieldOfView.leftDegrees) + Math.abs(right.fieldOfView.rightDegrees)));
+                        scene.fov = CesiumMath.toRadians(Math.abs(right.fieldOfView.leftDegrees) + Math.abs(right.fieldOfView.rightDegrees));
+                        Fullscreen.requestFullscreen(viewModel._vrElement, scene._vrDevice);
+                        console.log("vr Presenting");
+                    }, function (ex) {
+                        console.log("requestPresent failed.");
+                    }
+                );
+            } else {
+                if (!Fullscreen.fullscreen) {
+                    Fullscreen.requestFullscreen(viewModel._vrElement);
+                }
+                if (!viewModel._locked) {
+                    viewModel._locked = lockScreen('landscape');
+                }
+            }
             isVRMode(true);
         }
     }
@@ -180,6 +200,11 @@ define([
                 isVRMode(false);
             }
         };
+        navigator.getVRDisplays().then(function(displays) {
+            if(displays.length > 0) {
+                that._vrDevice = displays[0];
+            }
+        });
         document.addEventListener(Fullscreen.changeEventName, this._callback);
     }
 

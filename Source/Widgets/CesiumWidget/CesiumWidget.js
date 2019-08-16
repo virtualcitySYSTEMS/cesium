@@ -10,6 +10,8 @@ define([
         '../../Core/Ellipsoid',
         '../../Core/FeatureDetection',
         '../../Core/formatError',
+        '../../Core/Matrix3',
+        '../../Core/Quaternion',
         '../../Core/requestAnimationFrame',
         '../../Core/ScreenSpaceEventHandler',
         '../../Scene/createWorldImagery',
@@ -34,6 +36,8 @@ define([
         Ellipsoid,
         FeatureDetection,
         formatError,
+        Matrix3,
+        Quaternion,
         requestAnimationFrame,
         ScreenSpaceEventHandler,
         createWorldImagery,
@@ -54,6 +58,15 @@ define([
 
     function startRenderLoop(widget) {
         widget._renderLoopRunning = true;
+        var frameData = new VRFrameData();
+
+        function updateDeviceOrentation() {
+            if (frameData.pose && frameData.pose.orientation && widget.scene._deviceOrientationCameraController) {
+                widget.scene._deviceOrientationCameraController._alpha = -frameData.pose.orientation[1];
+                widget.scene._deviceOrientationCameraController._beta = -frameData.pose.orientation[2];
+                widget.scene._deviceOrientationCameraController._gamma = frameData.pose.orientation[0];
+            }
+        }
 
         var lastFrameTime = 0;
         function render(frameTime) {
@@ -65,9 +78,18 @@ define([
                 try {
                     var targetFrameRate = widget._targetFrameRate;
                     if (!defined(targetFrameRate)) {
-                        widget.resize();
-                        widget.render();
-                        requestAnimationFrame(render);
+                        if (widget.scene.vr) {
+                            widget.scene.vr.requestAnimationFrame(render);
+                            widget.resize();
+                            widget.render();
+                            widget.scene.vr.getFrameData(frameData);
+                            updateDeviceOrentation();
+                            widget.scene.vr.submitFrame();
+                        } else {
+                            widget.resize();
+                            widget.render();
+                            requestAnimationFrame(render);
+                        }
                     } else {
                         var interval = 1000.0 / targetFrameRate;
                         var delta = frameTime - lastFrameTime;
