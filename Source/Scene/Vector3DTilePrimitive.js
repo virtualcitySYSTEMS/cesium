@@ -641,14 +641,9 @@ import Vector3DTileBatch from './Vector3DTileBatch.js';
             }
         }
 
-        if (!needToRebatch) {
+        if (!needToRebatch || (defined(primitive._lastRebatchCount) && Math.abs(primitive._lastRebatchCount - length) < 10)) {
             primitive._batchDirty = false;
             return false;
-        }
-
-        if (needToRebatch && !primitive.forceRebatch && primitive._framesSinceLastRebatch < 120) {
-            ++primitive._framesSinceLastRebatch;
-            return;
         }
 
         batchedIndices.sort(compareColors);
@@ -658,6 +653,8 @@ import Vector3DTileBatch from './Vector3DTileBatch.js';
         } else {
             rebatchCPU(primitive, batchedIndices);
         }
+
+        primitive._lastRebatchCount = primitive._batchedIndices.length;
 
         primitive._framesSinceLastRebatch = 0;
         primitive._batchDirty = false;
