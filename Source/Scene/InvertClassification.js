@@ -110,7 +110,7 @@ define([
             },
             backFunction : StencilFunction.NEVER,
             reference : 0,
-            mask : StencilConstants.CLASSIFICATION_MASK
+            mask : StencilConstants.HIDECLASSIFICATION_MASK
         },
         blending : BlendingState.ALPHA_BLEND
     };
@@ -127,7 +127,7 @@ define([
             },
             backFunction : StencilFunction.NEVER,
             reference : 0,
-            mask : StencilConstants.CLASSIFICATION_MASK
+            mask : StencilConstants.HIDECLASSIFICATION_MASK
         },
         blending : BlendingState.ALPHA_BLEND
     };
@@ -158,7 +158,7 @@ define([
         '    {\n' +
         '        discard;\n' +
         '    }\n' +
-        '    bool isClassified = all(equal(texture2D(classifiedTexture, v_textureCoordinates), vec4(0.0)));\n' +
+        '    bool isClassified = !all(equal(texture2D(classifiedTexture, v_textureCoordinates), vec4(0.0)));\n' +
         '#ifdef UNCLASSIFIED\n' +
         '    vec4 highlightColor = czm_invertClassificationColor;\n' +
         '    if (isClassified)\n' +

@@ -19,7 +19,8 @@ define([
         CESIUM_3D_TILE_MASK : 0x80,
         SKIP_LOD_MASK : 0x70,
         SKIP_LOD_BIT_SHIFT : 4,
-        CLASSIFICATION_MASK : 0x0F
+        CLASSIFICATION_MASK : 8 | 4|1,
+        HIDECLASSIFICATION_MASK : 2|4,
     };
 
     StencilConstants.setCesium3DTileBit = function() {

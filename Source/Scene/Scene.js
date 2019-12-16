@@ -334,7 +334,7 @@ define([
         this._classificationStencilClearCommand = new ClearCommand({
             stencil : 0,
             renderState : RenderState.fromCache({
-                stencilMask : StencilConstants.CLASSIFICATION_MASK
+                stencilMask : StencilConstants.HIDECLASSIFICATION_MASK
             })
         });
 

@@ -136,6 +136,7 @@ define([
          * @default true
          */
         this.show = defaultValue(options.show, true);
+        this.hideClassification = true;
         /**
          * Determines whether terrain, 3D Tiles or both will be classified.
          *
@@ -382,7 +383,7 @@ define([
         return scene.context.stencilBuffer;
     };
 
-    function getStencilPreloadRenderState(enableStencil, mask3DTiles) {
+    function getStencilPreloadRenderState(enableStencil, mask3DTiles, hide) {
         var stencilFunction = mask3DTiles ? StencilFunction.EQUAL : StencilFunction.ALWAYS;
         return {
             colorMask : {
@@ -408,7 +409,7 @@ define([
                 reference : StencilConstants.CESIUM_3D_TILE_MASK,
                 mask : StencilConstants.CESIUM_3D_TILE_MASK
             },
-            stencilMask : StencilConstants.CLASSIFICATION_MASK,
+            stencilMask : hide ? StencilConstants.HIDECLASSIFICATION_MASK : StencilConstants.CLASSIFICATION_MASK,
             depthTest : {
                 enabled : false
             },
@@ -416,7 +417,7 @@ define([
         };
     }
 
-    function getStencilDepthRenderState(enableStencil, mask3DTiles) {
+    function getStencilDepthRenderState(enableStencil, mask3DTiles, hide) {
         var stencilFunction = mask3DTiles ? StencilFunction.EQUAL : StencilFunction.ALWAYS;
         return {
             colorMask : {
@@ -442,7 +443,7 @@ define([
                 reference : StencilConstants.CESIUM_3D_TILE_MASK,
                 mask : StencilConstants.CESIUM_3D_TILE_MASK
             },
-            stencilMask : StencilConstants.CLASSIFICATION_MASK,
+            stencilMask : hide ? StencilConstants.HIDECLASSIFICATION_MASK : StencilConstants.CLASSIFICATION_MASK,
             depthTest : {
                 enabled : true,
                 func : DepthFunction.LESS_OR_EQUAL
@@ -451,7 +452,7 @@ define([
         };
     }
 
-    function getColorRenderState(enableStencil) {
+    function getColorRenderState(enableStencil, hide) {
         return {
             stencilTest : {
                 enabled : enableStencil,
@@ -468,9 +469,9 @@ define([
                     zPass : StencilOperation.DECREMENT_WRAP
                 },
                 reference : 0,
-                mask : StencilConstants.CLASSIFICATION_MASK
+                mask : hide ? StencilConstants.HIDECLASSIFICATION_MASK : StencilConstants.CLASSIFICATION_MASK,
             },
-            stencilMask : StencilConstants.CLASSIFICATION_MASK,
+            stencilMask : hide ? StencilConstants.HIDECLASSIFICATION_MASK : StencilConstants.CLASSIFICATION_MASK,
             depthTest : {
                 enabled : false
             },
@@ -510,11 +511,11 @@ define([
         }
         var stencilEnabled = !classificationPrimitive.debugShowShadowVolume;
 
-        classificationPrimitive._rsStencilPreloadPass = RenderState.fromCache(getStencilPreloadRenderState(stencilEnabled, false));
-        classificationPrimitive._rsStencilPreloadPass3DTiles = RenderState.fromCache(getStencilPreloadRenderState(stencilEnabled, true));
-        classificationPrimitive._rsStencilDepthPass = RenderState.fromCache(getStencilDepthRenderState(stencilEnabled, false));
-        classificationPrimitive._rsStencilDepthPass3DTiles = RenderState.fromCache(getStencilDepthRenderState(stencilEnabled, true));
-        classificationPrimitive._rsColorPass = RenderState.fromCache(getColorRenderState(stencilEnabled, false));
+        classificationPrimitive._rsStencilPreloadPass = RenderState.fromCache(getStencilPreloadRenderState(stencilEnabled, false, classificationPrimitive.hide));
+        classificationPrimitive._rsStencilPreloadPass3DTiles = RenderState.fromCache(getStencilPreloadRenderState(stencilEnabled, true, classificationPrimitive.hide));
+        classificationPrimitive._rsStencilDepthPass = RenderState.fromCache(getStencilDepthRenderState(stencilEnabled, false, classificationPrimitive.hide));
+        classificationPrimitive._rsStencilDepthPass3DTiles = RenderState.fromCache(getStencilDepthRenderState(stencilEnabled, true, classificationPrimitive.hide));
+        classificationPrimitive._rsColorPass = RenderState.fromCache(getColorRenderState(stencilEnabled, false, classificationPrimitive.hide));
         classificationPrimitive._rsPickPass = RenderState.fromCache(pickRenderState);
     }
 
