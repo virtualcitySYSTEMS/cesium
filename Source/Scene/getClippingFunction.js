@@ -27,13 +27,16 @@ define([
         var unionClippingRegions = clippingPlaneCollection.unionClippingRegions;
         var clippingPlanesLength = clippingPlaneCollection.length;
         var usingFloatTexture = ClippingPlaneCollection.useFloatTexture(context);
+        var triangulated = clippingPlaneCollection.triangulated;
         var textureResolution = ClippingPlaneCollection.getTextureResolution(clippingPlaneCollection, context, textureResolutionScratch);
         var width = textureResolution.x;
         var height = textureResolution.y;
 
         var functions = usingFloatTexture ? getClippingPlaneFloat(width, height) : getClippingPlaneUint8(width, height);
         functions += '\n';
-        functions += unionClippingRegions ? clippingFunctionUnion(clippingPlanesLength) : clippingFunctionIntersect(clippingPlanesLength);
+        functions += unionClippingRegions ?
+            clippingFunctionUnion(clippingPlanesLength) :
+            clippingFunctionIntersect(clippingPlanesLength, triangulated);
         return functions;
     }
 
@@ -73,7 +76,7 @@ define([
         return functionString;
     }
 
-    function clippingFunctionIntersect(clippingPlanesLength) {
+    function clippingFunctionIntersect(clippingPlanesLength, triangulated) {
         var functionString =
             'float clip(vec4 fragCoord, sampler2D clippingPlanes, mat4 clippingPlanesMatrix)\n' +
             '{\n' +
@@ -94,7 +97,23 @@ define([
             '        float amount = dot(clipNormal, (position.xyz - clipPosition)) / pixelWidth;\n' +
             '        clipAmount = max(amount, clipAmount);\n' +
 
-            '        clipped = clipped && (amount <= 0.0);\n' +
+            '        clipped = clipped && (amount <= 0.0);\n';
+
+        if (triangulated) {
+            functionString = functionString +
+                '        if (mod(float(i), 3.0) == 2.0)\n' +
+                '        {\n' +
+                '           if (clipped)\n ' +
+                '           { \n' +
+                '               break; \n' +
+                '           } else if (i < ' + (clippingPlanesLength - 1) + ') {\n'+
+                '              clipped = true;\n' +
+                '              clipAmount = 0.0;\n' +
+                '           }\n' +
+                '       }\n';
+        }
+
+        functionString = functionString +
             '    }\n' +
 
             '    if (clipped)\n' +

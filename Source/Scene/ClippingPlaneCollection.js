@@ -103,6 +103,7 @@ define([
 
         this._planes = [];
 
+        this.triangulated = defaultValue(options.triangulated, false);
         // Do partial texture updates if just one plane is dirty.
         // If many planes are dirty, refresh the entire texture.
         this._dirtyIndex = -1;
