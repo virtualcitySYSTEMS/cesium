@@ -217,6 +217,7 @@ define([
         this._updatedVisibilityFrame = 0;
         this._extras = undefined;
         this._credits = undefined;
+        this._renderAsOpaque = defaultValue(options.renderAsOpaque, false);
 
         this._cullWithChildrenBounds = defaultValue(options.cullWithChildrenBounds, true);
         this._allTilesAdditive = true;
@@ -936,6 +937,11 @@ define([
     }
 
     defineProperties(Cesium3DTileset.prototype, {
+        renderAsOpaque : {
+            get : function() {
+                return this._renderAsOpaque;
+            }
+        },
         /**
          * Gets the tileset's asset object property, which contains metadata about the tileset.
          * <p>
