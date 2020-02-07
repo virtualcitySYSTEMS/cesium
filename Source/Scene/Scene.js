@@ -2234,6 +2234,7 @@ import View from './View.js';
         var clearClassificationStencil = scene._classificationStencilClearCommand;
         var depthPlane = scene._depthPlane;
         var usePostProcessSelected = environmentState.usePostProcessSelected;
+        var renderClassification = !(picking && renderTranslucentDepthForPick);
 
         var height2D = camera.position.z;
 
@@ -2294,12 +2295,14 @@ import View from './View.js';
                 passState.framebuffer = fb;
             }
 
-            // Draw terrain classification
-            us.updatePass(Pass.TERRAIN_CLASSIFICATION);
-            commands = frustumCommands.commands[Pass.TERRAIN_CLASSIFICATION];
-            length = frustumCommands.indices[Pass.TERRAIN_CLASSIFICATION];
-            for (j = 0; j < length; ++j) {
-                executeCommand(commands[j], scene, context, passState);
+            if (renderClassification) {
+                // Draw terrain classification
+                us.updatePass(Pass.TERRAIN_CLASSIFICATION);
+                commands = frustumCommands.commands[Pass.TERRAIN_CLASSIFICATION];
+                length = frustumCommands.indices[Pass.TERRAIN_CLASSIFICATION];
+                for (j = 0; j < length; ++j) {
+                    executeCommand(commands[j], scene, context, passState);
+                }
             }
 
             if (clearGlobeDepth) {
@@ -2330,12 +2333,14 @@ import View from './View.js';
                         globeDepth.executeUpdateDepth(context, passState, clearGlobeDepth);
                     }
 
-                    // Draw classifications. Modifies 3D Tiles color.
-                    us.updatePass(Pass.CESIUM_3D_TILE_CLASSIFICATION);
-                    commands = frustumCommands.commands[Pass.CESIUM_3D_TILE_CLASSIFICATION];
-                    length = frustumCommands.indices[Pass.CESIUM_3D_TILE_CLASSIFICATION];
-                    for (j = 0; j < length; ++j) {
-                        executeCommand(commands[j], scene, context, passState);
+                    if (renderClassification) {
+                        // Draw classifications. Modifies 3D Tiles color.
+                        us.updatePass(Pass.CESIUM_3D_TILE_CLASSIFICATION);
+                        commands = frustumCommands.commands[Pass.CESIUM_3D_TILE_CLASSIFICATION];
+                        length = frustumCommands.indices[Pass.CESIUM_3D_TILE_CLASSIFICATION];
+                        for (j = 0; j < length; ++j) {
+                            executeCommand(commands[j], scene, context, passState);
+                        }
                     }
                 }
             } else {
