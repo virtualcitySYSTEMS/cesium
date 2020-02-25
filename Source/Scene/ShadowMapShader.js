@@ -157,6 +157,7 @@ import ShaderSource from '../Renderer/ShaderSource.js';
         var hasCascades = shadowMap._numberOfCascades > 1;
         var debugCascadeColors = shadowMap.debugCascadeColors;
         var softShadows = shadowMap.softShadows;
+        var viewShed = shadowMap.viewShed;
         var bias = isPointLight ? shadowMap._pointBias : (isTerrain ? shadowMap._terrainBias : shadowMap._primitiveBias);
 
         var defines = fs.defines.slice(0);
@@ -258,7 +259,7 @@ import ShaderSource from '../Renderer/ShaderSource.js';
             '    shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w; \n' +
             '    shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; \n';
 
-        if (isTerrain) {
+        if (isTerrain && !viewShed) {
             // Scale depth bias based on view distance to reduce z-fighting in distant terrain
             fsSource += '    shadowParameters.depthBias *= max(depth * 0.01, 1.0); \n';
         } else if (!polygonOffsetSupported) {
@@ -358,9 +359,26 @@ import ShaderSource from '../Renderer/ShaderSource.js';
                 '    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n';
         }
 
-        fsSource +=
-            '    gl_FragColor.rgb *= visibility; \n' +
-            '} \n';
+        if (viewShed) {
+            var shadowColor = viewShed.shadowColor ? Cesium.Color.pack(viewShed.shadowColor, []) : [0.2, 0.2, 0.2, 0.1];
+            var visibleColor = viewShed.visibleColor ? Cesium.Color.pack(viewShed.visibleColor, []) : [1, 0.6, 0.0, 0.5];
+
+            fsSource +=
+                '    if (visibility <= '+ (viewShed.distance || '0.4') +') \n' +
+                '    { \n' +
+                '      gl_FragColor.rgba *= vec4('+ shadowColor.join(',') + '); \n' +
+                '    } \n' +
+                '    else \n' +
+                '    { \n' +
+                '        gl_FragColor.rgba *= vec4('+ visibleColor.join(',') + '); \n' +
+                '    } \n' +
+                '} \n';
+        } else {
+            fsSource +=
+                '    gl_FragColor.rgb *= visibility; \n' +
+                '} \n';
+        }
+
 
         sources.push(fsSource);
 
