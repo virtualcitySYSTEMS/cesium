@@ -3,7 +3,7 @@ define([
         '../ThirdParty/when',
         './Check'
     ], function(
-        SampleTerrainCache,
+        sampleTerrainCache,
         when,
         Check) {
     'use strict';
@@ -88,8 +88,8 @@ define([
         // Send request for each required tile
         var tilePromises = [];
         for (i = 0; i < tileRequests.length; ++i) {
-            if (SampleTerrainCache.has(tileRequests[i].key)) {
-                var terraindata = SampleTerrainCache.get(tileRequests[i].key);
+            if (sampleTerrainCache.has(tileRequests[i])) {
+                var terraindata = sampleTerrainCache.get(tileRequests[i]);
                 var interpolate = createInterpolateFunction(tileRequests[i]);
                 tilePromises.push(when(interpolate(terraindata)));
             } else {
@@ -115,8 +115,8 @@ define([
                 var position = tilePositions[i];
                 position.height = terrainData.interpolateHeight(rectangle, position.longitude, position.latitude);
             }
-            if (!SampleTerrainCache.has(tileRequest.key)) {
-                SampleTerrainCache.add(tileRequest.key, terrainData);
+            if (!sampleTerrainCache.has(tileRequest)) {
+                sampleTerrainCache.add(tileRequest, terrainData);
             }
         };
     }
