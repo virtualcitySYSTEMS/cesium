@@ -728,18 +728,13 @@ function rebatchCommands(primitive, context) {
     }
   }
 
-  if (!needToRebatch) {
+  if (
+    !needToRebatch ||
+    (defined(primitive._lastRebatchCount) &&
+      Math.abs(primitive._lastRebatchCount - length) < 10)
+  ) {
     primitive._batchDirty = false;
     return false;
-  }
-
-  if (
-    needToRebatch &&
-    !primitive.forceRebatch &&
-    primitive._framesSinceLastRebatch < 120
-  ) {
-    ++primitive._framesSinceLastRebatch;
-    return;
   }
 
   batchedIndices.sort(compareColors);
@@ -750,6 +745,7 @@ function rebatchCommands(primitive, context) {
     rebatchCPU(primitive, batchedIndices);
   }
 
+  primitive._lastRebatchCount = primitive._batchedIndices.length;
   primitive._framesSinceLastRebatch = 0;
   primitive._batchDirty = false;
   primitive._pickCommandsDirty = true;
