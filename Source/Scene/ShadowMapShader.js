@@ -207,6 +207,7 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
   var hasCascades = shadowMap._numberOfCascades > 1;
   var debugCascadeColors = shadowMap.debugCascadeColors;
   var softShadows = shadowMap.softShadows;
+  var viewshed = shadowMap.viewshed;
   var bias = isPointLight
     ? shadowMap._pointBias
     : isTerrain
@@ -315,7 +316,7 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
     "    shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w; \n" +
     "    shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; \n";
 
-  if (isTerrain) {
+  if (isTerrain && !viewshed) {
     // Scale depth bias based on view distance to reduce z-fighting in distant terrain
     fsSource += "    shadowParameters.depthBias *= max(depth * 0.01, 1.0); \n";
   } else if (!polygonOffsetSupported) {
@@ -402,7 +403,33 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
       "    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n";
   }
 
-  fsSource += "    gl_FragColor.rgb *= visibility; \n" + "} \n";
+  if (viewshed) {
+    var shadowColor = viewshed.shadowColor
+      ? Cesium.Color.pack(viewshed.shadowColor, [])
+      : [0.2, 0.2, 0.2, 0.1];
+    var visibleColor = viewshed.visibleColor
+      ? Cesium.Color.pack(viewshed.visibleColor, [])
+      : [1, 0.6, 0.0, 0.5];
+
+    fsSource +=
+      "    if (visibility <= " +
+      (viewshed.distance || "0.4") +
+      ") \n" +
+      "    { \n" +
+      "      gl_FragColor.rgba *= vec4(" +
+      shadowColor.join(",") +
+      "); \n" +
+      "    } \n" +
+      "    else \n" +
+      "    { \n" +
+      "        gl_FragColor.rgba *= vec4(" +
+      visibleColor.join(",") +
+      "); \n" +
+      "    } \n" +
+      "} \n";
+  } else {
+    fsSource += "    gl_FragColor.rgb *= visibility; \n" + "} \n";
+  }
 
   sources.push(fsSource);
 
