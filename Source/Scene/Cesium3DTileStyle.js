@@ -61,6 +61,7 @@ function Cesium3DTileStyle(style) {
   this._backgroundPadding = undefined;
   this._backgroundEnabled = undefined;
   this._scaleByDistance = undefined;
+  this._scale = undefined;
   this._translucencyByDistance = undefined;
   this._distanceDisplayCondition = undefined;
   this._heightOffset = undefined;
@@ -117,6 +118,7 @@ function setup(that, styleJson) {
   that.backgroundPadding = styleJson.backgroundPadding;
   that.backgroundEnabled = styleJson.backgroundEnabled;
   that.scaleByDistance = styleJson.scaleByDistance;
+  that.scale = styleJson.scale;
   that.translucencyByDistance = styleJson.translucencyByDistance;
   that.distanceDisplayCondition = styleJson.distanceDisplayCondition;
   that.heightOffset = styleJson.heightOffset;
@@ -1045,6 +1047,57 @@ Object.defineProperties(Cesium3DTileStyle.prototype, {
       this._style.scaleByDistance = getJsonFromExpression(
         this._scaleByDistance
       );
+    },
+  },
+
+  /**
+   * Gets or sets the {@link StyleExpression} object used to evaluate the style's <code>scale</code> property. Alternatively a string or object defining a number style can be used.
+   * The getter will return the internal {@link Expression} or {@link ConditionsExpression}, which may differ from the value provided to the setter.
+   * <p>
+   * The expression must return a <code>Number</code>.
+   * </p>
+   * <p>
+   * This expression is only applicable to point features in a Vector tile.
+   * </p>
+   *
+   * @memberof Cesium3DTileStyle.prototype
+   *
+   * @type {StyleExpression}
+   *
+   * @exception {DeveloperError} The style is not loaded.  Use {@link Cesium3DTileStyle#readyPromise} or wait for {@link Cesium3DTileStyle#ready} to be true.
+   *
+   * @experimental This feature is using part of the 3D Tiles spec that is not final and is subject to change without Cesium's standard deprecation policy.
+   *
+   * @example
+   * var style = new Cesium.Cesium3DTileStyle();
+   * // Override scale expression with a string
+   * style.scale = '5';
+   *
+   * @example
+   * var style = new Cesium.Cesium3DTileStyle();
+   * // Override scale expression with a condition
+   * style.scale = {
+   *     conditions : [
+   *         ['${height} > 2', '5'],
+   *         ['true', '0']
+   *     ]
+   * };
+   */
+  scale: {
+    get: function () {
+      //>>includeStart('debug', pragmas.debug);
+      if (!this._ready) {
+        throw new DeveloperError(
+          "The style is not loaded.  Use Cesium3DTileStyle.readyPromise or wait for Cesium3DTileStyle.ready to be true."
+        );
+      }
+      //>>includeEnd('debug');
+
+      return this._scale;
+    },
+    set: function (value) {
+      this._scale = getExpression(this, value, "scale");
+      this._style.scale = getJsonFromExpression(this._scale);
     },
   },
 
