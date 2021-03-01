@@ -1,4 +1,5 @@
 import Check from "./Check.js";
+import SampleTerrainCache from "./SampleTerrainCache.js";
 
 /**
  * Initiates a terrain height query for an array of {@link Cartographic} positions by
@@ -63,6 +64,7 @@ function doSampling(terrainProvider, level, positions) {
     if (!tileRequestSet.hasOwnProperty(key)) {
       // When tile is requested for the first time
       const value = {
+        key: key,
         x: xy.x,
         y: xy.y,
         level: level,
@@ -82,15 +84,21 @@ function doSampling(terrainProvider, level, positions) {
   const tilePromises = [];
   for (i = 0; i < tileRequests.length; ++i) {
     const tileRequest = tileRequests[i];
-    const requestPromise = tileRequest.terrainProvider.requestTileGeometry(
-      tileRequest.x,
-      tileRequest.y,
-      tileRequest.level
-    );
-    const tilePromise = requestPromise
-      .then(createInterpolateFunction(tileRequest))
-      .catch(createMarkFailedFunction(tileRequest));
-    tilePromises.push(tilePromise);
+    if (SampleTerrainCache.has(tileRequest.key)) {
+      const terraindata = SampleTerrainCache.get(tileRequest.key);
+      const interpolate = createInterpolateFunction(tileRequest);
+      tilePromises.push(interpolate(terraindata));
+    } else {
+      const requestPromise = tileRequest.terrainProvider.requestTileGeometry(
+        tileRequest.x,
+        tileRequest.y,
+        tileRequest.level
+      );
+      const tilePromise = requestPromise
+        .then(createInterpolateFunction(tileRequest))
+        .catch(createMarkFailedFunction(tileRequest));
+      tilePromises.push(tilePromise);
+    }
   }
 
   return Promise.all(tilePromises).then(function () {
@@ -141,6 +149,9 @@ function createInterpolateFunction(tileRequest) {
         terrainData,
         rectangle
       );
+      if (!SampleTerrainCache.has(tileRequest.key)) {
+        SampleTerrainCache.add(tileRequest.key, terrainData);
+      }
       // we've found a position which returned undefined - hinting to us
       //  that we probably need to create a mesh for this terrain data.
       // so break out of this loop and create the mesh - then we'll interpolate all the heights again
