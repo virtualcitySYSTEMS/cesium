@@ -174,7 +174,6 @@ function supportsPointerEvents() {
 
     //Firefox disabled because of https://github.com/CesiumGS/cesium/issues/6372
     hasPointerEvents =
-      !isFirefox() &&
       typeof PointerEvent !== "undefined" &&
       (!defined(theNavigator.pointerEnabled) || theNavigator.pointerEnabled);
   }
