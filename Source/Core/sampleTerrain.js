@@ -85,8 +85,8 @@ function doSampling(terrainProvider, level, positions) {
   var tilePromises = [];
   for (i = 0; i < tileRequests.length; ++i) {
     var tileRequest = tileRequests[i];
-    if (SampleTerrainCache.has(tileRequest.key)) {
-      var terraindata = SampleTerrainCache.get(tileRequest.key);
+    if (SampleTerrainCache.has(tileRequest.key + tileRequest.level)) {
+      var terraindata = SampleTerrainCache.get(tileRequest.key + tileRequest.level);
       var interpolate = createInterpolateFunction(tileRequest);
       tilePromises.push(when(interpolate(terraindata)));
     } else {
@@ -150,8 +150,8 @@ function createInterpolateFunction(tileRequest) {
         terrainData,
         rectangle
       );
-      if (!SampleTerrainCache.has(tileRequest.key)) {
-        SampleTerrainCache.add(tileRequest.key, terrainData);
+      if (!SampleTerrainCache.has(tileRequest.key + tileRequest.level)) {
+        SampleTerrainCache.add(tileRequest.key + tileRequest.level, terrainData);
       }
       // we've found a position which returned undefined - hinting to us
       //  that we probably need to create a mesh for this terrain data.
