@@ -410,7 +410,7 @@ function initialize(content, arrayBuffer, byteOffset) {
       gltf: gltfView,
       cull: false, // The model is already culled by 3D Tiles
       releaseGltfJson: true, // Models are unique and will not benefit from caching so save memory
-      opaquePass: Pass.CESIUM_3D_TILE, // Draw opaque portions of the model during the 3D Tiles pass
+      opaquePass: tileset.renderAsOpaque ? Pass.OPAQUE : Pass.CESIUM_3D_TILE, // Draw opaque portions of the model during the 3D Tiles pass
       basePath: resource,
       requestType: RequestType.TILES3D,
       modelMatrix: content._contentModelMatrix,

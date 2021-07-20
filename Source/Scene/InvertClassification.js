@@ -134,7 +134,7 @@ var translucentFS =
   "    {\n" +
   "        discard;\n" +
   "    }\n" +
-  "    bool isClassified = all(equal(texture2D(classifiedTexture, v_textureCoordinates), vec4(0.0)));\n" +
+  "    bool isClassified = !all(equal(texture2D(classifiedTexture, v_textureCoordinates), vec4(0.0)));\n" +
   "#ifdef UNCLASSIFIED\n" +
   "    vec4 highlightColor = czm_invertClassificationColor;\n" +
   "    if (isClassified)\n" +
