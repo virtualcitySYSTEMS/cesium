@@ -2009,60 +2009,65 @@ function loadWithHttpRequest(
   deferred,
   overrideMimeType
 ) {
+
   // Note: only the 'json' and 'text' responseTypes transforms the loaded buffer
   /* eslint-disable no-undef */
-  var URL = require("url").parse(url);
-  var http = URL.protocol === "https:" ? require("https") : require("http");
-  var zlib = require("zlib");
-  /* eslint-enable no-undef */
+  var Url = new URL(url);
+  var httpPromise = Url.protocol === "https:" ? import("https") : import("http");
+  httpPromise
+    .then(function (http) {
 
-  var options = {
-    protocol: URL.protocol,
-    hostname: URL.hostname,
-    port: URL.port,
-    path: URL.path,
-    query: URL.query,
-    method: method,
-    headers: headers,
-  };
+      var options = {
+        protocol: Url.protocol,
+        hostname: Url.hostname,
+        port: Url.port,
+        path: Url.pathname,
+        query: Url.query,
+        method: method,
+        headers: headers,
+      };
 
-  http
-    .request(options)
-    .on("response", function (res) {
-      if (res.statusCode < 200 || res.statusCode >= 300) {
-        deferred.reject(
-          new RequestErrorEvent(res.statusCode, res, res.headers)
-        );
-        return;
-      }
+      http
+        .request(options)
+        .on("response", function (res) {
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            deferred.reject(
+              new RequestErrorEvent(res.statusCode, res, res.headers)
+            );
+            return;
+          }
 
-      var chunkArray = [];
-      res.on("data", function (chunk) {
-        chunkArray.push(chunk);
-      });
+          var chunkArray = [];
+          res.on("data", function (chunk) {
+            chunkArray.push(chunk);
+          });
 
-      res.on("end", function () {
-        // eslint-disable-next-line no-undef
-        var result = Buffer.concat(chunkArray);
-        if (res.headers["content-encoding"] === "gzip") {
-          zlib.gunzip(result, function (error, resultUnzipped) {
-            if (error) {
-              deferred.reject(
-                new RuntimeError("Error decompressing response.")
-              );
+          res.on("end", function () {
+            // eslint-disable-next-line no-undef
+            var result = Buffer.concat(chunkArray);
+            if (res.headers["content-encoding"] === "gzip") {
+              import("zlib")
+                .then(function (zlib) {
+                  zlib.gunzip(result, function (error, resultUnzipped) {
+                    if (error) {
+                      deferred.reject(
+                        new RuntimeError("Error decompressing response.")
+                      );
+                    } else {
+                      deferred.resolve(decodeResponse(resultUnzipped, responseType));
+                    }
+                  });
+                })
             } else {
-              deferred.resolve(decodeResponse(resultUnzipped, responseType));
+              deferred.resolve(decodeResponse(result, responseType));
             }
           });
-        } else {
-          deferred.resolve(decodeResponse(result, responseType));
-        }
-      });
-    })
-    .on("error", function (e) {
-      deferred.reject(new RequestErrorEvent());
-    })
-    .end();
+        })
+        .on("error", function (e) {
+          deferred.reject(new RequestErrorEvent());
+        })
+        .end();
+    });
 }
 
 var noXMLHttpRequest = typeof XMLHttpRequest === "undefined";

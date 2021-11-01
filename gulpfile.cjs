@@ -30,6 +30,7 @@ const yargs = require("yargs");
 const AWS = require("aws-sdk");
 const mime = require("mime");
 const rollup = require("rollup");
+const rollupPluginIgnore = require("rollup-plugin-ignore");
 const rollupPluginStripPragma = require("rollup-plugin-strip-pragma");
 const rollupPluginExternalGlobals = require("rollup-plugin-external-globals");
 const rollupPluginTerser = require("rollup-plugin-terser");
@@ -164,6 +165,7 @@ function createWorkers() {
     .rollup({
       input: workers,
       onwarn: rollupWarning,
+      plugins: [rollupPluginIgnore(["http", "https", "zlib"])]
     })
     .then(function (bundle) {
       return bundle.write({
@@ -194,7 +196,7 @@ async function buildThirdParty() {
   return rollup
     .rollup({
       input: workers,
-      plugins: [rollupResolve(), rollupCommonjs()],
+      plugins: [rollupResolve(), rollupCommonjs(), rollupPluginIgnore(["http", "https", "zlib"])],
       onwarn: rollupWarning,
     })
     .then(function (bundle) {
@@ -1236,7 +1238,7 @@ gulp.task("convertToModules", function () {
 });
 
 function combineCesium(debug, minify, combineOutput) {
-  const plugins = [];
+  const plugins = [rollupPluginIgnore(["http", "https", "zlib"])];
 
   if (!debug) {
     plugins.push(
@@ -1262,6 +1264,7 @@ function combineCesium(debug, minify, combineOutput) {
         file: path.join(combineOutput, "Cesium.js"),
         sourcemap: debug,
         banner: copyrightHeader,
+        inlineDynamicImports: true
       });
     });
 }
@@ -1309,7 +1312,7 @@ function combineWorkers(debug, minify, combineOutput) {
       return globby(["Source/WorkersES6/*.js"]);
     })
     .then(function (files) {
-      const plugins = [];
+      const plugins = [rollupPluginIgnore(["http", "https", "zlib"])];
 
       if (!debug) {
         plugins.push(
@@ -1911,6 +1914,7 @@ function buildCesiumViewer() {
           moduleSideEffects: false,
         },
         plugins: [
+          rollupPluginIgnore(["http", "https", "zlib"]),
           rollupPluginStripPragma({
             pragmas: ["debug"],
           }),
