@@ -1,0 +1,59 @@
+default:
+  image: gitlab.virtualcitysystems.de:5050/vcsuite/devops/gitlabrunner/node:14
+
+variables:
+  GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_PROJECT_PATH_SLUG/$CI_COMMIT_REF_SLUG
+  GIT_STRATEGY: fetch
+
+stages:
+  - build
+  - version
+  - publish
+
+.template: &job_definition
+  only:
+    variables:
+      - $PUBLISH
+  tags:
+    - linux-2.0
+
+build:
+  <<: *job_definition
+  script:
+    - npm set registry 'http://npmregistry:4873'
+    - npm ci
+    - npm run prepare
+  stage: build
+
+.after_build_template: &after_build_definition
+  <<: *job_definition
+  variables:
+    GIT_STRATEGY: none
+
+patchVersion:
+  <<: *after_build_definition
+  stage: version
+  script:
+    - npm version patch -m "%s [skip-ci]"
+    - TAG=`git describe --abbrev=0`
+    - git push git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/cesium.git $TAG
+    - git push git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/cesium.git HEAD:$CI_COMMIT_REF_NAME
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_RUNNER_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan gitlab.virtualcitysystems.de >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config user.name "Gitlab Runner"
+    - git config user.email "gitlab-runner@vc.systems"
+
+publish:
+  <<: *after_build_definition
+  stage: publish
+  script:
+    - npm run release
+    - npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+    - npm publish --registry https://registry.npmjs.org
+
+
