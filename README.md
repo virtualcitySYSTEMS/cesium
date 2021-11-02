@@ -2,6 +2,11 @@
 <img src="https://github.com/CesiumGS/cesium/wiki/logos/Cesium_Logo_Color.jpg" width="50%" />
 </p>
 
+# Attention
+> This is a custom CesiumJS fork to be used with the `vcMAP`.
+> For the common CesiumJS module visit [this package](https://www.npmjs.com/package/cesium).
+---
+
 [![Build Status](https://travis-ci.com/CesiumGS/cesium.svg?branch=main)](https://travis-ci.com/CesiumGS/cesium)
 [![npm](https://img.shields.io/npm/v/cesium)](https://www.npmjs.com/package/cesium)
 [![Docs](https://img.shields.io/badge/docs-online-orange.svg)](https://cesium.com/learn/)
