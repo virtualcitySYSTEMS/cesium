@@ -15,8 +15,6 @@ import when from "../ThirdParty/when.js";
  *
  * @alias Composite3DTileContent
  * @constructor
- *
- * @private
  */
 function Composite3DTileContent(
   tileset,

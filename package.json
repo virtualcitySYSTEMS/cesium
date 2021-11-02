@@ -27,7 +27,7 @@
   },
   "main": "index.cjs",
   "module": "./Source/Cesium.js",
-  "types": "./Source/Cesium.d.ts",
+  "types": "index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     "./Source/": "./Source/",
