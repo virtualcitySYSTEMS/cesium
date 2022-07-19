@@ -980,7 +980,7 @@ function generateTechnique(
     fragmentShader +=
       "    vec3 zenithColor = mix(blueSkyColor, sceneSkyBox, smoothstepHeight);\n";
 
-    fragmentShader += "    vec3 blueSkyDiffuseColor = vec3(0.7, 0.85, 0.9);\n";
+    fragmentShader += "    vec3 blueSkyDiffuseColor = vec3(0.9, 0.9, 0.9);\n";
     fragmentShader +=
       "    float diffuseIrradianceFromEarth = (1.0 - horizonDotNadir) * (reflectionDotNadir * 0.25 + 0.75) * smoothstepHeight;\n";
     fragmentShader +=
