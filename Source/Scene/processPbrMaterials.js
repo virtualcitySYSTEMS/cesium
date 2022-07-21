@@ -1074,6 +1074,7 @@ function generateTechnique(
   } else {
     fragmentShader += "    vec3 color = baseColor;\n";
   }
+// TODO: implement darkness at night
 
   // Ignore occlusion and emissive when unlit
   if (!isUnlit) {
