@@ -942,7 +942,7 @@ function generateTechnique(
     fragmentShader += "            float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);\n";
 
 
-    fragmentShader += "            float specularFactor = clamp(-1000.0 * LdotZenith_raw, 0.0, 1.0);\n";
+    fragmentShader += "            float specularFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);\n";
     // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
     fragmentShader += "            float m = 0.209439510239;\n";  
     fragmentShader += "            float nn = (1.0 + m) / m * (-LdotZenith + m) / (1.0 + m);\n";
@@ -957,7 +957,7 @@ function generateTechnique(
     fragmentShader += "            float denominator = (0.91 + 10.0 * exp(-3.0 * S) + 0.45 * pow(LdotZenith,2.0)) * (1.0 - exp(-0.32));\n";
     fragmentShader += "            float luminance = gltf_luminanceAtZenith * (numerator / denominator);\n";
     fragmentShader += "            luminance *= luminanceFactor;\n";
-    fragmentShader += "            color *= luminanceFactor;\n";
+    fragmentShader += "            color *= specularFactor;\n";
 
 
     fragmentShader += "        #endif \n";
