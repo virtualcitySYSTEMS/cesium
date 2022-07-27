@@ -447,18 +447,11 @@ void main()
 
 #ifdef ENABLE_VERTEX_LIGHTING
 //    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);
-   
- 
-  //  color = vec4(0.5, 0.5, 0.5, 1.0);
- 
  //	vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
  
  /////////////////////////////////////////////////////////////////7
  
     vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
-    
-    
-    
   vec3 v = -normalize(v_positionEC);
   vec3 n = normalize(v_normalEC);
 
@@ -471,24 +464,12 @@ void main()
    		vec3 lightColorHdr = gltf_lightColor;
     #endif
     
-    
-    
-
     vec3 l = normalize(czm_lightDirectionEC);
-    vec3 h = normalize(v + l);
-    
         float NdotL = clamp(dot(n, l), 0.001, 1.0);
-        float VdotH = clamp(dot(v, h), 0.0, 1.0);
-        vec3 f0 = vec3(0.04);
-    
 	
-        vec3 diffuseColor = color.rgb * (1.0 - f0);
-//        vec3 F = vec3(0.04);
+       vec3 diffuseColor = color.rgb;
         
-        vec3 diffuseContribution =  lambertianDiffuse(diffuseColor);
-        
-        vec3 color2 = NdotL * lightColorHdr * diffuseContribution;
-        
+        vec3 diffuseContribution =  lambertianDiffuse(color.rgb);
 
     // Use the procedural IBL if there are no environment maps
         vec3 r = normalize(czm_inverseViewRotation * normalize(reflect(v, n)));
@@ -501,16 +482,7 @@ void main()
         r = -normalize(czm_temeToPseudoFixed * r);
         r.x = -r.x;
         float atmosphereHeight = 0.05;
-        float blendRegionSize = 0.1 * (9.1 - horizonDotNadir);
-        float farAboveHorizon = clamp(horizonDotNadir - blendRegionSize * 0.5 - 1.0, 1.0e-10 - blendRegionSize, 0.99999);
-        float aroundHorizon = clamp(horizonDotNadir + blendRegionSize * 0.5, 1.0e-10 - blendRegionSize, 0.99999);
-        float farBelowHorizon = clamp(horizonDotNadir + blendRegionSize * 1.5, 1.0e-10 - blendRegionSize, 0.99999);
         float smoothstepHeight = smoothstep(0.0, atmosphereHeight, horizonDotNadir);
-        vec3 belowHorizonColor = mix(vec3(0.1, 0.15, 0.25), vec3(0.4, 0.7, 0.9), smoothstepHeight);
-        vec3 nadirColor = belowHorizonColor * 0.5;
-        vec3 aboveHorizonColor = mix(vec3(0.9, 1.0, 1.2), belowHorizonColor, 0.5);
-        vec3 blueSkyColor = mix(vec3(0.18, 0.26, 0.48), aboveHorizonColor, 0.75);
-        vec3 zenithColor = mix(blueSkyColor, vec3( 0.0), smoothstepHeight);
         vec3 blueSkyDiffuseColor = vec3(0.9, 0.9, 0.9);
         float diffuseIrradianceFromEarth = (1.0 - horizonDotNadir) * (reflectionDotNadir * 0.25 + 0.75) * smoothstepHeight;
         float diffuseIrradianceFromSky = (1.0 - smoothstepHeight) * (1.0 - (reflectionDotNadir * 0.25 + 0.25));
@@ -518,9 +490,6 @@ void main()
         
         float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));
         float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
-
-
-        float specularFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);
  
         float S = acos(LdotZenith);
         float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);
@@ -528,33 +497,34 @@ void main()
         float numerator = ((0.91 + 10.0 * exp(-3.0 * gamma) + 0.45 * pow(NdotL, 2.0)) * (1.0 - exp(-0.32 / NdotZenith)));
         float denominator = (0.91 + 10.0 * exp(-3.0 * S) + 0.45 * pow(LdotZenith,2.0)) * (1.0 - exp(-0.32));
 		float luminanceAtZenith = 0.2;
-        float luminance = luminanceAtZenith * (numerator / denominator);
         
         // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
         float m = 0.209439510239;  
         float nn = (-LdotZenith + m) / m;
         float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;
         
-        luminance *= luminanceFactor;
-        color2 *= specularFactor;
+        float luminance = luminanceAtZenith * (numerator / denominator) * luminanceFactor;
         
+        float directLightFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);
         
-
-        vec3 IBLColor = (diffuseIrradiance * diffuseColor);
-        
-        float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);
+  		float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);
         vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);
-        IBLColor *= lightColor;
-
-
-        color2 += IBLColor * luminance;
         
-     color2 = applyTonemapping(color2);
+        vec3 IBLColor = (diffuseIrradiance * diffuseColor) * lightColor;
+
+        vec3 directLight = (NdotL * lightColorHdr * diffuseContribution) * directLightFactor;
+        
+        vec3 ambientLight = IBLColor * luminance;
+
+       vec3 colorRGB = directLight + ambientLight;
+
+        
+     colorRGB = applyTonemapping(colorRGB);
  
- 	color2 = LINEARtoSRGB(color2);
+ 	colorRGB = LINEARtoSRGB(colorRGB);
  
  
- 	vec4 finalColor = vec4(color2.rgb, color.a);
+ 	vec4 finalColor = vec4(colorRGB.rgb, color.a);
  
  
  ///////////////////////////////////////////////////7
