@@ -713,6 +713,8 @@ function generateTechnique(
     "#endif \n" +
     "}\n\n";
 
+  
+
   fragmentShader +=
     "vec2 computeTexCoord(vec2 texCoords, vec2 offset, float rotation, vec2 scale) \n" +
     "{\n" +
@@ -804,6 +806,8 @@ function generateTechnique(
 
   fragmentShader += "    vec3 baseColor = baseColorWithAlpha.rgb;\n";
 
+
+
   if (hasNormals && !isUnlit) {
     if (useSpecGloss) {
       if (defined(generatedMaterialValues.u_specularGlossinessTexture)) {
@@ -866,9 +870,11 @@ function generateTechnique(
     // Generate fragment shader's lighting block
     fragmentShader += "    #ifndef USE_CUSTOM_LIGHT_COLOR \n";
     fragmentShader += "        vec3 lightColorHdr = czm_lightColorHdr;\n";
+ //   fragmentShader += "        lightColorHdr.b = 0.5;\n";
     fragmentShader += "    #else \n";
     fragmentShader += "        vec3 lightColorHdr = gltf_lightColor;\n";
-    fragmentShader += "    #endif \n";
+  //  fragmentShader += "        lightColorHdr.r = 0.5;\n";
+   fragmentShader += "    #endif \n";
     fragmentShader += "    vec3 l = normalize(czm_lightDirectionEC);\n";
     fragmentShader += "    vec3 h = normalize(v + l);\n";
     fragmentShader += "    float NdotL = clamp(dot(n, l), 0.001, 1.0);\n";
@@ -900,6 +906,10 @@ function generateTechnique(
     fragmentShader += "    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);\n";
     fragmentShader += "    vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
 //    fragmentShader += "    vec3 color = vec3(NdotL, 0.0, 0.0); // * lightColorHdr * (diffuseContribution + specularContribution);\n";
+
+    fragmentShader += "    vec3 color_before_ibl_lighting = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
+
+
 
     // Use the procedural IBL if there are no environment maps
     fragmentShader += "    #if defined(USE_IBL_LIGHTING) && !defined(DIFFUSE_IBL) && !defined(SPECULAR_IBL) \n";
@@ -976,6 +986,7 @@ function generateTechnique(
     fragmentShader += "            color += IBLColor; \n";
     fragmentShader += "        #endif \n";
 
+
     // Environment maps were provided, use them for IBL
     fragmentShader += "    #elif defined(DIFFUSE_IBL) || defined(SPECULAR_IBL) \n";
     fragmentShader += "        const mat3 yUpToZUp = mat3(-1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); \n";
@@ -1007,6 +1018,9 @@ function generateTechnique(
     fragmentShader += "    vec3 color = baseColor;\n";
   }
 
+    fragmentShader += "    vec3 color_after_sun_luminance = color;\n";
+
+
   // Ignore occlusion and emissive when unlit
   if (!isUnlit) {
     if (defined(generatedMaterialValues.u_occlusionTexture)) {
@@ -1031,7 +1045,7 @@ function generateTechnique(
 
 
 
-//    fragmentShader += "    color = vec3(luminanceFactor,luminanceFactor,luminanceFactor);\n";
+  //  fragmentShader += "    color = vec3(luminanceFactor,luminanceFactor,luminanceFactor);\n";
   //  fragmentShader += "    color = vec3(nn,nn,nn);\n";
   //  fragmentShader += "    color = vec3(-LdotZenith_raw,-LdotZenith_raw,-LdotZenith_raw);\n";
 
@@ -1039,6 +1053,9 @@ function generateTechnique(
 
 
   fragmentShader += "    color = LINEARtoSRGB(color);\n";
+
+    fragmentShader += "    vec3 color_after_sun_luminance2 = color;\n";
+
 
   if (hasOutline) {
     fragmentShader += "    float outlineness = max(\n";
@@ -1049,20 +1066,33 @@ function generateTechnique(
     fragmentShader += "    color = mix(color, vec3(0.0, 0.0, 0.0), outlineness);\n";
   }
 
+
+ // fragmentShader += "    color = color_after_sun_luminance2;\n";
+
+
   if (defined(alphaMode)) {
     if (alphaMode === "MASK") {
       fragmentShader += "    if (baseColorWithAlpha.a < u_alphaCutoff) {\n";
       fragmentShader += "        discard;\n";
       fragmentShader += "    }\n";
-      fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
+   //   fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
+      fragmentShader += "    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n";
+
     } else if (alphaMode === "BLEND") {
-      fragmentShader +=
-        "    gl_FragColor = vec4(color, baseColorWithAlpha.a);\n";
+//      fragmentShader += "    gl_FragColor = vec4(color, baseColorWithAlpha.a);\n";
+      fragmentShader += "    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);\n";
+
     } else {
       fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
+ // 		fragmentShader += "    gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);\n";
+//  	  fragmentShader += "    gl_FragColor = vec4(color_before_ibl_lighting.rgb, 1.0);\n";
+
+
     }
   } else {
-    fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
+//    fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
+   fragmentShader += "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n";
+
   }
 
   fragmentShader += "}\n";
