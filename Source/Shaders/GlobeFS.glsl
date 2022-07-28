@@ -464,6 +464,9 @@ void main()
    		vec3 lightColorHdr = gltf_lightColor;
     #endif
     
+    
+    	
+    
     vec3 l = normalize(czm_lightDirectionEC);
         float NdotL = clamp(dot(n, l), 0.001, 1.0);
 	
@@ -490,6 +493,10 @@ void main()
         
         float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));
         float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
+        float L = clamp(LdotZenith_raw, 0.0, 1.0);
+        float directLightFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);
+        
+        
  
         float S = acos(LdotZenith);
         float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);
@@ -500,23 +507,51 @@ void main()
         
         // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
         float m = 0.209439510239;  
-        float nn = (-LdotZenith + m) / m;
+        float p = (1.0 + m) / m;
+        float y = (-L + m) / (1.0 + m);
+        float nn = p * y;
         float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;
+        
+        
         
         float luminance = luminanceAtZenith * (numerator / denominator) * luminanceFactor;
         
-        float directLightFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);
         
   		float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);
         vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);
         
+		
+			
+        
         vec3 IBLColor = (diffuseIrradiance * diffuseColor) * lightColor;
+        
+        vec3 directLightColorHdr = lightColorHdr;
+		//float alpha = clamp(dot(normalize(czm_inverseViewRotation * l), normalize(positionWC)), 0.0, 1.0);
+		float alpha2 = L;
+        float beta = pow(alpha2, 1.0/3.0);
 
-        vec3 directLight = (NdotL * lightColorHdr * diffuseContribution) * directLightFactor;
+		vec3 beta_color = vec3(beta, beta, beta);
+
+        float sun_minB = 0.5; //0.7;
+		float sun_minG = sun_minB * 0.5 + 0.5; 
+		float sun_G = beta*(1.0 - sun_minG) + sun_minG;
+		float sun_B = beta*(1.0 - sun_minB) + sun_minB;
+			
+		directLightColorHdr.g *= sun_G;
+		directLightColorHdr.b *= sun_B;
+		
+		
+        vec3 directLight = (NdotL * directLightColorHdr * diffuseContribution) * directLightFactor;
+        
+        
+		
+		vec3 ldotz_color = vec3(LdotZenith_raw, LdotZenith_raw, LdotZenith_raw);
+        
         
         vec3 ambientLight = IBLColor * luminance;
 
        vec3 colorRGB = directLight + ambientLight;
+   //    vec3 colorRGB = ambientLight;
 
         
      colorRGB = applyTonemapping(colorRGB);
@@ -525,6 +560,7 @@ void main()
  
  
  	vec4 finalColor = vec4(colorRGB.rgb, color.a);
+ 	
  
  
  ///////////////////////////////////////////////////7
@@ -606,14 +642,10 @@ void main()
     }
 #endif
 
-	//vec3 color3 = finalColor.rgb;
-	
-	//finalColor = vec4(finalColor.rgb, finalColor.a);
-	
-	
     gl_FragColor = finalColor;
  
-//	gl_FragColor =  vec4(specularContribution.rgb, 1.0);
+
+//	gl_FragColor =  vec4(lightColorHdr.rgb, 1.0);
 }
 
 

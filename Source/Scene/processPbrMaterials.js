@@ -875,6 +875,8 @@ function generateTechnique(
     fragmentShader += "        vec3 lightColorHdr = gltf_lightColor;\n";
   //  fragmentShader += "        lightColorHdr.r = 0.5;\n";
    fragmentShader += "    #endif \n";
+
+
     fragmentShader += "    vec3 l = normalize(czm_lightDirectionEC);\n";
     fragmentShader += "    vec3 h = normalize(v + l);\n";
     fragmentShader += "    float NdotL = clamp(dot(n, l), 0.001, 1.0);\n";
@@ -904,15 +906,14 @@ function generateTechnique(
 
     fragmentShader += "    vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);\n";
     fragmentShader += "    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);\n";
-    fragmentShader += "    vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
-//    fragmentShader += "    vec3 color = vec3(NdotL, 0.0, 0.0); // * lightColorHdr * (diffuseContribution + specularContribution);\n";
-
-    fragmentShader += "    vec3 color_before_ibl_lighting = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
 
 
 
     // Use the procedural IBL if there are no environment maps
     fragmentShader += "    #if defined(USE_IBL_LIGHTING) && !defined(DIFFUSE_IBL) && !defined(SPECULAR_IBL) \n";
+
+
+
     fragmentShader += "        vec3 r = normalize(czm_inverseViewRotation * normalize(reflect(v, n)));\n";
     // Figure out if the reflection vector hits the ellipsoid
     fragmentShader += "        float vertexRadius = length(positionWC);\n";
@@ -945,17 +946,38 @@ function generateTechnique(
     fragmentShader += "        vec3 specularIrradiance = mix(zenithColor, aboveHorizonColor, smoothstep(farAboveHorizon, aroundHorizon, reflectionDotNadir) * notDistantRough);\n";
     fragmentShader += "        specularIrradiance = mix(specularIrradiance, belowHorizonColor, smoothstep(aroundHorizon, farBelowHorizon, reflectionDotNadir) * inverseRoughness);\n";
     fragmentShader += "        specularIrradiance = mix(specularIrradiance, nadirColor, smoothstep(farBelowHorizon, 1.0, reflectionDotNadir) * inverseRoughness);\n";
+
+
+    // Angle between sun and zenith
+    fragmentShader += "        float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));\n";
+    fragmentShader += "        float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);\n";
+    fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";  
+    fragmentShader += "        float directLightFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);\n";
+
+    fragmentShader += "         vec3 directLightColorHdr = lightColorHdr;\n";
+    fragmentShader += "        float alpha2 = L;\n";
+    fragmentShader += "        float beta = pow(alpha2, 1.0/3.0);\n";
+
+    fragmentShader += "        vec3 beta_color = vec3(beta, beta, beta);\n";
+
+    fragmentShader += "        float sun_minB =  0.5; //0.7;\n";
+    fragmentShader += "        float sun_minG = sun_minB * 0.5 + 0.5; \n";
+    fragmentShader += "        float sun_G = beta*(1.0 - sun_minG) + sun_minG;\n";
+    fragmentShader += "        float sun_B = beta*(1.0 - sun_minB) + sun_minB;\n";
+			
+    fragmentShader += "        directLightColorHdr.g *= sun_G;\n";
+    fragmentShader += "        directLightColorHdr.b *= sun_B;\n";
+		
+    fragmentShader += "        vec3 directLight = NdotL * directLightColorHdr * (diffuseContribution + specularContribution) * directLightFactor;\n";
+
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
-    // Angle between sun and zenith
-    fragmentShader += "            float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));\n";
-    fragmentShader += "            float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);\n";
 
-
-    fragmentShader += "            float specularFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);\n";
     // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
     fragmentShader += "            float m = 0.209439510239;\n";  
-    fragmentShader += "            float nn = (1.0 + m) / m * (-LdotZenith + m) / (1.0 + m);\n";
+    fragmentShader += "            float p = (1.0 + m) / m;\n";  
+    fragmentShader += "            float y = (-L + m) / (1.0 + m);\n";
+    fragmentShader += "            float nn = p * y;\n";
     fragmentShader += "            float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;\n";
 
     fragmentShader += "            float S = acos(LdotZenith);\n";
@@ -967,9 +989,6 @@ function generateTechnique(
     fragmentShader += "            float denominator = (0.91 + 10.0 * exp(-3.0 * S) + 0.45 * pow(LdotZenith,2.0)) * (1.0 - exp(-0.32));\n";
     fragmentShader += "            float luminance = gltf_luminanceAtZenith * (numerator / denominator);\n";
     fragmentShader += "            luminance *= luminanceFactor;\n";
-    fragmentShader += "            color *= specularFactor;\n";
-
-
     fragmentShader += "        #endif \n";
 
     fragmentShader += "        vec2 brdfLut = texture2D(czm_brdfLut, vec2(NdotV, roughness)).rg;\n";
@@ -981,14 +1000,21 @@ function generateTechnique(
 
 
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
-    fragmentShader += "            color += IBLColor * luminance;\n";
+    fragmentShader += "            vec3 color = directLight + IBLColor * luminance;\n";
     fragmentShader += "        #else \n";
-    fragmentShader += "            color += IBLColor; \n";
+    fragmentShader += "            vec3 color = directLight + IBLColor; \n";
     fragmentShader += "        #endif \n";
 
 
     // Environment maps were provided, use them for IBL
     fragmentShader += "    #elif defined(DIFFUSE_IBL) || defined(SPECULAR_IBL) \n";
+
+
+    fragmentShader += "        vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
+//    fragmentShader += "        vec3 color = vec3(NdotL, 0.0, 0.0); // * lightColorHdr * (diffuseContribution + specularContribution);\n";
+
+
+
     fragmentShader += "        const mat3 yUpToZUp = mat3(-1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); \n";
     fragmentShader += "        vec3 cubeDir = normalize(yUpToZUp * gltf_iblReferenceFrameMatrix * normalize(reflect(-v, n))); \n";
     fragmentShader += "        #ifdef DIFFUSE_IBL \n";
@@ -1018,7 +1044,6 @@ function generateTechnique(
     fragmentShader += "    vec3 color = baseColor;\n";
   }
 
-    fragmentShader += "    vec3 color_after_sun_luminance = color;\n";
 
 
   // Ignore occlusion and emissive when unlit
@@ -1054,7 +1079,6 @@ function generateTechnique(
 
   fragmentShader += "    color = LINEARtoSRGB(color);\n";
 
-    fragmentShader += "    vec3 color_after_sun_luminance2 = color;\n";
 
 
   if (hasOutline) {
@@ -1067,7 +1091,6 @@ function generateTechnique(
   }
 
 
- // fragmentShader += "    color = color_after_sun_luminance2;\n";
 
 
   if (defined(alphaMode)) {
@@ -1075,23 +1098,19 @@ function generateTechnique(
       fragmentShader += "    if (baseColorWithAlpha.a < u_alphaCutoff) {\n";
       fragmentShader += "        discard;\n";
       fragmentShader += "    }\n";
-   //   fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
-      fragmentShader += "    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n";
+      fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
 
     } else if (alphaMode === "BLEND") {
-//      fragmentShader += "    gl_FragColor = vec4(color, baseColorWithAlpha.a);\n";
-      fragmentShader += "    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);\n";
+      fragmentShader += "    gl_FragColor = vec4(color, baseColorWithAlpha.a);\n";
 
     } else {
       fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
- // 		fragmentShader += "    gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);\n";
-//  	  fragmentShader += "    gl_FragColor = vec4(color_before_ibl_lighting.rgb, 1.0);\n";
+  //	  fragmentShader += "    gl_FragColor = vec4(directLightFactor, directLightFactor, directLightFactor, 1.0);\n";
 
 
     }
   } else {
-//    fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
-   fragmentShader += "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n";
+    fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
 
   }
 
