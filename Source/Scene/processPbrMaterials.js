@@ -904,7 +904,6 @@ function generateTechnique(
     fragmentShader += "    float G = smithVisibilityGGX(alpha, NdotL, NdotV);\n";
     fragmentShader += "    float D = GGX(alpha, NdotH);\n";
 
-    fragmentShader += "    vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);\n";
     fragmentShader += "    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);\n";
 
 
@@ -968,7 +967,10 @@ function generateTechnique(
     fragmentShader += "        directLightColorHdr.g *= sun_G;\n";
     fragmentShader += "        directLightColorHdr.b *= sun_B;\n";
 		
-    fragmentShader += "        vec3 directLight = NdotL * directLightColorHdr * (diffuseContribution + specularContribution) * directLightFactor;\n";
+  //  fragmentShader += "        vec3 directLight = NdotL * directLightColorHdr * (diffuseContribution + specularContribution) * directLightFactor;\n";
+
+
+    fragmentShader += "        vec3 specularLight = directLightColorHdr * F * G * D / 4.0 / NdotV * directLightFactor;\n";
 
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
@@ -992,23 +994,29 @@ function generateTechnique(
     fragmentShader += "        #endif \n";
 
     fragmentShader += "        vec2 brdfLut = texture2D(czm_brdfLut, vec2(NdotV, roughness)).rg;\n";
+  //  fragmentShader += "            specularIrradiance *= directLightFactor;\n";
+
     fragmentShader += "        vec3 IBLColor = (diffuseIrradiance * diffuseColor * gltf_iblFactor.x) + (specularIrradiance * SRGBtoLINEAR3(specularColor * brdfLut.x + brdfLut.y) * gltf_iblFactor.y);\n";
-    fragmentShader += "        float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);\n";
-    fragmentShader += "        vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);\n";
+ //   fragmentShader += "        float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);\n";
+ //   fragmentShader += "        vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);\n";
+    fragmentShader += "        vec3 lightColor = lightColorHdr / 2.0;\n";
     fragmentShader += "        IBLColor *= lightColor;\n";
 
 
 
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
-    fragmentShader += "            vec3 color = directLight + IBLColor * luminance;\n";
+    fragmentShader += "            vec3 ambientLight = IBLColor * luminance;\n";
     fragmentShader += "        #else \n";
-    fragmentShader += "            vec3 color = directLight + IBLColor; \n";
+    fragmentShader += "            vec3 ambientLight = IBLColor; \n";
     fragmentShader += "        #endif \n";
+
+    fragmentShader += "        vec3 color = ambientLight + specularLight; \n";
 
 
     // Environment maps were provided, use them for IBL
     fragmentShader += "    #elif defined(DIFFUSE_IBL) || defined(SPECULAR_IBL) \n";
 
+    fragmentShader += "        vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);\n";
 
     fragmentShader += "        vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
 //    fragmentShader += "        vec3 color = vec3(NdotL, 0.0, 0.0); // * lightColorHdr * (diffuseContribution + specularContribution);\n";
@@ -1070,12 +1078,6 @@ function generateTechnique(
 
 
 
-  //  fragmentShader += "    color = vec3(luminanceFactor,luminanceFactor,luminanceFactor);\n";
-  //  fragmentShader += "    color = vec3(nn,nn,nn);\n";
-  //  fragmentShader += "    color = vec3(-LdotZenith_raw,-LdotZenith_raw,-LdotZenith_raw);\n";
-
-
-
 
   fragmentShader += "    color = LINEARtoSRGB(color);\n";
 
@@ -1105,7 +1107,6 @@ function generateTechnique(
 
     } else {
       fragmentShader += "    gl_FragColor = vec4(color, 1.0);\n";
-  //	  fragmentShader += "    gl_FragColor = vec4(directLightFactor, directLightFactor, directLightFactor, 1.0);\n";
 
 
     }

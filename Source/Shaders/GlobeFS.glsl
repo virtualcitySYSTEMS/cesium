@@ -472,7 +472,6 @@ void main()
 	
        vec3 diffuseColor = color.rgb;
         
-        vec3 diffuseContribution =  lambertianDiffuse(color.rgb);
 
     // Use the procedural IBL if there are no environment maps
         vec3 r = normalize(czm_inverseViewRotation * normalize(reflect(v, n)));
@@ -495,8 +494,6 @@ void main()
         float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
         float L = clamp(LdotZenith_raw, 0.0, 1.0);
         float directLightFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);
-        
-        
  
         float S = acos(LdotZenith);
         float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);
@@ -512,16 +509,8 @@ void main()
         float nn = p * y;
         float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;
         
-        
-        
         float luminance = luminanceAtZenith * (numerator / denominator) * luminanceFactor;
-        
-        
-  		float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);
-        vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);
-        
-		
-			
+        vec3 lightColor = lightColorHdr / 2.0;
         
         vec3 IBLColor = (diffuseIrradiance * diffuseColor) * lightColor;
         
@@ -540,18 +529,9 @@ void main()
 		directLightColorHdr.g *= sun_G;
 		directLightColorHdr.b *= sun_B;
 		
-		
-        vec3 directLight = (NdotL * directLightColorHdr * diffuseContribution) * directLightFactor;
-        
-        
-		
-		vec3 ldotz_color = vec3(LdotZenith_raw, LdotZenith_raw, LdotZenith_raw);
-        
-        
         vec3 ambientLight = IBLColor * luminance;
 
-       vec3 colorRGB = directLight + ambientLight;
-   //    vec3 colorRGB = ambientLight;
+       vec3 colorRGB = ambientLight;
 
         
      colorRGB = applyTonemapping(colorRGB);
