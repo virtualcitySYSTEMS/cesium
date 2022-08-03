@@ -1138,9 +1138,6 @@ function generateTechnique(
     }
   }
 
- //   fragmentShader += "   color = sceneSkyBox;\n";
-	
-
   if (!isUnlit) {
     fragmentShader += "    color = applyTonemapping(color);\n";
   }
