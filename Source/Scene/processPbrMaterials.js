@@ -999,7 +999,7 @@ function generateTechnique(
     fragmentShader += "        float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));\n";
     fragmentShader += "        float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);\n";
     fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";  
-    fragmentShader += "        float directLightFactor = clamp(-100.0 * LdotZenith_raw, 0.0, 1.0);\n";
+    fragmentShader += "        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);\n";
 
     fragmentShader += "         vec3 directLightColorHdr = lightColorHdr;\n";
     fragmentShader += "        float alpha2 = L;\n";
@@ -1015,10 +1015,7 @@ function generateTechnique(
     fragmentShader += "        directLightColorHdr.g *= sun_G;\n";
     fragmentShader += "        directLightColorHdr.b *= sun_B;\n";
 		
-  //  fragmentShader += "        vec3 directLight = NdotL * directLightColorHdr * (diffuseContribution + specularContribution) * directLightFactor;\n";
-
-
-    fragmentShader += "        vec3 specularLight = directLightColorHdr * F * G * D / 4.0 / NdotV * directLightFactor;\n";
+    fragmentShader += "        vec3 specularLight = directLightColorHdr * F * G * D / 4.0 / NdotV * sunAboveHorizon;\n";
 
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
@@ -1034,6 +1031,9 @@ function generateTechnique(
     // Angle between zenith and current pixel
     fragmentShader +=
       "    float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);\n";
+
+    fragmentShader += "    NdotL *= sunAboveHorizon;\n";
+
     // Angle between sun and current pixel
     fragmentShader += "    float gamma = acos(NdotL);\n";
     fragmentShader +=
@@ -1137,6 +1137,9 @@ function generateTechnique(
       fragmentShader += "    color += u_emissiveFactor;\n";
     }
   }
+
+ //   fragmentShader += "   color = sceneSkyBox;\n";
+	
 
   if (!isUnlit) {
     fragmentShader += "    color = applyTonemapping(color);\n";
