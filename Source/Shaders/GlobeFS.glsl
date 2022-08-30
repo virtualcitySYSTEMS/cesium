@@ -289,61 +289,6 @@ vec3 computeGroundAtmosphereColor(vec3 fogColor, vec4 finalColor, vec3 atmospher
 #endif
 
 const float fExposure = 2.0;
-const float M_PI = 3.141592653589793;
-
-
-
-vec3 SRGBtoLINEAR3(vec3 srgbIn)
-{
-    return pow(srgbIn, vec3(2.2));
-}
-
-vec4 SRGBtoLINEAR4(vec4 srgbIn)
-{
-    vec3 linearOut = pow(srgbIn.rgb, vec3(2.2));
-    return vec4(linearOut, srgbIn.a);
-}
-    
-vec3 LINEARtoSRGB(vec3 linearIn)
-{
-    #ifndef HDR
-        return pow(linearIn, vec3(1.0/2.2));
-    #else
-        return linearIn;
-    #endif
-}
-
-
-vec3 applyTonemapping(vec3 linearIn)
-{
-#ifndef HDR
-    return czm_acesTonemapping(linearIn);
-#else 
-    return linearIn;
-#endif
-}
-
-
-
-
-
-
-vec3 fresnelSchlick2_f90one_f004(float VdotH)
-{
-    return vec3(0.04) + vec3(0.96) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
-}      
-
-        
-         
-
-
-vec3 lambertianDiffuse(vec3 diffuseColor)
-{
-    return diffuseColor / M_PI;
-}
-
-
-
 
 void main()
 {
@@ -375,10 +320,6 @@ void main()
     // fragments on the edges of tiles even though the vertex shader is outputting
     // coordinates strictly in the 0-1 range.
     vec4 color = computeDayColor(u_initialColor, clamp(v_textureCoordinates, 0.0, 1.0), nightBlend);
-    
-
-    
-    
 
 #ifdef SHOW_TILE_BOUNDARIES
     if (v_textureCoordinates.x < (1.0/256.0) || v_textureCoordinates.x > (255.0/256.0) ||
@@ -583,17 +524,8 @@ void main()
     }
 #endif
 
-	//vec3 color3 = finalColor.rgb;
-	
-	//finalColor = vec4(finalColor.rgb, finalColor.a);
-	
-	
     gl_FragColor = finalColor;
- 
-//	gl_FragColor =  vec4(specularContribution.rgb, 1.0);
 }
-
-
 
 #ifdef GROUND_ATMOSPHERE
 vec3 computeGroundAtmosphereColor(vec3 fogColor, vec4 finalColor, vec3 atmosphereLightDirection, float cameraDist)
