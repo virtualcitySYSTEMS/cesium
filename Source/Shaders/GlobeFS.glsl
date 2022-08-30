@@ -376,16 +376,8 @@ void main()
     // coordinates strictly in the 0-1 range.
     vec4 color = computeDayColor(u_initialColor, clamp(v_textureCoordinates, 0.0, 1.0), nightBlend);
     
+
     
-    //     vec4 computeDayColor(vec4 initialColor, vec3 textureCoordinates, float nightBlend)
-    //    vec4 color = computeDayColor(vec4(0.0, 0.0, 0.0, 1.0), clamp(v_textureCoordinates, 0.0, 1.0), 0.0);
-    
-    
-    color = SRGBtoLINEAR4(color);
-    
-    vec4 diffuse = color;
- 
- //color = color * 0.2;
     
 
 #ifdef SHOW_TILE_BOUNDARIES
@@ -457,24 +449,25 @@ void main()
 #endif
 
 #ifdef ENABLE_VERTEX_LIGHTING
-//    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);
-   
+
+
+#ifdef ENABLE_LEGACY_LIGHTING
+
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);
+    
+ 	vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
  
-  //  color = vec4(0.5, 0.5, 0.5, 1.0);
- 
- //	vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
+ #else
  
  /////////////////////////////////////////////////////////////////7
  
+ 	vec4 orgColor = color;
+ 
     vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
     
-    
-    
-  vec3 v = -normalize(v_positionEC);
-  vec3 n = normalize(v_normalEC);
+	vec3 v = -normalize(v_positionEC);
+	vec3 n = normalize(v_normalEC);
 
-    // Generate fragment shader's lighting block
-    
     #ifndef USE_CUSTOM_LIGHT_COLOR 
     	vec3 lightColorHdr = czm_lightColorHdr;
     	
@@ -483,88 +476,35 @@ void main()
     #endif
     
     
-    
+    lightColorHdr *= 2.5;
 
     vec3 l = normalize(czm_lightDirectionEC);
-    vec3 h = normalize(v + l);
     
-        float NdotL = clamp(dot(n, l), 0.001, 1.0);
-        float VdotH = clamp(dot(v, h), 0.0, 1.0);
-        vec3 f0 = vec3(0.04);
-    
+    float NdotL = clamp(dot(n, l), 0.001, 1.0);
     
 	vec3 baseColor = color.rgb;
-	
-        vec3 diffuseColor = baseColor * (1.0 - f0);
-
-	    vec3 F =  vec3(0.04) + vec3(0.96) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
         
-        vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);
-        
-        
-
-    // Use the procedural IBL if there are no environment maps
-        vec3 r = normalize(czm_inverseViewRotation * normalize(reflect(v, n)));
-    // Figure out if the reflection vector hits the ellipsoid
-        float vertexRadius = length(positionWC);
-        float horizonDotNadir = 1.0 - min(1.0, czm_ellipsoidRadii.x / vertexRadius);
-        float reflectionDotNadir = dot(r, normalize(positionWC));
-        float atmosphereHeight = 0.05;
-        float smoothstepHeight = smoothstep(0.0, atmosphereHeight, horizonDotNadir);
-        vec3 blueSkyDiffuseColor = vec3(0.9, 0.9, 0.9);
-        float diffuseIrradianceFromEarth = (1.0 - horizonDotNadir) * (reflectionDotNadir * 0.25 + 0.75) * smoothstepHeight;
-        float diffuseIrradianceFromSky = (1.0 - smoothstepHeight) * (1.0 - (reflectionDotNadir * 0.25 + 0.25));
-        vec3 diffuseIrradiance = blueSkyDiffuseColor * clamp(diffuseIrradianceFromEarth + diffuseIrradianceFromSky, 0.0, 1.0);
-    // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
-
     // Angle between sun and zenith
-        float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));
-        float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
+    float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));
+    float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
 
-
-        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);
+    float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);
     // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
-        float m = 0.209439510239;  
-        float nn = (-LdotZenith + m) / m;
-        float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;
-
-        float S = acos(LdotZenith);
-    // Angle between zenith and current pixel
-        float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);
+    float m = 0.209439510239;  
+    float nn = (-LdotZenith + m) / m;
+    float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.67 + 0.33;
   
-      NdotL *= sunAboveHorizon;
-  
-    // Angle between sun and current pixel
-        float gamma = acos(NdotL);
-        float numerator = ((0.91 + 10.0 * exp(-3.0 * gamma) + 0.45 * pow(NdotL, 2.0)) * (1.0 - exp(-0.32 / NdotZenith)));
-        float denominator = (0.91 + 10.0 * exp(-3.0 * S) + 0.45 * pow(LdotZenith,2.0)) * (1.0 - exp(-0.32));
-		float luminanceAtZenith = 0.2;
-        float luminance = luminanceAtZenith * (numerator / denominator);
-        luminance *= luminanceFactor;
+	NdotL *= sunAboveHorizon;
         
-        
-        
-        float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);
-        vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);
-
-        vec3 directLight = NdotL * lightColorHdr * diffuseContribution;
-       
-       vec3 ambientLight = diffuseIrradiance * diffuseColor * lightColor * luminance;
-
-        vec3 color2 = directLight + ambientLight;
-        
-    //  color2 = directLight;
-        
-        
-     color2 = applyTonemapping(color2);
- 
- 	color2 = LINEARtoSRGB(color2);
- 
- 
+	vec3 lightColor = lightColorHdr / 2.0;
+	vec3 directLight = NdotL * lightColorHdr * baseColor * 0.05;
+	vec3 ambientLight = baseColor * lightColorHdr * luminanceFactor * 0.16;
+	vec3 color2 = directLight + ambientLight;        
  	vec4 finalColor = vec4(color2.rgb, color.a);
+ ///////////////////////////////////////////////////
  
+#endif
  
- ///////////////////////////////////////////////////7
  
 #elif defined(ENABLE_DAYNIGHT_SHADING)
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);

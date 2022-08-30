@@ -894,6 +894,9 @@ function generateTechnique(
     fragmentShader += "#else \n";
     fragmentShader += "    vec3 lightColorHdr = gltf_lightColor;\n";
     fragmentShader += "#endif \n";
+
+    fragmentShader += "lightColorHdr *= 2.5;\n";
+
     fragmentShader += "    vec3 l = normalize(czm_lightDirectionEC);\n";
     fragmentShader += "    vec3 h = normalize(v + l);\n";
     fragmentShader += "    float NdotL = clamp(dot(n, l), 0.001, 1.0);\n";
@@ -1137,6 +1140,9 @@ function generateTechnique(
       fragmentShader += "    color += u_emissiveFactor;\n";
     }
   }
+
+ //   fragmentShader += "   color = sceneSkyBox;\n";
+	
 
   if (!isUnlit) {
     fragmentShader += "    color = applyTonemapping(color);\n";
