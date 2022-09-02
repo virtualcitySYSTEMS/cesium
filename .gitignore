@@ -38,7 +38,6 @@ Source/ThirdParty/Workers/z-worker-pako.js
 /node_modules
 npm-debug.log
 npm-debug.log.*
-package-lock.json
 yarn.lock
 
 # WebStorm user-specific
