@@ -406,7 +406,6 @@ void main()
  
     vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
     
-	vec3 v = -normalize(v_positionEC);
 	vec3 n = normalize(v_normalEC);
 
     #ifndef USE_CUSTOM_LIGHT_COLOR 
