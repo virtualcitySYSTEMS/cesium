@@ -404,8 +404,6 @@ void main()
     // This block will use the angle between zenith and sun for controlling the globe illumination.
     // Also, twilight before and after sun set is simulated assuming darkness at -12 degress (nautical twilight)
  
- 	vec4 orgColor = color;
- 
     vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
     
 	vec3 v = -normalize(v_positionEC);
