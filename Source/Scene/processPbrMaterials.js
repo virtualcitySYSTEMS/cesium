@@ -1036,6 +1036,7 @@ function generateTechnique(
     fragmentShader +=
       "    float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);\n";
 
+    // let n dot l be zero if sun is down in order to block direct light
     fragmentShader += "    NdotL *= sunAboveHorizon;\n";
 
     // Angle between sun and current pixel
