@@ -392,6 +392,7 @@ void main()
 #ifdef ENABLE_VERTEX_LIGHTING
 
 
+// for reactivating the original globe shader without dark night, set the shader variable ENABLE_LEGACY_LIGHTING, e.g. in GlobeSurfaceShaderSet
 #ifdef ENABLE_LEGACY_LIGHTING
 
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);
@@ -399,8 +400,9 @@ void main()
  	vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
  
  #else
- 
- /////////////////////////////////////////////////////////////////7
+    /////// CUSTOM SHADER CODE START //////////////////////////////////////////////////////////
+    // This block will use the angle between zenith and sun for controlling the globe illumination.
+    // Also, twilight before and after sun set is simulated assuming darkness at -12 degress (nautical twilight)
  
  	vec4 orgColor = color;
  
@@ -430,20 +432,20 @@ void main()
     float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
 
     float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);
-    // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
+	// beginning of nautical twilight at 12 degrees below horizon
     float m = 0.209439510239;  
     float nn = (-LdotZenith + m) / m;
     float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.67 + 0.33;
   
-	NdotL *= sunAboveHorizon;
+    NdotL *= sunAboveHorizon;
         
-	vec3 lightColor = lightColorHdr / 2.0;
-	vec3 directLight = NdotL * lightColorHdr * baseColor * 0.05;
-	vec3 ambientLight = baseColor * lightColorHdr * luminanceFactor * 0.16;
-	vec3 color2 = directLight + ambientLight;        
- 	vec4 finalColor = vec4(color2.rgb, color.a);
- ///////////////////////////////////////////////////
- 
+    vec3 lightColor = lightColorHdr / 2.0;
+    vec3 directLight = NdotL * lightColorHdr * baseColor * 0.05;
+    vec3 ambientLight = baseColor * lightColorHdr * luminanceFactor * 0.16;
+    vec3 color2 = directLight + ambientLight;        
+     vec4 finalColor = vec4(color2.rgb, color.a);
+ 	
+    /////// CUSTOM SHADER CODE END //////////////////////////////////////////////////////////
 #endif
  
  

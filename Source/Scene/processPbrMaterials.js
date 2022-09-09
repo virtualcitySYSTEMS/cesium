@@ -895,7 +895,6 @@ function generateTechnique(
     fragmentShader += "    vec3 lightColorHdr = gltf_lightColor;\n";
     fragmentShader += "#endif \n";
 
-    fragmentShader += "lightColorHdr *= 2.5;\n";
 
     fragmentShader += "    vec3 l = normalize(czm_lightDirectionEC);\n";
     fragmentShader += "    vec3 h = normalize(v + l);\n";
@@ -997,6 +996,9 @@ function generateTechnique(
       "    specularIrradiance = mix(specularIrradiance, nadirColor, smoothstep(farBelowHorizon, 1.0, reflectionDotNadir) * inverseRoughness);\n";
 
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
+    // VCS shader adjustments allow dark rendering at night. 
+    // Also, twilight before and after sun set is simulated assuming darkness at -12 degress (nautical twilight)
+
 
     // Angle between sun and zenith
     fragmentShader += "        float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));\n";
@@ -1004,11 +1006,10 @@ function generateTechnique(
     fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";  
     fragmentShader += "        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);\n";
 
-    fragmentShader += "         vec3 directLightColorHdr = lightColorHdr;\n";
-    fragmentShader += "        float alpha2 = L;\n";
-    fragmentShader += "        float beta = pow(alpha2, 1.0/3.0);\n";
+    fragmentShader += "        lightColorHdr *= 2.5;\n";
 
-    fragmentShader += "        vec3 beta_color = vec3(beta, beta, beta);\n";
+    fragmentShader += "        vec3 directLightColorHdr = lightColorHdr;\n";
+    fragmentShader += "        float beta = pow(L, 1.0/3.0);\n";
 
     fragmentShader += "        float sun_minB =  0.5; //0.7;\n";
     fragmentShader += "        float sun_minG = sun_minB * 0.5 + 0.5; \n";
@@ -1075,9 +1076,6 @@ function generateTechnique(
     fragmentShader += "        vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);\n";
 
     fragmentShader += "        vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
-//    fragmentShader += "        vec3 color = vec3(NdotL, 0.0, 0.0); // * lightColorHdr * (diffuseContribution + specularContribution);\n";
-
-
 
     fragmentShader +=
       "    const mat3 yUpToZUp = mat3(-1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); \n";
@@ -1141,7 +1139,6 @@ function generateTechnique(
     }
   }
 
- //   fragmentShader += "   color = sceneSkyBox;\n";
 	
 
   if (!isUnlit) {
