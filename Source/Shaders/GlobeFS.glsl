@@ -396,56 +396,56 @@ void main()
 #ifdef ENABLE_LEGACY_LIGHTING
 
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);
-    
- 	vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
- 
+
+     vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
+
  #else
     /////// CUSTOM SHADER CODE START //////////////////////////////////////////////////////////
     // This block will use the angle between zenith and sun for controlling the globe illumination.
     // Also, twilight before and after sun set is simulated assuming darkness at -12 degress (nautical twilight)
- 
-    vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
-    
-	vec3 n = normalize(v_normalEC);
 
-    #ifndef USE_CUSTOM_LIGHT_COLOR 
-    	vec3 lightColorHdr = czm_lightColorHdr;
-    	
-    #else 
-   		vec3 lightColorHdr = gltf_lightColor;
+    vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
+
+    vec3 n = normalize(v_normalEC);
+
+    #ifndef USE_CUSTOM_LIGHT_COLOR
+        vec3 lightColorHdr = czm_lightColorHdr;
+
+    #else
+        vec3 lightColorHdr = gltf_lightColor;
     #endif
-    
-    
+
+
     lightColorHdr *= 2.5;
 
     vec3 l = normalize(czm_lightDirectionEC);
-    
+
     float NdotL = clamp(dot(n, l), 0.001, 1.0);
-    
-	vec3 baseColor = color.rgb;
-        
+
+    vec3 baseColor = color.rgb;
+
     // Angle between sun and zenith
     float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));
     float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);
 
     float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);
-	// beginning of nautical twilight at 12 degrees below horizon
-    float m = 0.209439510239;  
+    // beginning of nautical twilight at 12 degrees below horizon
+    float m = 0.209439510239;
     float nn = (-LdotZenith + m) / m;
     float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.67 + 0.33;
-  
+
     NdotL *= sunAboveHorizon;
-        
+
     vec3 lightColor = lightColorHdr / 2.0;
     vec3 directLight = NdotL * lightColorHdr * baseColor * 0.05;
     vec3 ambientLight = baseColor * lightColorHdr * luminanceFactor * 0.16;
-    vec3 color2 = directLight + ambientLight;        
+    vec3 color2 = directLight + ambientLight;
      vec4 finalColor = vec4(color2.rgb, color.a);
- 	
+
     /////// CUSTOM SHADER CODE END //////////////////////////////////////////////////////////
 #endif
- 
- 
+
+
 #elif defined(ENABLE_DAYNIGHT_SHADING)
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);
     diffuseIntensity = mix(1.0, diffuseIntensity, fade);

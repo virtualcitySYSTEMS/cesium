@@ -996,14 +996,14 @@ function generateTechnique(
       "    specularIrradiance = mix(specularIrradiance, nadirColor, smoothstep(farBelowHorizon, 1.0, reflectionDotNadir) * inverseRoughness);\n";
 
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
-    // VCS shader adjustments allow dark rendering at night. 
+    // VCS shader adjustments allow dark rendering at night.
     // Also, twilight before and after sun set is simulated assuming darkness at -12 degress (nautical twilight)
 
 
     // Angle between sun and zenith
     fragmentShader += "        float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));\n";
     fragmentShader += "        float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);\n";
-    fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";  
+    fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";
     fragmentShader += "        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);\n";
 
     fragmentShader += "        lightColorHdr *= 2.5;\n";
@@ -1015,18 +1015,18 @@ function generateTechnique(
     fragmentShader += "        float sun_minG = sun_minB * 0.5 + 0.5; \n";
     fragmentShader += "        float sun_G = beta*(1.0 - sun_minG) + sun_minG;\n";
     fragmentShader += "        float sun_B = beta*(1.0 - sun_minB) + sun_minB;\n";
-			
+
     fragmentShader += "        directLightColorHdr.g *= sun_G;\n";
     fragmentShader += "        directLightColorHdr.b *= sun_B;\n";
-		
+
     fragmentShader += "        vec3 specularLight = directLightColorHdr * F * G * D / 4.0 / NdotV * sunAboveHorizon;\n";
 
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
 
     // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
-    fragmentShader += "            float m = 0.209439510239;\n";  
-    fragmentShader += "            float p = (1.0 + m) / m;\n";  
+    fragmentShader += "            float m = 0.209439510239;\n";
+    fragmentShader += "            float p = (1.0 + m) / m;\n";
     fragmentShader += "            float y = (-L + m) / (1.0 + m);\n";
     fragmentShader += "            float nn = p * y;\n";
     fragmentShader += "            float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;\n";
@@ -1047,7 +1047,7 @@ function generateTechnique(
       "    float denominator = (0.91 + 10.0 * exp(-3.0 * S) + 0.45 * pow(LdotZenith,2.0)) * (1.0 - exp(-0.32));\n";
     fragmentShader +=
       "    float luminance = gltf_luminanceAtZenith * (numerator / denominator);\n";
-    fragmentShader += 
+    fragmentShader +=
       "    luminance *= luminanceFactor;\n";
     fragmentShader += "#endif \n";
 
@@ -1056,7 +1056,7 @@ function generateTechnique(
 
     fragmentShader +=
       "    vec3 IBLColor = (diffuseIrradiance * diffuseColor * gltf_iblFactor.x) + (specularIrradiance * SRGBtoLINEAR3(specularColor * brdfLut.x + brdfLut.y) * gltf_iblFactor.y);\n";
-    fragmentShader += 
+    fragmentShader +=
       "    vec3 lightColor = lightColorHdr / 2.0;\n";
     fragmentShader += "    IBLColor *= lightColor;\n";
 
@@ -1140,7 +1140,7 @@ function generateTechnique(
     }
   }
 
-	
+
 
   if (!isUnlit) {
     fragmentShader += "    color = applyTonemapping(color);\n";
