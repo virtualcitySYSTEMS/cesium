@@ -894,6 +894,8 @@ function generateTechnique(
     fragmentShader += "#else \n";
     fragmentShader += "    vec3 lightColorHdr = gltf_lightColor;\n";
     fragmentShader += "#endif \n";
+
+
     fragmentShader += "    vec3 l = normalize(czm_lightDirectionEC);\n";
     fragmentShader += "    vec3 h = normalize(v + l);\n";
     fragmentShader += "    float NdotL = clamp(dot(n, l), 0.001, 1.0);\n";
@@ -929,11 +931,7 @@ function generateTechnique(
     fragmentShader += "    float D = GGX(alpha, NdotH);\n";
 
     fragmentShader +=
-      "    vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);\n";
-    fragmentShader +=
       "    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);\n";
-    fragmentShader +=
-      "    vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
 
     // Use the procedural IBL if there are no environment maps
     fragmentShader +=
@@ -998,14 +996,49 @@ function generateTechnique(
       "    specularIrradiance = mix(specularIrradiance, nadirColor, smoothstep(farBelowHorizon, 1.0, reflectionDotNadir) * inverseRoughness);\n";
 
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
-    fragmentShader += "#ifdef USE_SUN_LUMINANCE \n";
+    // VCS shader adjustments allow dark rendering at night.
+    // Also, twilight before and after sun set is simulated assuming darkness at -12 degress (nautical twilight)
+
+
     // Angle between sun and zenith
-    fragmentShader +=
-      "    float LdotZenith = clamp(dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0)), 0.001, 1.0);\n";
-    fragmentShader += "    float S = acos(LdotZenith);\n";
+    fragmentShader += "        float LdotZenith_raw = dot(normalize(czm_inverseViewRotation * l), normalize(positionWC * -1.0));\n";
+    fragmentShader += "        float LdotZenith = clamp(LdotZenith_raw, 0.001, 1.0);\n";
+    fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";
+    fragmentShader += "        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);\n";
+
+    fragmentShader += "        lightColorHdr *= 2.5;\n";
+
+    fragmentShader += "        vec3 directLightColorHdr = lightColorHdr;\n";
+    fragmentShader += "        float beta = pow(L, 1.0/3.0);\n";
+
+    fragmentShader += "        float sun_minB =  0.5; //0.7;\n";
+    fragmentShader += "        float sun_minG = sun_minB * 0.5 + 0.5; \n";
+    fragmentShader += "        float sun_G = beta*(1.0 - sun_minG) + sun_minG;\n";
+    fragmentShader += "        float sun_B = beta*(1.0 - sun_minB) + sun_minB;\n";
+
+    fragmentShader += "        directLightColorHdr.g *= sun_G;\n";
+    fragmentShader += "        directLightColorHdr.b *= sun_B;\n";
+
+    fragmentShader += "        vec3 specularLight = directLightColorHdr * F * G * D / 4.0 / NdotV * sunAboveHorizon;\n";
+
+    // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
+    fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
+
+    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
+    fragmentShader += "            float m = 0.209439510239;\n";
+    fragmentShader += "            float p = (1.0 + m) / m;\n";
+    fragmentShader += "            float y = (-L + m) / (1.0 + m);\n";
+    fragmentShader += "            float nn = p * y;\n";
+    fragmentShader += "            float luminanceFactor = smoothstep(0.0, 1.0, nn) * 0.88 + 0.12;\n";
+
+    fragmentShader += "            float S = acos(LdotZenith);\n";
     // Angle between zenith and current pixel
     fragmentShader +=
       "    float NdotZenith = clamp(dot(normalize(czm_inverseViewRotation * n), normalize(positionWC * -1.0)), 0.001, 1.0);\n";
+
+    // let n dot l be zero if sun is down in order to block direct light
+    fragmentShader += "    NdotL *= sunAboveHorizon;\n";
+
     // Angle between sun and current pixel
     fragmentShader += "    float gamma = acos(NdotL);\n";
     fragmentShader +=
@@ -1014,27 +1047,37 @@ function generateTechnique(
       "    float denominator = (0.91 + 10.0 * exp(-3.0 * S) + 0.45 * pow(LdotZenith,2.0)) * (1.0 - exp(-0.32));\n";
     fragmentShader +=
       "    float luminance = gltf_luminanceAtZenith * (numerator / denominator);\n";
+    fragmentShader +=
+      "    luminance *= luminanceFactor;\n";
     fragmentShader += "#endif \n";
 
     fragmentShader +=
       "    vec2 brdfLut = texture2D(czm_brdfLut, vec2(NdotV, roughness)).rg;\n";
+
     fragmentShader +=
       "    vec3 IBLColor = (diffuseIrradiance * diffuseColor * gltf_iblFactor.x) + (specularIrradiance * SRGBtoLINEAR3(specularColor * brdfLut.x + brdfLut.y) * gltf_iblFactor.y);\n";
-
     fragmentShader +=
-      "    float maximumComponent = max(max(lightColorHdr.x, lightColorHdr.y), lightColorHdr.z);\n";
-    fragmentShader +=
-      "    vec3 lightColor = lightColorHdr / max(maximumComponent, 1.0);\n";
+      "    vec3 lightColor = lightColorHdr / 2.0;\n";
     fragmentShader += "    IBLColor *= lightColor;\n";
 
+
+
     fragmentShader += "#ifdef USE_SUN_LUMINANCE \n";
-    fragmentShader += "    color += IBLColor * luminance;\n";
+    fragmentShader += "    vec3 ambientLight = IBLColor * luminance;\n";
     fragmentShader += "#else \n";
-    fragmentShader += "    color += IBLColor; \n";
+    fragmentShader += "    vec3 ambientLight = IBLColor; \n";
     fragmentShader += "#endif \n";
+
+    fragmentShader += "        vec3 color = ambientLight + specularLight; \n";
+
 
     // Environment maps were provided, use them for IBL
     fragmentShader += "#elif defined(DIFFUSE_IBL) || defined(SPECULAR_IBL) \n";
+
+    fragmentShader += "        vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);\n";
+
+    fragmentShader += "        vec3 color = NdotL * lightColorHdr * (diffuseContribution + specularContribution);\n";
+
     fragmentShader +=
       "    const mat3 yUpToZUp = mat3(-1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); \n";
     fragmentShader +=
@@ -1096,6 +1139,8 @@ function generateTechnique(
       fragmentShader += "    color += u_emissiveFactor;\n";
     }
   }
+
+
 
   if (!isUnlit) {
     fragmentShader += "    color = applyTonemapping(color);\n";
