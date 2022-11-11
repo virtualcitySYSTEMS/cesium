@@ -1068,7 +1068,7 @@ function generateTechnique(
     fragmentShader += "    vec3 ambientLight = IBLColor; \n";
     fragmentShader += "#endif \n";
 
-    fragmentShader += "        vec3 color = ambientLight + specularLight; \n";
+    fragmentShader += "        vec3 color = 0.8*ambientLight + specularLight; \n";
 
 
     // Environment maps were provided, use them for IBL

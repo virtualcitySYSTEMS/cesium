@@ -439,7 +439,7 @@ void main()
     vec3 lightColor = lightColorHdr / 2.0;
     vec3 directLight = NdotL * lightColorHdr * baseColor * 0.05;
     vec3 ambientLight = baseColor * lightColorHdr * luminanceFactor * 0.16;
-    vec3 color2 = directLight + ambientLight;
+    vec3 color2 = directLight*1.3 + ambientLight*0.9;
      vec4 finalColor = vec4(color2.rgb, color.a);
 
     /////// CUSTOM SHADER CODE END //////////////////////////////////////////////////////////
