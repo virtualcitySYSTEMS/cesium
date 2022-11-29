@@ -1006,7 +1006,7 @@ function generateTechnique(
     fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";
     fragmentShader += "        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);\n";
 
-    fragmentShader += "        lightColorHdr *= 2.5;\n";
+    fragmentShader += "        lightColorHdr *= 2.5 * 0.7;\n";
 
     fragmentShader += "        vec3 directLightColorHdr = lightColorHdr;\n";
     fragmentShader += "        float beta = pow(L, 1.0/3.0);\n";
