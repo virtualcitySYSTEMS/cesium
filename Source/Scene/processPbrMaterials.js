@@ -802,7 +802,9 @@ function generateTechnique(
       fragmentShader += "    baseColorWithAlpha *= u_baseColorFactor;\n";
     }
   } else if (defined(generatedMaterialValues.u_baseColorFactor)) {
-    fragmentShader += "    vec4 baseColorWithAlpha = u_baseColorFactor;\n";
+ //   fragmentShader += "    vec4 baseColorWithAlpha = u_baseColorFactor;\n";
+    fragmentShader += "    vec4 baseColorWithAlpha = SRGBtoLINEAR4(u_baseColorFactor);\n";
+
   } else {
     fragmentShader += "    vec4 baseColorWithAlpha = vec4(1.0);\n";
   }
@@ -1006,7 +1008,7 @@ function generateTechnique(
     fragmentShader += "        float L = clamp(LdotZenith_raw, 0.0, 1.0);\n";
     fragmentShader += "        float sunAboveHorizon = clamp(-20.0 * LdotZenith_raw, 0.0, 1.0);\n";
 
-    fragmentShader += "        lightColorHdr *= 2.5 * 0.7;\n";
+    fragmentShader += "        lightColorHdr *= 2.0;\n";
 
     fragmentShader += "        vec3 directLightColorHdr = lightColorHdr;\n";
     fragmentShader += "        float beta = pow(L, 1.0/3.0);\n";
@@ -1024,7 +1026,7 @@ function generateTechnique(
     // Luminance model from page 40 of http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
     fragmentShader += "        #ifdef USE_SUN_LUMINANCE \n";
 
-    // Winkel nautische Daemmerung: Winkel der Sonne unter dem Horizont, bei dem kein Sonnelicht mehr ankommt (in radiens)
+    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
     fragmentShader += "            float m = 0.209439510239;\n";
     fragmentShader += "            float p = (1.0 + m) / m;\n";
     fragmentShader += "            float y = (-L + m) / (1.0 + m);\n";
