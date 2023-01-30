@@ -34,6 +34,9 @@ patchVersion:
   <<: *after_build_definition
   stage: version
   script:
+    - npm version patch --workspaces
+    - git add "package*.json"
+    - git commit -m "patch workspaces [skip-ci]"
     - npm version patch -m "%s [skip-ci]"
     - TAG=`git describe --abbrev=0`
     - git push git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/cesium.git $TAG
@@ -54,4 +57,4 @@ publish:
   script:
     - npm run release
     - npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-    - npm publish --registry https://registry.npmjs.org
+    - npm publish --registry https://registry.npmjs.org --workspace packages/engine

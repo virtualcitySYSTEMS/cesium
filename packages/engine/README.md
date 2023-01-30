@@ -1,5 +1,12 @@
 # @cesium/engine
 
+> > **_Attention_**
+>
+> This is a custom CesiumJS fork to be used with the `VC Map`.
+> For the common CesiumJS module visit [this package](https://www.npmjs.com/package/@cesium/engine).
+
+---
+
 ![Cesium](https://github.com/CesiumGS/cesium/wiki/logos/Cesium_Logo_Color.jpg)
 
 [![Build Status](https://travis-ci.com/CesiumGS/cesium.svg?branch=main)](https://travis-ci.com/CesiumGS/cesium)
@@ -13,25 +20,25 @@ CesiumJS is a JavaScript library for creating 3D globes and 2D maps in a web bro
 
 ## Install
 
-`@cesium/engine` is published as ES modules with full typing support.
+`@vcmap-cesium/engine` is published as ES modules with full typing support.
 
 Install with npm:
 
 ```sh
-npm install @cesium/engine --save
+npm install @vcmap-cesium/engine --save
 ```
 
 Or, install with yarn:
 
 ```sh
-yarn add @cesium/engine
+yarn add @vcmap-cesium/engine
 ```
 
 ## Usage
 
 ```js
-import * as Cesium from "@cesium/engine";
-import "@cesium/engine/Source/Widget/CesiumWidget.css";
+import * as Cesium from "@vcmap-cesium/engine";
+import "@vcmap-cesium/engine/Source/Widget/CesiumWidget.css";
 
 const cesiumWidget = new Cesium.CesiumWidget("cesiumContainer");
 ```
@@ -39,8 +46,8 @@ const cesiumWidget = new Cesium.CesiumWidget("cesiumContainer");
 Or, import individual modules to benefit from tree shaking optmtimizations through most build tools:
 
 ```js
-import { CesiumWidget } from "@cesium/engine";
-import "@cesium/engine/Source/Widget/CesiumWidget.css";
+import { CesiumWidget } from "@vcmap-cesium/engine";
+import "@vcmap-cesium/engine/Source/Widget/CesiumWidget.css";
 
 const cesiumWidget = new CesiumWidget("cesiumContainer");
 ```

@@ -99,7 +99,7 @@ import {
   WebMapServiceImageryProvider,
   WebMapTileServiceImageryProvider,
   writeTextToCanvas,
-} from "@vcmap/cesium";
+} from "@vcmap-cesium/engine";
 
 // Verify ImageryProvider instances conform to the expected interface
 let imageryProvider: ImageryProvider;

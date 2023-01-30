@@ -1,5 +1,5 @@
-import { defaultValue } from "@cesium/engine";
-import { Viewer } from "@cesium/widgets";
+import { defaultValue } from "@vcmap-cesium/engine";
+import { Viewer } from "@vcmap-cesium/widgets";
 
 import getWebGLStub from "./getWebGLStub.js";
 
