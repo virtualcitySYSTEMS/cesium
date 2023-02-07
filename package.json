@@ -51,8 +51,8 @@
     "./Specs/**/*"
   ],
   "dependencies": {
-    "@vcmap-cesium/engine": "1.1.1",
-    "@vcmap-cesium/widgets": "1.1.1"
+    "@vcmap-cesium/engine": "1.1.2",
+    "@vcmap-cesium/widgets": "1.1.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^23.0.5",
