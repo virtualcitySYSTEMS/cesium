@@ -2064,7 +2064,6 @@ Cesium3DTile.prototype.process = function (tileset, frameState) {
 
     // Refresh style for expired content
     this._selectedFrame = 0;
-    this.lastStyleTime = 0.0;
 
     JulianDate.now(this._loadTimestamp);
     this._contentState = Cesium3DTileContentState.READY;
