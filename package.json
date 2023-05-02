@@ -51,8 +51,8 @@
     "./Specs/**/*"
   ],
   "dependencies": {
-    "@vcmap-cesium/engine": "2.3.0",
-    "@vcmap-cesium/widgets": "2.2.0"
+    "@vcmap-cesium/engine": "2.3.1",
+    "@vcmap-cesium/widgets": "2.2.1"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.276.0",
