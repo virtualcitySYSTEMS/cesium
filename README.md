@@ -1,5 +1,12 @@
 # CesiumJS
 
+## Attention
+
+> This is a custom CesiumJS fork to be used with the `VC Map`.
+> For the common CesiumJS module visit [this package](https://www.npmjs.com/package/cesium).
+
+---
+
 [![Build Status](https://travis-ci.com/CesiumGS/cesium.svg?branch=main)](https://travis-ci.com/CesiumGS/cesium)
 [![npm](https://img.shields.io/npm/v/cesium)](https://www.npmjs.com/package/cesium)
 [![Docs](https://img.shields.io/badge/docs-online-orange.svg)](https://cesium.com/learn/)
@@ -39,8 +46,8 @@ const viewer = new Viewer("cesiumContainer");
 
 In addition to the `cesium` package, CesiumJS is also [distributed as scoped npm packages for better dependency management](https://cesium.com/blog/2022/12/07/modular-structure-in-cesiumjs/):
 
-- [`@cesium/engine`](./packages/engine/README.md) - CesiumJS's core, rendering, and data APIs
-- [`@cesium/widgets`](./packages/widgets/README.md) - A widgets library for use with CesiumJS
+- [`@vcmap-cesium/engine`](./packages/engine/README.md) - CesiumJS's core, rendering, and data APIs
+- [`@vcmap-cesium/widgets`](./packages/widgets/README.md) - A widgets library for use with CesiumJS
 
 ### What next?
 
