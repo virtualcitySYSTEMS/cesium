@@ -1,4 +1,5 @@
 import defined from "../Core/defined.js";
+import Color from "../Core/Color.js";
 import ShaderSource from "../Renderer/ShaderSource.js";
 
 /**
@@ -186,6 +187,7 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
   const hasCascades = shadowMap._numberOfCascades > 1;
   const debugCascadeColors = shadowMap.debugCascadeColors;
   const softShadows = shadowMap.softShadows;
+  const viewshed = shadowMap.viewshed;
   const bias = isPointLight
     ? shadowMap._pointBias
     : isTerrain
@@ -294,7 +296,7 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
     "    shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w; \n" +
     "    shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; \n";
 
-  if (isTerrain) {
+  if (isTerrain && !viewshed) {
     // Scale depth bias based on view distance to reduce z-fighting in distant terrain
     fsSource += "    shadowParameters.depthBias *= max(depth * 0.01, 1.0); \n";
   } else if (!polygonOffsetSupported) {
@@ -382,8 +384,27 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
       "    shadowParameters.nDotL = nDotL; \n" +
       "    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n";
   }
+  if (viewshed) {
+    const shadowColor = viewshed.shadowColor
+      ? Color.pack(viewshed.shadowColor, [])
+      : [0.2, 0.2, 0.2, 0.1];
+    const visibleColor = viewshed.visibleColor
+      ? Color.pack(viewshed.visibleColor, [])
+      : [1, 0.6, 0.0, 0.5];
 
-  fsSource += "    out_FragColor.rgb *= visibility; \n" + "} \n";
+    fsSource +=
+      `    if (visibility <= ${viewshed.distance || "0.4"}) \n` +
+      `    { \n` +
+      `      out_FragColor.rgba *= vec4(${shadowColor.join(",")}); \n` +
+      `    } \n` +
+      `    else \n` +
+      `    { \n` +
+      `        out_FragColor.rgba *= vec4(${visibleColor.join(",")}); \n` +
+      `    } \n` +
+      `} \n`;
+  } else {
+    fsSource += "    out_FragColor.rgb *= visibility; \n" + "} \n";
+  }
 
   sources.push(fsSource);
 

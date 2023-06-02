@@ -2693,6 +2693,9 @@ function filterProcessingQueue(tileset) {
  */
 function processTiles(tileset, frameState) {
   filterProcessingQueue(tileset);
+  tileset._styleEngine.applyStyle(tileset);
+  tileset._styleApplied = true;
+
   const tiles = tileset._processingQueue;
   const statistics = tileset._statistics;
   let tile;
@@ -2874,9 +2877,6 @@ function updateTileDebugLabels(tileset, frameState) {
  * @param {object} passOptions
  */
 function updateTiles(tileset, frameState, passOptions) {
-  tileset._styleEngine.applyStyle(tileset);
-  tileset._styleApplied = true;
-
   const { commandList, context } = frameState;
   const numberOfInitialCommands = commandList.length;
   const selectedTiles = tileset._selectedTiles;

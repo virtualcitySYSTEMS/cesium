@@ -51,6 +51,19 @@ Cesium3DTileStyleEngine.prototype.applyStyle = function (tileset) {
   const lastStyleTime = this._lastStyleTime;
   const statistics = tileset._statistics;
 
+  const proccessingTiles = tileset._processingQueue;
+  const processingTilesLength = proccessingTiles.length;
+  for (let i = 0; i < processingTilesLength; ++i) {
+    const tile = proccessingTiles[i];
+    if (tile.lastStyleTime !== lastStyleTime && tile.contentReady) {
+      const content = tile.content;
+      tile.lastStyleTime = lastStyleTime;
+      content.applyStyle(this._style);
+      statistics.numberOfFeaturesStyled += content.featuresLength;
+      ++statistics.numberOfTilesStyled;
+    }
+  }
+
   // If a new style was assigned, loop through all the visible tiles; otherwise, loop through
   // only the tiles that are newly visible, i.e., they are visible this frame, but were not
   // visible last frame.  In many cases, the newly selected tiles list will be short or empty.
@@ -63,7 +76,7 @@ Cesium3DTileStyleEngine.prototype.applyStyle = function (tileset) {
   const length = tiles.length;
   for (let i = 0; i < length; ++i) {
     const tile = tiles[i];
-    if (tile.lastStyleTime !== lastStyleTime) {
+    if (tile.lastStyleTime !== lastStyleTime && tile.contentReady) {
       // Apply the style to this tile if it wasn't already applied because:
       //   1) the user assigned a new style to the tileset
       //   2) this tile is now visible, but it wasn't visible when the style was first assigned
