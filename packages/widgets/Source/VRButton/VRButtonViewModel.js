@@ -7,7 +7,7 @@ import {
   Fullscreen,
   getElement,
   OrthographicFrustum,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import NoSleep from "nosleep.js";
 import createCommand from "../createCommand.js";

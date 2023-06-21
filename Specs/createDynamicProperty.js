@@ -1,4 +1,4 @@
-import { ConstantProperty } from "@cesium/engine";
+import { ConstantProperty } from "@vcmap-cesium/engine";
 
 function createDynamicProperty(value) {
   const property = new ConstantProperty(value);
