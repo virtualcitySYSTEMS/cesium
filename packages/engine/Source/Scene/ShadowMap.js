@@ -115,9 +115,9 @@ function ShadowMap(options) {
    * Determines the darkness of the shadows.
    *
    * @type {number}
-   * @default 0.3
+   * @default 0.5
    */
-  this.darkness = defaultValue(options.darkness, 0.3);
+  this.darkness = defaultValue(options.darkness, 0.5);
   this._darkness = this.darkness;
 
   /**

@@ -616,9 +616,9 @@ ModelSceneGraph.prototype.configurePipeline = function (frameState) {
     return;
   }
 
-  if (model.imageBasedLighting.enabled) {
+  /*if (model.imageBasedLighting.enabled) {
     modelPipelineStages.push(ImageBasedLightingPipelineStage);
-  }
+  }*/
 
   if (model.isClippingEnabled()) {
     modelPipelineStages.push(ModelClippingPlanesPipelineStage);

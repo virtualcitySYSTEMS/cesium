@@ -77,13 +77,18 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
         baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
         #endif
 
-    baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
+   		baseColorWithAlpha = texture(u_baseColorTexture, baseColorTexCoords);
 
         #ifdef HAS_BASE_COLOR_FACTOR
         baseColorWithAlpha *= u_baseColorFactor;
         #endif
+        
+       	baseColorWithAlpha = czm_srgbToLinear(baseColorWithAlpha);
+        
+        
     #elif defined(HAS_BASE_COLOR_FACTOR)
-    baseColorWithAlpha = u_baseColorFactor;
+  	//  baseColorWithAlpha = u_baseColorFactor;
+        baseColorWithAlpha = czm_srgbToLinear(u_baseColorFactor); 
     #endif
 
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE
@@ -179,6 +184,7 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
       glossiness
     );
     material.diffuse = parameters.diffuseColor;
+    
     // the specular glossiness extension's alpha overrides anything set
     // by the base material.
     material.alpha = diffuse.a;
@@ -214,12 +220,15 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
             float roughness = 1.0;
             #endif
         #endif
+        
+        
     czm_pbrParameters parameters = czm_pbrMetallicRoughnessMaterial(
       material.diffuse,
       metalness,
       roughness
     );
-    material.diffuse = parameters.diffuseColor;
+    
+    material.diffuse = parameters.diffuseColor;    
     material.specular = parameters.f0;
     material.roughness = parameters.roughness;
     #endif
