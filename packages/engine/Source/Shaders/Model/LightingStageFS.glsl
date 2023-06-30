@@ -7,33 +7,32 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
     pbrParameters.roughness = inputMaterial.roughness;
     
     #ifdef USE_CUSTOM_LIGHT_COLOR
-    	vec3 lightColorHdr = model_lightColorHdr;
+    vec3 lightColorHdr = model_lightColorHdr;
     #else
-    	vec3 lightColorHdr = czm_lightColorHdr;
+    vec3 lightColorHdr = czm_lightColorHdr;
     #endif
 
     vec3 color = inputMaterial.diffuse;
     #ifdef HAS_NORMALS
-	    color = czm_pbrLighting(
-	        attributes.positionEC,
-	        inputMaterial.normalEC,
-	        czm_lightDirectionEC,
-	        lightColorHdr,
-	        pbrParameters
-	    );
+    color = czm_pbrLighting(
+        attributes.positionEC,
+        inputMaterial.normalEC,
+        czm_lightDirectionEC,
+        lightColorHdr,
+        pbrParameters
+    );
 
-	    #ifndef USE_VCS_CUSTOM_SHADING
-	        #ifdef USE_IBL_LIGHTING
-		        color += imageBasedLightingStage(
-		            attributes.positionEC,
-		            inputMaterial.normalEC,
-		            czm_lightDirectionEC,
-		            lightColorHdr,
-		            pbrParameters
-		        );
-	        #endif
-	    #endif
-        
+    	#ifndef USE_VCS_CUSTOM_SHADING
+        #ifdef USE_IBL_LIGHTING
+        color += imageBasedLightingStage(
+            attributes.positionEC,
+            inputMaterial.normalEC,
+            czm_lightDirectionEC,
+            lightColorHdr,
+            pbrParameters
+        );
+        #endif
+   		#endif
     #endif
 
     color *= inputMaterial.occlusion;
