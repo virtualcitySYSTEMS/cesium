@@ -68,27 +68,42 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     material.normalEC = computeNormal(attributes);
     #endif
 
-    vec4 baseColorWithAlpha = vec4(1.0);
-    // Regardless of whether we use PBR, set a base color
-    #ifdef HAS_BASE_COLOR_TEXTURE
-    vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
+   	vec4 baseColorWithAlpha = vec4(1.0);
 
-        #ifdef HAS_BASE_COLOR_TEXTURE_TRANSFORM
-        baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
-        #endif
+    #ifdef USE_VCS_CUSTOM_SHADING
+	    // Regardless of whether we use PBR, set a base color
+	    #ifdef HAS_BASE_COLOR_TEXTURE
+	   		vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
+	
+	   		#ifdef HAS_BASE_COLOR_TEXTURE_TRANSFORM
+	   			baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
+	   		#endif
 
-   		baseColorWithAlpha = texture(u_baseColorTexture, baseColorTexCoords);
-
-        #ifdef HAS_BASE_COLOR_FACTOR
-        baseColorWithAlpha *= u_baseColorFactor;
-        #endif
-        
-       	baseColorWithAlpha = czm_srgbToLinear(baseColorWithAlpha);
-        
-        
-    #elif defined(HAS_BASE_COLOR_FACTOR)
-  	//  baseColorWithAlpha = u_baseColorFactor;
-        baseColorWithAlpha = czm_srgbToLinear(u_baseColorFactor); 
+	   		baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
+	
+	        #ifdef HAS_BASE_COLOR_FACTOR
+	        	baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+	        #endif
+	    #elif defined(HAS_BASE_COLOR_FACTOR)
+	        baseColorWithAlpha = czm_srgbToLinear(u_baseColorFactor); 
+	    #endif
+    #else
+	    // Regardless of whether we use PBR, set a base color
+	    #ifdef HAS_BASE_COLOR_TEXTURE
+	    	vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
+	
+	    	#ifdef HAS_BASE_COLOR_TEXTURE_TRANSFORM
+	   			baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
+	    	#endif
+	
+	    	baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
+	
+	        #ifdef HAS_BASE_COLOR_FACTOR
+	        	baseColorWithAlpha *= u_baseColorFactor;
+	        #endif
+	    #elif defined(HAS_BASE_COLOR_FACTOR)
+	   		baseColorWithAlpha = u_baseColorFactor;
+	    #endif
     #endif
 
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE

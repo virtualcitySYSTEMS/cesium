@@ -70,76 +70,102 @@ vec3 czm_pbrLighting(
     czm_pbrParameters pbrParameters
 )
 {
-    lightColorHdr *= 0.75;
-    
-
-    vec3 diffuseColor = pbrParameters.diffuseColor;
-    float u_lambertDiffuseMultiplier = 0.9;
-	float u_vertexShadowDarkness = 0.3;
+    #ifdef USE_VCS_CUSTOM_SHADING
+	    lightColorHdr *= 0.5;
 	
-	float ambientLuminanceNight = 0.05;
-	float ambientLuminanceDay = (1.0 - ambientLuminanceNight) * u_vertexShadowDarkness + ambientLuminanceNight;
+	    vec3 diffuseColor = pbrParameters.diffuseColor;
+	    float u_lambertDiffuseMultiplier = 0.9;
+		float u_vertexShadowDarkness = 0.3;
+		
+		float ambientLuminanceNight = 0.05;
+		float ambientLuminanceDay = (1.0 - ambientLuminanceNight) * u_vertexShadowDarkness + ambientLuminanceNight;
+		
+	 	float distance = length(positionEC);
+	    vec3 v = -normalize(positionEC);
+	    vec3 l = normalize(lightDirectionEC);
+	    vec3 h = normalize(v + l);
+	    vec3 n = normalEC;
+	    float NdotL = dot(n, l);
+	    float NdotLclamped = clamp(NdotL, 0.0, 1.0);
+	    float NdotV = abs(dot(n, v)) + 0.001;
+	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
+	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
+	    
+	    vec3 positionWC = vec3(czm_inverseView * vec4(positionEC, 1.0));
+	    vec3 upWC = normalize(positionWC);
+	    vec3 lWC = normalize(czm_inverseViewRotation * l);
+	    vec3 nWC = normalize(czm_inverseViewRotation * n);
+	    float LdotZ = dot(lWC, -upWC);
+	    float NdotZ = dot(nWC, upWC);
+	    float sunAboveHorizon = clamp(-200.0 * LdotZ, 0.0, 1.0);
+		
+	    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
+	    float LdotZclamped = clamp(LdotZ, 0.0, 1.0);
+	    float m = 0.209439510239;
+	    float p = (1.0 + m) / m;
+	    float y = (-LdotZclamped + m) / (1.0 + m);
+	    float nn = p * y;
+	    float beta = smoothstep(0.0, 1.0, nn);
+	    float ambientLightLuminance = mix(ambientLuminanceNight, ambientLuminanceDay, beta);
+	    
+		//modify hue of sunlight
+		vec3 directLightColorHdr = lightColorHdr;
+	    float gamma = clamp(-20.0 * LdotZ, 0.0, 1.0);
+	    
+	    float sun_minB =  0.5; //0.7;
+	    float sun_minG = sun_minB * 0.5 + 0.5; 
+	    float sun_G = gamma*(1.0 - sun_minG) + sun_minG;
+	    float sun_B = gamma*(1.0 - sun_minB) + sun_minB;
+	    directLightColorHdr.g *= sun_G;
+	    directLightColorHdr.b *= sun_B;
+		
+	    //ambient diffuse light
+	    float ambientModulationMinimum = 0.2;
+	    float ambientModulation = ambientModulationMinimum + (NdotZ*0.5 + 0.5)*(NdotL*0.2 + 0.8)*(1.0 - ambientModulationMinimum);
+	    vec3 ambientLightContribution = diffuseColor * lightColorHdr * ambientLightLuminance * ambientModulation;
+	    
+		// direct light
+	    vec3 directLightContribution = diffuseColor * directLightColorHdr * NdotLclamped * u_lambertDiffuseMultiplier * sunAboveHorizon;
+	    
+	    //direct specular light
+	    vec3 f0 = pbrParameters.f0;
+	    float reflectance = max(max(f0.r, f0.g), f0.b);
+	    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
+	    vec3 F = fresnelSchlick2(f0, f90, VdotH);
+	    float alpha = pbrParameters.roughness;
+	    float G = smithVisibilityGGX(alpha, NdotLclamped, NdotV);
+	    float D = GGX(alpha, NdotH);
+	    vec3 directSpecularContribution = clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
+	    
+	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution;
+	    return finalColorRGB;
+	#else
+		vec3 v = -normalize(positionEC);
+	    vec3 l = normalize(lightDirectionEC);
+	    vec3 h = normalize(v + l);
+	    vec3 n = normalEC;
+	    float NdotL = clamp(dot(n, l), 0.001, 1.0);
+	    float NdotV = abs(dot(n, v)) + 0.001;
+	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
+	    float LdotH = clamp(dot(l, h), 0.0, 1.0);
+	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
 	
- 	float distance = length(positionEC);
-    vec3 v = -normalize(positionEC);
-    vec3 l = normalize(lightDirectionEC);
-    vec3 h = normalize(v + l);
-    vec3 n = normalEC;
-    float NdotL = dot(n, l);
-    float NdotLclamped = clamp(NdotL, 0.0, 1.0);
-    float NdotV = abs(dot(n, v)) + 0.001;
-    float NdotH = clamp(dot(n, h), 0.0, 1.0);
-    float VdotH = clamp(dot(v, h), 0.0, 1.0);
-    
-    vec3 positionWC = vec3(czm_inverseView * vec4(positionEC, 1.0));
-    vec3 upWC = normalize(positionWC);
-    vec3 lWC = normalize(czm_inverseViewRotation * l);
-    vec3 nWC = normalize(czm_inverseViewRotation * n);
-    float LdotZ = dot(lWC, -upWC);
-    float NdotZ = dot(nWC, upWC);
-    float sunAboveHorizon = clamp(-200.0 * LdotZ, 0.0, 1.0);
+	    vec3 f0 = pbrParameters.f0;
+	    float reflectance = max(max(f0.r, f0.g), f0.b);
+	    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
+	    vec3 F = fresnelSchlick2(f0, f90, VdotH);
 	
+	    float alpha = pbrParameters.roughness;
+	    float G = smithVisibilityGGX(alpha, NdotL, NdotV);
+	    float D = GGX(alpha, NdotH);
+	    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);
 	
-    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
-    float LdotZclamped = clamp(LdotZ, 0.0, 1.0);
-    float m = 0.209439510239;
-    float p = (1.0 + m) / m;
-    float y = (-LdotZclamped + m) / (1.0 + m);
-    float nn = p * y;
-    float beta = smoothstep(0.0, 1.0, nn);
-    float ambientLightLuminance = mix(ambientLuminanceNight, ambientLuminanceDay, beta);
-    
-	//modify hue of sunlight
-	vec3 directLightColorHdr = lightColorHdr;
-    float gamma = clamp(-20.0 * LdotZ, 0.0, 1.0);
-    
-    float sun_minB =  0.5; //0.7;
-    float sun_minG = sun_minB * 0.5 + 0.5; 
-    float sun_G = gamma*(1.0 - sun_minG) + sun_minG;
-    float sun_B = gamma*(1.0 - sun_minB) + sun_minB;
-    directLightColorHdr.g *= sun_G;
-    directLightColorHdr.b *= sun_B;
+	    vec3 diffuseColor = pbrParameters.diffuseColor;
+	    // F here represents the specular contribution
+	    vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);
 	
-    //ambient diffuse light
-    float ambientModulationMinimum = 0.2;
-    float ambientModulation = ambientModulationMinimum + (NdotZ*0.5 + 0.5)*(NdotL*0.2 + 0.8)*(1.0 - ambientModulationMinimum);
-    vec3 ambientLightContribution = diffuseColor * lightColorHdr * ambientLightLuminance * ambientModulation;
-    
-	// direct light
-    vec3 directLightContribution = diffuseColor * directLightColorHdr * NdotLclamped * u_lambertDiffuseMultiplier * sunAboveHorizon;
-    
-    //direct specular light
-    vec3 f0 = pbrParameters.f0;
-    float reflectance = max(max(f0.r, f0.g), f0.b);
-    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
-    vec3 F = fresnelSchlick2(f0, f90, VdotH);
-    float alpha = pbrParameters.roughness;
-    float G = smithVisibilityGGX(alpha, NdotLclamped, NdotV);
-    float D = GGX(alpha, NdotH);
-    vec3 directSpecularContribution = clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
-    
-    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution;
-       //finalColorRGB = vec3(ambientModulation,ambientModulation,ambientModulation);
-   
-    return finalColorRGB;
+	    // Lo = (diffuse + specular) * Li * NdotL
+	    return (diffuseContribution + specularContribution) * NdotL * lightColorHdr;
+	#endif
+	    
 }
