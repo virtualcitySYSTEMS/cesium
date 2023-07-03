@@ -436,7 +436,7 @@ void main()
 	    vec3 l = normalize(czm_lightDirectionEC);
 	    vec3 n = v_normalEC;
 	    float NdotL = dot(n, l);
-	    float NdotLclamped = clamp(NdotL, 0.0, 1.0);
+	    float NdotLclamped = clamp(NdotL, 0.0001, 1.0);
 	    
 	    vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
 	    vec3 upWC = normalize(positionWC);

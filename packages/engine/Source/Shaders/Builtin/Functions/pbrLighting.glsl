@@ -86,7 +86,7 @@ vec3 czm_pbrLighting(
 	    vec3 h = normalize(v + l);
 	    vec3 n = normalEC;
 	    float NdotL = dot(n, l);
-	    float NdotLclamped = clamp(NdotL, 0.0, 1.0);
+	    float NdotLclamped = clamp(NdotL, 0.0001, 1.0);
 	    float NdotV = abs(dot(n, v)) + 0.001;
 	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
 	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
@@ -136,6 +136,7 @@ vec3 czm_pbrLighting(
 	    vec3 directSpecularContribution = clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
 	    
 	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution;
+	    
 	    return finalColorRGB;
 	#else
 		vec3 v = -normalize(positionEC);
