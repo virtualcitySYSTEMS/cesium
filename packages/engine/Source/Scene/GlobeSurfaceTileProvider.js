@@ -2187,8 +2187,6 @@ function addDrawCommandsForTile(tileProvider, tile, frameState) {
   const saturationShift = tileProvider.saturationShift;
   const brightnessShift = tileProvider.brightnessShift;
 
-
-
   let colorCorrect = !(
     CesiumMath.equalsEpsilon(hueShift, 0.0, CesiumMath.EPSILON7) &&
     CesiumMath.equalsEpsilon(saturationShift, 0.0, CesiumMath.EPSILON7) &&
