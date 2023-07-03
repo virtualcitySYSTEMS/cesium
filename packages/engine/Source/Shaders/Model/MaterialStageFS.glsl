@@ -68,8 +68,7 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     material.normalEC = computeNormal(attributes);
     #endif
 
-   	vec4 baseColorWithAlpha = vec4(1.0);
-
+    vec4 baseColorWithAlpha = vec4(1.0);
     #ifdef USE_VCS_CUSTOM_SHADING
 	    // Regardless of whether we use PBR, set a base color
 	    #ifdef HAS_BASE_COLOR_TEXTURE
@@ -88,24 +87,24 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
 	        baseColorWithAlpha = czm_srgbToLinear(u_baseColorFactor); 
 	    #endif
     #else
-	    // Regardless of whether we use PBR, set a base color
-	    #ifdef HAS_BASE_COLOR_TEXTURE
-	    	vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
-	
-	    	#ifdef HAS_BASE_COLOR_TEXTURE_TRANSFORM
-	   			baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
-	    	#endif
-	
-	    	baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
-	
-	        #ifdef HAS_BASE_COLOR_FACTOR
-	        	baseColorWithAlpha *= u_baseColorFactor;
-	        #endif
-	    #elif defined(HAS_BASE_COLOR_FACTOR)
-	   		baseColorWithAlpha = u_baseColorFactor;
-	    #endif
-    #endif
+    // Regardless of whether we use PBR, set a base color
+    #ifdef HAS_BASE_COLOR_TEXTURE
+    vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
 
+        #ifdef HAS_BASE_COLOR_TEXTURE_TRANSFORM
+        baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
+        #endif
+
+    baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
+
+        #ifdef HAS_BASE_COLOR_FACTOR
+        baseColorWithAlpha *= u_baseColorFactor;
+        #endif
+    #elif defined(HAS_BASE_COLOR_FACTOR)
+    baseColorWithAlpha = u_baseColorFactor;
+    #endif
+    #endif
+    
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE
     baseColorWithAlpha = v_pointCloudColor;
     #elif defined(HAS_COLOR_0)
