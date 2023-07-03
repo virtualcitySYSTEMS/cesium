@@ -199,7 +199,6 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
       glossiness
     );
     material.diffuse = parameters.diffuseColor;
-    
     // the specular glossiness extension's alpha overrides anything set
     // by the base material.
     material.alpha = diffuse.a;
@@ -235,15 +234,12 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
             float roughness = 1.0;
             #endif
         #endif
-        
-        
     czm_pbrParameters parameters = czm_pbrMetallicRoughnessMaterial(
       material.diffuse,
       metalness,
       roughness
     );
-    
-    material.diffuse = parameters.diffuseColor;    
+    material.diffuse = parameters.diffuseColor;
     material.specular = parameters.f0;
     material.roughness = parameters.roughness;
     #endif
