@@ -199,12 +199,11 @@ vec4 sampleAndBlend(
     vec3 color = value.rgb;
     float alpha = value.a;
     
-    color = czm_srgbToLinear(color);
-    
-    
-    const vec3 REFLECTANCE_DIELECTRIC = vec3(0.04);
-    color *= (1.0 - REFLECTANCE_DIELECTRIC);
-     
+    #ifdef USE_VCS_CUSTOM_SHADING
+    	color = czm_srgbToLinear(color);
+   		const vec3 REFLECTANCE_DIELECTRIC = vec3(0.04);
+    	color *= (1.0 - REFLECTANCE_DIELECTRIC);
+    #endif
 
 #ifdef APPLY_COLOR_TO_ALPHA
     vec3 colorDiff = abs(color.rgb - colorToAlpha.rgb);
@@ -414,7 +413,7 @@ void main()
 
 #ifdef ENABLE_VERTEX_LIGHTING
 
-    #ifdef USE_VCS_CUSTOM_SHADING
+#ifdef USE_VCS_CUSTOM_SHADING
 
 	    #ifdef USE_CUSTOM_LIGHT_COLOR
 	   		vec3 lightColorHdr = model_lightColorHdr;
@@ -478,12 +477,11 @@ void main()
 	    
 	    vec4 finalColor = vec4(finalColorRGB.rgb, color.a);
 	#else
-	   	float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * u_lambertDiffuseMultiplier + u_vertexShadowDarkness, 0.0, 1.0);
-	    vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * u_lambertDiffuseMultiplier + u_vertexShadowDarkness, 0.0, 1.0);
+    vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
     #endif
-	
-	
-	
+    
+    
 #elif defined(ENABLE_DAYNIGHT_SHADING)
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);
     diffuseIntensity = mix(1.0, diffuseIntensity, fade);
@@ -620,8 +618,7 @@ void main()
       finalColor.a *= interpolateByDistance(alphaByDistance, v_distance);
     }
 #endif
-
-
+    
 #ifdef USE_VCS_CUSTOM_SHADING
 	#ifndef HDR 
 	    finalColor = vec4(czm_acesTonemapping(finalColor.rgb), finalColor.a) ;
@@ -631,7 +628,6 @@ void main()
 	    finalColor = czm_linearToSrgb(finalColor);
 	#endif 
 #endif  
-    
     out_FragColor =  finalColor;
 }
 
