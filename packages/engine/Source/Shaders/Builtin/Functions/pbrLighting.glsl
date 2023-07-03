@@ -70,7 +70,7 @@ vec3 czm_pbrLighting(
     czm_pbrParameters pbrParameters
 )
 {
-    #ifdef USE_VCS_CUSTOM_SHADING
+   #ifdef USE_VCS_CUSTOM_SHADING
 	    lightColorHdr *= 0.5;
 	
 	    vec3 diffuseColor = pbrParameters.diffuseColor;
@@ -139,32 +139,31 @@ vec3 czm_pbrLighting(
 	    
 	    return finalColorRGB;
 	#else
-		vec3 v = -normalize(positionEC);
-	    vec3 l = normalize(lightDirectionEC);
-	    vec3 h = normalize(v + l);
-	    vec3 n = normalEC;
-	    float NdotL = clamp(dot(n, l), 0.001, 1.0);
-	    float NdotV = abs(dot(n, v)) + 0.001;
-	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
-	    float LdotH = clamp(dot(l, h), 0.0, 1.0);
-	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
-	
-	    vec3 f0 = pbrParameters.f0;
-	    float reflectance = max(max(f0.r, f0.g), f0.b);
-	    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
-	    vec3 F = fresnelSchlick2(f0, f90, VdotH);
-	
-	    float alpha = pbrParameters.roughness;
-	    float G = smithVisibilityGGX(alpha, NdotL, NdotV);
-	    float D = GGX(alpha, NdotH);
-	    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);
-	
-	    vec3 diffuseColor = pbrParameters.diffuseColor;
-	    // F here represents the specular contribution
-	    vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);
-	
-	    // Lo = (diffuse + specular) * Li * NdotL
-	    return (diffuseContribution + specularContribution) * NdotL * lightColorHdr;
-	#endif
-	    
+    vec3 v = -normalize(positionEC);
+    vec3 l = normalize(lightDirectionEC);
+    vec3 h = normalize(v + l);
+    vec3 n = normalEC;
+    float NdotL = clamp(dot(n, l), 0.001, 1.0);
+    float NdotV = abs(dot(n, v)) + 0.001;
+    float NdotH = clamp(dot(n, h), 0.0, 1.0);
+    float LdotH = clamp(dot(l, h), 0.0, 1.0);
+    float VdotH = clamp(dot(v, h), 0.0, 1.0);
+
+    vec3 f0 = pbrParameters.f0;
+    float reflectance = max(max(f0.r, f0.g), f0.b);
+    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
+    vec3 F = fresnelSchlick2(f0, f90, VdotH);
+
+    float alpha = pbrParameters.roughness;
+    float G = smithVisibilityGGX(alpha, NdotL, NdotV);
+    float D = GGX(alpha, NdotH);
+    vec3 specularContribution = F * G * D / (4.0 * NdotL * NdotV);
+
+    vec3 diffuseColor = pbrParameters.diffuseColor;
+    // F here represents the specular contribution
+    vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);
+
+    // Lo = (diffuse + specular) * Li * NdotL
+    return (diffuseContribution + specularContribution) * NdotL * lightColorHdr;
+	#endif    
 }
