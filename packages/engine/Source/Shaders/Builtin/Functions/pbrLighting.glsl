@@ -102,9 +102,7 @@ vec3 czm_pbrLighting(
 	    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
 	    float LdotZclamped = clamp(LdotZ, 0.0, 1.0);
 	    float m = 0.209439510239;
-	    float p = (1.0 + m) / m;
-	    float y = (-LdotZclamped + m) / (1.0 + m);
-	    float nn = p * y;
+	    float nn = (-LdotZclamped + m) / m;
 	    float beta = smoothstep(0.0, 1.0, nn);
 	    float ambientLightLuminance = mix(ambientLuminanceNight, ambientLuminanceDay, beta);
 	    

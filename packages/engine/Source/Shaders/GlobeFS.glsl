@@ -197,7 +197,6 @@ vec4 sampleAndBlend(
     vec2 textureCoordinates = tileTextureCoordinates * scale + translation;
     vec4 value = texture(textureToSample, textureCoordinates);
     vec3 color = value.rgb;
-       //    color = vec3(1.0, 1.0, 1.0);
     float alpha = value.a;
     
     color = czm_srgbToLinear(color);
@@ -312,8 +311,6 @@ vec3 computeEllipsoidPosition()
     return (czm_inverseView * vec4(ellipsoidPosition, 1.0)).xyz;
 }
 
-
-
 void main()
 {
 #ifdef TILE_LIMIT_RECTANGLE
@@ -344,7 +341,6 @@ void main()
     // fragments on the edges of tiles even though the vertex shader is outputting
     // coordinates strictly in the 0-1 range.
     vec4 color = computeDayColor(u_initialColor, clamp(v_textureCoordinates, 0.0, 1.0), nightBlend);
-    
 
 #ifdef SHOW_TILE_BOUNDARIES
     if (v_textureCoordinates.x < (1.0/256.0) || v_textureCoordinates.x > (255.0/256.0) ||
@@ -431,22 +427,16 @@ void main()
 	    
 	    vec3 diffuseColor = vec3(color.rgb);
 	    
-	   // float u_lambertDiffuseMultiplier = 0.9;
-	//	float u_vertexShadowDarkness = 0.3;
+	   // float u_lambertDiffuseMultiplier = 0.9; // default value
+	   // float u_vertexShadowDarkness = 0.3; // default value
 		
 		float ambientLuminanceNight = 0.05;
 		float ambientLuminanceDay = (1.0 - ambientLuminanceNight) * u_vertexShadowDarkness + ambientLuminanceNight;
 		
-		float distance = length(v_positionEC);
-	    vec3 v = -normalize(v_positionEC);
 	    vec3 l = normalize(czm_lightDirectionEC);
-	    vec3 h = normalize(v + l);
 	    vec3 n = v_normalEC;
 	    float NdotL = dot(n, l);
 	    float NdotLclamped = clamp(NdotL, 0.0, 1.0);
-	    float NdotV = abs(dot(n, v)) + 0.001;
-	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
-	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
 	    
 	    vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
 	    vec3 upWC = normalize(positionWC);
@@ -459,11 +449,11 @@ void main()
 	    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
 	    float LdotZclamped = clamp(LdotZ, 0.0, 1.0);
 	    float m = 0.209439510239;
-	    float p = (1.0 + m) / m;
-	    float y = (-LdotZclamped + m) / (1.0 + m);
-	    float nn = p * y;
+	    float nn = (-LdotZclamped + m) / m;
 	    float beta = smoothstep(0.0, 1.0, nn);
 	    float ambientLightLuminance = mix(ambientLuminanceNight, ambientLuminanceDay, beta);
+
+
 	
 		//modify hue of sunlight
 		vec3 directLightColorHdr = lightColorHdr;
@@ -644,8 +634,6 @@ void main()
     
     out_FragColor =  finalColor;
 }
-
-
 
 
 #ifdef SHOW_REFLECTIVE_OCEAN
