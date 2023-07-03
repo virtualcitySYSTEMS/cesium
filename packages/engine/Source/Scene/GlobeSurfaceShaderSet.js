@@ -259,7 +259,6 @@ GlobeSurfaceShaderSet.prototype.getShaderProgram = function (options) {
     }
 
     if("undefined"!=typeof globalThis && globalThis.useVcsCustomShading){
-      vs.defines.push("USE_VCS_CUSTOM_SHADING");
       fs.defines.push("USE_VCS_CUSTOM_SHADING");			
 	}
 
