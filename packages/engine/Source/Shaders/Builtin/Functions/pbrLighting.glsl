@@ -71,7 +71,7 @@ vec3 czm_pbrLighting(
 )
 {
    #ifdef USE_VCS_CUSTOM_SHADING
-	    lightColorHdr *= 0.5;
+	    lightColorHdr *= 0.35;
 	
 	    vec3 diffuseColor = pbrParameters.diffuseColor;
 	    float u_lambertDiffuseMultiplier = 0.9;
@@ -90,6 +90,8 @@ vec3 czm_pbrLighting(
 	    float NdotV = abs(dot(n, v)) + 0.001;
 	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
 	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
+	    
+	    float directLight = clamp(NdotL*50.0, 0.0, 1.0);
 	    
 	    vec3 positionWC = vec3(czm_inverseView * vec4(positionEC, 1.0));
 	    vec3 upWC = normalize(positionWC);
@@ -133,7 +135,7 @@ vec3 czm_pbrLighting(
 	    float alpha = pbrParameters.roughness;
 	    float G = smithVisibilityGGX(alpha, NdotLclamped, NdotV);
 	    float D = GGX(alpha, NdotH);
-	    vec3 directSpecularContribution = clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
+	    vec3 directSpecularContribution = directLight * clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
 	    
 	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution;
 	    

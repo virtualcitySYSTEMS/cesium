@@ -422,7 +422,7 @@ void main()
 	    #endif
 	
 	
-	    lightColorHdr *= 0.5;
+	    lightColorHdr *= 0.35;
 	    
 	    vec3 diffuseColor = vec3(color.rgb);
 	    
