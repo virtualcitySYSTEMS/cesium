@@ -258,9 +258,9 @@ GlobeSurfaceShaderSet.prototype.getShaderProgram = function (options) {
       }
     }
 
-    if("undefined"!=typeof globalThis && globalThis.useVcsCustomShading){
-      fs.defines.push("USE_VCS_CUSTOM_SHADING");			
-	}
+    if ("undefined" !== typeof globalThis && globalThis.useVcsCustomShading) {
+      fs.defines.push("USE_VCS_CUSTOM_SHADING");
+    }
 
     if (dynamicAtmosphereLighting) {
       vs.defines.push("DYNAMIC_ATMOSPHERE_LIGHTING");

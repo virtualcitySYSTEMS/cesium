@@ -616,10 +616,10 @@ ModelSceneGraph.prototype.configurePipeline = function (frameState) {
     return;
   }
 
-  if(!("undefined"!=typeof globalThis && globalThis.useVcsCustomShading)){
-  if (model.imageBasedLighting.enabled) {
-    modelPipelineStages.push(ImageBasedLightingPipelineStage);
-  }
+  if (!("undefined" !== typeof globalThis && globalThis.useVcsCustomShading)) {
+    if (model.imageBasedLighting.enabled) {
+      modelPipelineStages.push(ImageBasedLightingPipelineStage);
+    }
   }
   if (model.isClippingEnabled()) {
     modelPipelineStages.push(ModelClippingPlanesPipelineStage);

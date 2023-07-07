@@ -62,14 +62,13 @@ LightingPipelineStage.process = function (renderResources, primitive) {
       ShaderDestination.FRAGMENT
     );
 
-    if("undefined"!=typeof globalThis && globalThis.useVcsCustomShading){
-	    shaderBuilder.addDefine(
-	      "USE_VCS_CUSTOM_SHADING",
-	      undefined,
-	      ShaderDestination.FRAGMENT
-      );		
+    if ("undefined" !== typeof globalThis && globalThis.useVcsCustomShading) {
+      shaderBuilder.addDefine(
+        "USE_VCS_CUSTOM_SHADING",
+        undefined,
+        ShaderDestination.FRAGMENT
+      );
     }
-	
   } else {
     shaderBuilder.addDefine(
       "LIGHTING_UNLIT",

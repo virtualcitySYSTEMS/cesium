@@ -402,13 +402,15 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
       `        out_FragColor.rgba *= vec4(${visibleColor.join(",")}); \n` +
       `    } \n` +
       `} \n`;
+  } else if (
+    "undefined" !== typeof globalThis &&
+    globalThis.useVcsCustomShading
+  ) {
+    fsSource +=
+      "    vec3 shadowSub = 0.8 * (1.0 - visibility) * vec3(nDotL); \n";
+    fsSource += "    out_FragColor.rgb -= shadowSub; \n" + "} \n";
   } else {
-	if("undefined"!=typeof globalThis && globalThis.useVcsCustomShading){
-	  fsSource += "    vec3 shadowSub = 0.8 * (1.0 - visibility) * vec3(nDotL); \n";
-      fsSource += "    out_FragColor.rgb -= shadowSub; \n" + "} \n";
-    } else {
     fsSource += "    out_FragColor.rgb *= visibility; \n" + "} \n";
-    }
   }
 
   sources.push(fsSource);
