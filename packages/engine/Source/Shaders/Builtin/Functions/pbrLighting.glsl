@@ -136,9 +136,14 @@ vec3 czm_pbrLighting(
 	    float G = smithVisibilityGGX(alpha, NdotLclamped, NdotV);
 	    float D = GGX(alpha, NdotH);
 	    vec3 directSpecularContribution = directLight * clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
+
+		//ambient specular light
+		const vec3 blueSkyDiffuseColor = vec3(0.7, 0.85, 0.9); 
+		const vec3 REFLECTANCE_DIELECTRIC = vec3(0.04);
+		vec3 g0 = (f0 - REFLECTANCE_DIELECTRIC) / (1.0 - REFLECTANCE_DIELECTRIC) ;
+	    vec3 ambientSpecularContribution = g0 * blueSkyDiffuseColor * ambientLightLuminance * ambientModulation;
 	    
-	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution;
-	    
+	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution + ambientSpecularContribution;
 	    return finalColorRGB;
 	#else
     vec3 v = -normalize(positionEC);
