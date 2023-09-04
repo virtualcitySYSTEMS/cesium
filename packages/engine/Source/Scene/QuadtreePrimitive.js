@@ -993,6 +993,9 @@ function visitVisibleChildrenNearToFar(
   ancestorMeetsSse,
   traversalDetails
 ) {
+  if (southwest.level >= traversalQuadsByLevel.length) {
+    return;
+  }
   const cameraPosition = frameState.camera.positionCartographic;
   const tileProvider = primitive._tileProvider;
   const occluders = primitive._occluders;

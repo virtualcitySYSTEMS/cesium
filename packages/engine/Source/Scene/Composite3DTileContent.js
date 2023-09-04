@@ -14,8 +14,6 @@ import RuntimeError from "../Core/RuntimeError.js";
  *
  * @alias Composite3DTileContent
  * @constructor
- *
- * @private
  */
 function Composite3DTileContent(tileset, tile, resource, contents) {
   this._tileset = tileset;
