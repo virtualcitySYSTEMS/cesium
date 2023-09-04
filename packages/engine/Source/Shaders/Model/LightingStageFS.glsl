@@ -22,6 +22,7 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
         pbrParameters
     );
 
+    	#ifndef USE_VCS_CUSTOM_SHADING
         #ifdef USE_IBL_LIGHTING
         color += imageBasedLightingStage(
             attributes.positionEC,
@@ -31,6 +32,7 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
             pbrParameters
         );
         #endif
+   		#endif
     #endif
 
     color *= inputMaterial.occlusion;
