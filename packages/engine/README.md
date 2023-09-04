@@ -1,5 +1,12 @@
 # @cesium/engine
 
+> > **_Attention_**
+>
+> This is a custom CesiumJS fork to be used with the `VC Map`.
+> For the common CesiumJS module visit [this package](https://www.npmjs.com/package/@cesium/engine).
+
+---
+
 [![Build Status](https://travis-ci.com/CesiumGS/cesium.svg?branch=main)](https://travis-ci.com/CesiumGS/cesium)
 [![npm](https://img.shields.io/npm/v/@cesium/engine)](https://www.npmjs.com/package/@cesium/engine)
 [![Docs](https://img.shields.io/badge/docs-online-orange.svg)](https://cesium.com/learn/)

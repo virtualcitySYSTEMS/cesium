@@ -12,7 +12,7 @@ import {
   ShaderProgram,
   VertexArray,
   Math as CesiumMath,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import equals from "./equals.js";
 
 function createMissingFunctionMessageFunction(

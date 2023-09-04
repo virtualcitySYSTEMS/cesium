@@ -2,7 +2,7 @@ import {
   EllipsoidTerrainProvider,
   FeatureDetection,
   ImageryLayerCollection,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 import { BaseLayerPicker } from "../../index.js";
 

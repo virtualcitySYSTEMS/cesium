@@ -10,7 +10,7 @@ import {
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
   TileCoordinatesImageryProvider,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import createCommand from "../createCommand.js";
 
