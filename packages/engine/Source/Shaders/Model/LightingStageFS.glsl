@@ -5,7 +5,7 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
     pbrParameters.diffuseColor = inputMaterial.diffuse;
     pbrParameters.f0 = inputMaterial.specular;
     pbrParameters.roughness = inputMaterial.roughness;
-    
+
     #ifdef USE_CUSTOM_LIGHT_COLOR
     vec3 lightColorHdr = model_lightColorHdr;
     #else
@@ -22,7 +22,6 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
         pbrParameters
     );
 
-    	#ifndef USE_VCS_CUSTOM_SHADING
         #ifdef USE_IBL_LIGHTING
         color += imageBasedLightingStage(
             attributes.positionEC,
@@ -32,7 +31,6 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
             pbrParameters
         );
         #endif
-   		#endif
     #endif
 
     color *= inputMaterial.occlusion;
@@ -42,9 +40,9 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
     // post-processing stages (see PostProcessStageCollection) will handle
     // tonemapping. However, if HDR is not enabled, we must tonemap else large
     // values may be clamped to 1.0
-    #ifndef HDR 
+    #ifndef HDR
     color = czm_acesTonemapping(color);
-    #endif 
+    #endif
 
     return color;
 }

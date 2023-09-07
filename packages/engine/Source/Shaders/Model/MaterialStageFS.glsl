@@ -19,7 +19,7 @@ vec2 computeTextureTransform(vec2 texCoord, mat3 textureTransform)
 #ifdef HAS_NORMALS
 vec3 computeNormal(ProcessedAttributes attributes)
 {
-    // Geometry normal. This is already normalized 
+    // Geometry normal. This is already normalized
     vec3 ng = attributes.normalEC;
 
     vec3 normal = ng;
@@ -69,24 +69,6 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     #endif
 
     vec4 baseColorWithAlpha = vec4(1.0);
-    #ifdef USE_VCS_CUSTOM_SHADING
-	    // Regardless of whether we use PBR, set a base color
-	    #ifdef HAS_BASE_COLOR_TEXTURE
-	   		vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
-	
-	   		#ifdef HAS_BASE_COLOR_TEXTURE_TRANSFORM
-	   			baseColorTexCoords = computeTextureTransform(baseColorTexCoords, u_baseColorTextureTransform);
-	   		#endif
-
-	   		baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
-	
-	        #ifdef HAS_BASE_COLOR_FACTOR
-	        	baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
-	        #endif
-	    #elif defined(HAS_BASE_COLOR_FACTOR)
-	        baseColorWithAlpha = czm_srgbToLinear(u_baseColorFactor); 
-	    #endif
-    #else
     // Regardless of whether we use PBR, set a base color
     #ifdef HAS_BASE_COLOR_TEXTURE
     vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
@@ -98,13 +80,31 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
 
         #ifdef HAS_BASE_COLOR_FACTOR
-        baseColorWithAlpha *= u_baseColorFactor;
+            // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBColorFactors set we
+            // handle the baseColorFactor as SRGB values instead of linear color
+            #ifdef USE_VCS_CUSTOM_SHADING
+                #ifdef USE_VCS_SRGB_COLOR_FACTORS
+                    baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+                #else
+                    baseColorWithAlpha *= u_baseColorFactor;
+                #endif
+            #else
+                // default Cesium path
+                baseColorWithAlpha *= u_baseColorFactor;
+            #endif
         #endif
     #elif defined(HAS_BASE_COLOR_FACTOR)
-    baseColorWithAlpha = u_baseColorFactor;
+        #ifdef USE_VCS_CUSTOM_SHADING
+            #ifdef USE_VCS_SRGB_COLOR_FACTORS
+                baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+            #else
+                baseColorWithAlpha = u_baseColorFactor;
+            #endif
+        #else
+            baseColorWithAlpha = u_baseColorFactor;
+        #endif
     #endif
-    #endif
-    
+
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE
     baseColorWithAlpha = v_pointCloudColor;
     #elif defined(HAS_COLOR_0)
@@ -112,6 +112,12 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
         // .pnts files store colors in the sRGB color space
         #ifdef HAS_SRGB_COLOR
         color = czm_srgbToLinear(color);
+        #elif defined(USE_VCS_CUSTOM_SHADING)
+            // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBAVertexColor set we
+            // handle the baseColorFactor as SRGB values instead of linear color
+            #ifdef USE_VCS_SRGB_VERTEX_COLORS
+                color = czm_srgbToLinear(color);
+            #endif
         #endif
     baseColorWithAlpha *= color;
     #endif
