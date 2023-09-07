@@ -69,7 +69,7 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     #endif
 
     vec4 baseColorWithAlpha = vec4(1.0);
-    #ifdef USE_VCS_CUSTOM_SHADING
+    #ifdef USE_VCS_SRGB_COLOR_FACTORS
 	    // Regardless of whether we use PBR, set a base color
 	    #ifdef HAS_BASE_COLOR_TEXTURE
 	   		vec2 baseColorTexCoords = TEXCOORD_BASE_COLOR;
@@ -106,14 +106,16 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     #endif
     
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE
-    baseColorWithAlpha = v_pointCloudColor;
+    	baseColorWithAlpha = v_pointCloudColor;
     #elif defined(HAS_COLOR_0)
-    vec4 color = attributes.color_0;
+    	vec4 color = attributes.color_0;
         // .pnts files store colors in the sRGB color space
         #ifdef HAS_SRGB_COLOR
-        color = czm_srgbToLinear(color);
-        #endif
-    baseColorWithAlpha *= color;
+       		color = czm_srgbToLinear(color);
+   		#elif defined(USE_VCS_SRGB_COLOR_FACTORS)
+       		color = czm_srgbToLinear(color);
+        #endif        
+    	baseColorWithAlpha *= color;
     #endif
 
     material.diffuse = baseColorWithAlpha.rgb;
