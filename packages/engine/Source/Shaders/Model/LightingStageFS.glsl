@@ -22,6 +22,7 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
         pbrParameters
     );
 
+        #ifndef USE_VCS_CUSTOM_SHADING
         #ifdef USE_IBL_LIGHTING
         color += imageBasedLightingStage(
             attributes.positionEC,
@@ -30,6 +31,7 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
             lightColorHdr,
             pbrParameters
         );
+        #endif
         #endif
     #endif
 
@@ -41,7 +43,11 @@ vec3 computePbrLighting(czm_modelMaterial inputMaterial, ProcessedAttributes att
     // tonemapping. However, if HDR is not enabled, we must tonemap else large
     // values may be clamped to 1.0
     #ifndef HDR
-    color = czm_acesTonemapping(color);
+        #ifndef USE_VCS_CUSTOM_SHADING
+            // Custom VCS Shading, if VCS Shading is activated we do not do toneMapping for models,
+            // cesium default is to do tonemapping
+            color = czm_acesTonemapping(color);
+        #endif
     #endif
 
     return color;

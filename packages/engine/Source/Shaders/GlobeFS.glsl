@@ -620,9 +620,7 @@ void main()
 #endif
     
 #ifdef USE_VCS_CUSTOM_SHADING
-	#ifndef HDR 
-	    finalColor = vec4(czm_acesTonemapping(finalColor.rgb), finalColor.a) ;
-	    
+	#ifndef HDR
 	    // If HDR is not enabled, the frame buffer stores sRGB colors rather than
 	    // linear colors so the linear value must be converted.
 	    finalColor = czm_linearToSrgb(finalColor);
