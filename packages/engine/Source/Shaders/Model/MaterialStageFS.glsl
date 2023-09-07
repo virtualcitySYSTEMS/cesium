@@ -82,24 +82,15 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
         #ifdef HAS_BASE_COLOR_FACTOR
             // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBColorFactors set we
             // handle the baseColorFactor as SRGB values instead of linear color
-            #ifdef USE_VCS_CUSTOM_SHADING
-                #ifdef USE_VCS_SRGB_COLOR_FACTORS
-                    baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
-                #else
-                    baseColorWithAlpha *= u_baseColorFactor;
-                #endif
+            #ifdef USE_VCS_SRGB_COLOR_FACTORS
+                baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
             #else
-                // default Cesium path
                 baseColorWithAlpha *= u_baseColorFactor;
             #endif
         #endif
     #elif defined(HAS_BASE_COLOR_FACTOR)
-        #ifdef USE_VCS_CUSTOM_SHADING
-            #ifdef USE_VCS_SRGB_COLOR_FACTORS
-                baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
-            #else
-                baseColorWithAlpha = u_baseColorFactor;
-            #endif
+        #ifdef USE_VCS_SRGB_COLOR_FACTORS
+            baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
         #else
             baseColorWithAlpha = u_baseColorFactor;
         #endif
@@ -112,12 +103,10 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
         // .pnts files store colors in the sRGB color space
         #ifdef HAS_SRGB_COLOR
         color = czm_srgbToLinear(color);
-        #elif defined(USE_VCS_CUSTOM_SHADING)
+        #elif defined(USE_VCS_SRGB_VERTEX_COLORS)
             // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBAVertexColor set we
             // handle the baseColorFactor as SRGB values instead of linear color
-            #ifdef USE_VCS_SRGB_VERTEX_COLORS
-                color = czm_srgbToLinear(color);
-            #endif
+            color = czm_srgbToLinear(color);
         #endif
     baseColorWithAlpha *= color;
     #endif
