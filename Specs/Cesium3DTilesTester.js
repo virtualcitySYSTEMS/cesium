@@ -7,7 +7,7 @@ import {
   Cesium3DTileContentFactory,
   Cesium3DTileset,
   TileBoundingSphere,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 import pollToPromise from "./pollToPromise.js";
 

@@ -204,6 +204,12 @@ vec4 sampleAndBlend(
     vec4 value = texture(textureToSample, textureCoordinates);
     vec3 color = value.rgb;
     float alpha = value.a;
+    
+    #ifdef USE_VCS_CUSTOM_SHADING
+    	color = czm_srgbToLinear(color);
+   		const vec3 REFLECTANCE_DIELECTRIC = vec3(0.04);
+    	color *= (1.0 - REFLECTANCE_DIELECTRIC);
+    #endif
 
 #ifdef APPLY_COLOR_TO_ALPHA
     vec3 colorDiff = abs(color.rgb - colorToAlpha.rgb);
@@ -398,8 +404,76 @@ void main()
 #endif
 
 #ifdef ENABLE_VERTEX_LIGHTING
+
+#ifdef USE_VCS_CUSTOM_SHADING
+
+	    #ifdef USE_CUSTOM_LIGHT_COLOR
+	   		vec3 lightColorHdr = model_lightColorHdr;
+	    #else
+	    	vec3 lightColorHdr = czm_lightColorHdr;
+	    #endif
+	
+	
+	    lightColorHdr *= 0.35;
+	    
+	    vec3 diffuseColor = vec3(color.rgb);
+	    
+	   // float u_lambertDiffuseMultiplier = 0.9; // default value
+	   // float u_vertexShadowDarkness = 0.3; // default value
+		
+		float ambientLuminanceNight = 0.05;
+		float ambientLuminanceDay = (1.0 - ambientLuminanceNight) * u_vertexShadowDarkness + ambientLuminanceNight;
+		
+	    vec3 l = normalize(czm_lightDirectionEC);
+	    vec3 n = v_normalEC;
+	    float NdotL = dot(n, l);
+	    float NdotLclamped = clamp(NdotL, 0.0001, 1.0);
+	    
+	    vec3 positionWC = vec3(czm_inverseView * vec4(v_positionEC, 1.0));
+	    vec3 upWC = normalize(positionWC);
+	    vec3 lWC = normalize(czm_inverseViewRotation * l);
+	    vec3 nWC = normalize(czm_inverseViewRotation * n);
+	    float LdotZ = dot(lWC, -upWC);
+	    float NdotZ = dot(nWC, upWC);
+	    float sunAboveHorizon = clamp(-200.0 * LdotZ, 0.0, 1.0);
+		
+	    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
+	    float LdotZclamped = clamp(LdotZ, 0.0, 1.0);
+	    float m = 0.209439510239;
+	    float nn = (-LdotZclamped + m) / m;
+	    float beta = smoothstep(0.0, 1.0, nn);
+	    float ambientLightLuminance = mix(ambientLuminanceNight, ambientLuminanceDay, beta);
+
+
+	
+		//modify hue of sunlight
+		vec3 directLightColorHdr = lightColorHdr;
+	    float gamma = clamp(-20.0 * LdotZ, 0.0, 1.0);
+	    
+	    float sun_minB =  0.5; //0.7;
+	    float sun_minG = sun_minB * 0.5 + 0.5; 
+	    float sun_G = gamma*(1.0 - sun_minG) + sun_minG;
+	    float sun_B = gamma*(1.0 - sun_minB) + sun_minB;
+	    directLightColorHdr.g *= sun_G;
+	    directLightColorHdr.b *= sun_B;
+		
+	    //ambient diffuse light
+	    float ambientModulationMinimum = 0.2;
+	    float ambientModulation = ambientModulationMinimum + (NdotZ*0.5 + 0.5)*(NdotL*0.2 + 0.8)*(1.0 - ambientModulationMinimum);
+	    vec3 ambientLightContribution = diffuseColor * lightColorHdr * ambientLightLuminance * ambientModulation;
+	    
+		// direct light
+	    vec3 directLightContribution = diffuseColor * directLightColorHdr * NdotLclamped * u_lambertDiffuseMultiplier * sunAboveHorizon;
+	    
+	    vec3 finalColorRGB = ambientLightContribution + directLightContribution;
+	    
+	    vec4 finalColor = vec4(finalColorRGB.rgb, color.a);
+	#else
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * u_lambertDiffuseMultiplier + u_vertexShadowDarkness, 0.0, 1.0);
     vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);
+    #endif
+    
+    
 #elif defined(ENABLE_DAYNIGHT_SHADING)
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);
     diffuseIntensity = mix(1.0, diffuseIntensity, fade);
@@ -547,7 +621,14 @@ void main()
       finalColor.a *= interpolateByDistance(alphaByDistance, v_distance);
     }
 #endif
-
+    
+#ifdef USE_VCS_CUSTOM_SHADING
+	#ifndef HDR
+	    // If HDR is not enabled, the frame buffer stores sRGB colors rather than
+	    // linear colors so the linear value must be converted.
+	    finalColor = czm_linearToSrgb(finalColor);
+	#endif 
+#endif  
     out_FragColor =  finalColor;
 }
 

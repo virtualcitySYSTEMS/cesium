@@ -1,4 +1,4 @@
-import { defaultValue, FeatureDetection } from "@cesium/engine";
+import { defaultValue, FeatureDetection } from "@vcmap-cesium/engine";
 
 function createMouseEvent(type, options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);

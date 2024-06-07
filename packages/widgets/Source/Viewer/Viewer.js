@@ -30,7 +30,7 @@ import {
   ScreenSpaceEventType,
   TimeDynamicPointCloud,
   VoxelPrimitive,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import Animation from "../Animation/Animation.js";
 import AnimationViewModel from "../Animation/AnimationViewModel.js";
