@@ -65,7 +65,7 @@ float smithVisibilityGGX(float roughness, float NdotL, float NdotV)
     return (
         smithVisibilityG1(NdotL, roughness) *
         smithVisibilityG1(NdotV, roughness)
-    ) / (4.0 * NdotL * NdotV);
+    );
 }
 
 /**
@@ -121,15 +121,15 @@ float computeDirectSpecularStrength(vec3 normal, vec3 lightDirection, vec3 viewD
  * @param {czm_modelMaterial} The material properties.
  * @return {vec3} The computed HDR color
  */
-vec3 czm_pbrLighting(vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC, czm_modelMaterial material)
+vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC, czm_modelMaterial material)
 {
-   #ifdef USE_VCS_CUSTOM_SHADING
-        #ifdef USE_CUSTOM_LIGHT_COLOR
+    #ifdef USE_CUSTOM_LIGHT_COLOR
         vec3 lightColorHdr = model_lightColorHdr;
-        #else
+    #else
         vec3 lightColorHdr = czm_lightColorHdr;
-        #endif
-	    lightColorHdr *= 0.35;
+    #endif
+   #ifdef USE_VCS_CUSTOM_SHADING
+	    lightColorHdr *= 0.25;
 
 	    vec3 diffuseColor = material.diffuse;
 	    float u_lambertDiffuseMultiplier = 0.9;
@@ -140,7 +140,7 @@ vec3 czm_pbrLighting(vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC,
 
 	 	float distance = length(positionEC);
 	    vec3 v = -normalize(positionEC);
-	    vec3 l = normalize(lightDirectionEC);
+	    vec3 l = lightDirectionEC;
 	    vec3 h = normalize(v + l);
 	    vec3 n = normalEC;
 	    float NdotL = dot(n, l);
@@ -202,7 +202,7 @@ vec3 czm_pbrLighting(vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC,
 	    vec3 ambientSpecularContribution = g0 * blueSkyDiffuseColor * ambientLightLuminance * ambientModulation;
 
 	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution + ambientSpecularContribution;
-	    return finalColorRGB;
+        return finalColorRGB;
 	#else
 
     vec3 halfwayDirectionEC = normalize(viewDirectionEC + lightDirectionEC);
@@ -241,6 +241,6 @@ vec3 czm_pbrLighting(vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC,
     vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);
 
     // Lo = (diffuse + specular) * Li * NdotL
-    return (diffuseContribution + specularContribution) * NdotL;
+    return (diffuseContribution + specularContribution) * NdotL * lightColorHdr;
 	#endif
 }
