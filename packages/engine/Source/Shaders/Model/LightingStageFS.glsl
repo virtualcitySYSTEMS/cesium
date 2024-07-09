@@ -86,12 +86,26 @@ vec3 computePbrLighting(in czm_modelMaterial material, in vec3 position)
 
     // Accumulate colors from base layer
     vec3 color = directColor + material.emissive;
-    #ifdef USE_IBL_LIGHTING
-        color += computeIBL(position, normal, lightDirection, lightColorHdr, material);
+    #ifndef USE_VCS_CUSTOM_SHADING
+        #ifdef USE_IBL_LIGHTING
+            color += computeIBL(position, normal, lightDirection, lightColorHdr, material);
+        #endif
+    #endif
+
+    // In HDR mode, the frame buffer is in linear color space. The
+    // post-processing stages (see PostProcessStageCollection) will handle
+    // tonemapping. However, if HDR is not enabled, we must tonemap else large
+    // values may be clamped to 1.0
+    #ifndef HDR
+        #ifndef USE_VCS_CUSTOM_SHADING
+            // Custom VCS Shading, if VCS Shading is activated we do not do toneMapping for models,
+            // cesium default is to do tonemapping
+            color = czm_acesTonemapping(color);
+        #endif
     #endif
 
     #ifdef USE_CLEARCOAT
-        color = addClearcoatReflection(color, position, lightDirection, lightColorHdr, material);
+    color = addClearcoatReflection(color, position, lightDirection, lightColorHdr, material);
     #endif
 
     return color;

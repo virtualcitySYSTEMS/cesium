@@ -1,4 +1,4 @@
-import { Check, defaultValue, defined } from "@cesium/engine";
+import { Check, defaultValue, defined } from "@vcmap-cesium/engine";
 
 /**
  * A static class with helper functions used by CesiumInspector, Cesium3DTilesInspector, and VoxelInspector

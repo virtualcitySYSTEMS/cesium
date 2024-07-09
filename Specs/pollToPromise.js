@@ -1,4 +1,4 @@
-import { defaultValue, getTimestamp } from "@cesium/engine";
+import { defaultValue, getTimestamp } from "@vcmap-cesium/engine";
 
 function pollToPromise(f, options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);

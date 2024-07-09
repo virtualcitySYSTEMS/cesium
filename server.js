@@ -81,12 +81,12 @@ function formatTimeSinceInSeconds(start) {
 async function generateDevelopmentBuild() {
   const startTime = performance.now();
 
-  // Build @cesium/engine index.js
-  console.log("[1/3] Building @cesium/engine...");
+  // Build @vcmap-cesium/engine index.js
+  console.log("[1/3] Building @vcmap-cesium/engine...");
   await createIndexJs("engine");
 
-  // Build @cesium/widgets index.js
-  console.log("[2/3] Building @cesium/widgets...");
+  // Build @vcmap-cesium/widgets index.js
+  console.log("[2/3] Building @vcmap-cesium/widgets...");
   await createIndexJs("widgets");
 
   // Build CesiumJS and save returned contexts for rebuilding upon request

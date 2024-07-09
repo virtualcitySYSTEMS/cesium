@@ -149,7 +149,7 @@ vec3 getClearcoatNormalFromTexture(ProcessedAttributes attributes, vec3 geometry
 #ifdef HAS_NORMALS
 vec3 computeNormal(ProcessedAttributes attributes)
 {
-    // Geometry normal. This is already normalized 
+    // Geometry normal. This is already normalized
     vec3 normal = attributes.normalEC;
 
     #if defined(HAS_NORMAL_TEXTURE) && !defined(HAS_WIREFRAME)
@@ -309,6 +309,7 @@ float setMetallicRoughness(inout czm_modelMaterial material)
 
     return metalness;
 }
+
 #ifdef USE_SPECULAR
 void setSpecular(inout czm_modelMaterial material, in float metalness)
 {
@@ -352,6 +353,7 @@ void setSpecular(inout czm_modelMaterial material, in float metalness)
     material.specular = mix(dielectricSpecularF0, material.baseColor.rgb, metalness);
 }
 #endif
+
 #ifdef USE_ANISOTROPY
 void setAnisotropy(inout czm_modelMaterial material, in NormalInfo normalInfo)
 {
@@ -379,6 +381,7 @@ void setAnisotropy(inout czm_modelMaterial material, in NormalInfo normalInfo)
     material.anisotropyStrength = anisotropyStrength;
 }
 #endif
+
 #ifdef USE_CLEARCOAT
 void setClearcoat(inout czm_modelMaterial material, in ProcessedAttributes attributes)
 {
@@ -443,19 +446,38 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     // Regardless of whether we use PBR, set a base color
     #ifdef HAS_BASE_COLOR_TEXTURE
         baseColorWithAlpha = getBaseColorFromTexture();
+        #ifdef HAS_BASE_COLOR_FACTOR
+            // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBColorFactors set we
+            // handle the baseColorFactor as SRGB values instead of linear color
+            #ifdef USE_VCS_SRGB_COLOR_FACTORS
+                baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+            #else
+                baseColorWithAlpha *= u_baseColorFactor;
+            #endif
+        #endif
     #elif defined(HAS_BASE_COLOR_FACTOR)
-        baseColorWithAlpha = u_baseColorFactor;
+    // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBColorFactors set we
+    // handle the baseColorFactor as SRGB values instead of linear color
+        #ifdef USE_VCS_SRGB_COLOR_FACTORS
+            baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+        #else
+            baseColorWithAlpha *= u_baseColorFactor;
+        #endif
     #endif
 
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE
-        baseColorWithAlpha = v_pointCloudColor;
+    baseColorWithAlpha = v_pointCloudColor;
     #elif defined(HAS_COLOR_0)
-        vec4 color = attributes.color_0;
-        // .pnts files store colors in the sRGB color space
-        #ifdef HAS_SRGB_COLOR
-            color = czm_srgbToLinear(color);
-        #endif
-        baseColorWithAlpha *= color;
+    vec4 color = attributes.color_0;
+    // .pnts files store colors in the sRGB color space
+    #ifdef HAS_SRGB_COLOR
+    color = czm_srgbToLinear(color);
+    #elif defined(USE_VCS_SRGB_VERTEX_COLORS)
+    // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBAVertexColor set we
+    // handle the baseColorFactor as SRGB values instead of linear color
+    color = czm_srgbToLinear(color);
+    #endif
+    baseColorWithAlpha *= color;
     #endif
 
     material.baseColor = baseColorWithAlpha;
@@ -463,35 +485,36 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     material.alpha = baseColorWithAlpha.a;
 
     #ifdef USE_CPU_STYLING
-        material.diffuse = blend(material.diffuse, feature.color.rgb, model_colorBlend);
+    material.diffuse = blend(material.diffuse, feature.color.rgb, model_colorBlend);
     #endif
 
     #ifdef HAS_OCCLUSION_TEXTURE
-        vec2 occlusionTexCoords = TEXCOORD_OCCLUSION;
-        #ifdef HAS_OCCLUSION_TEXTURE_TRANSFORM
-            occlusionTexCoords = computeTextureTransform(occlusionTexCoords, u_occlusionTextureTransform);
-        #endif
-        material.occlusion = texture(u_occlusionTexture, occlusionTexCoords).r;
+    vec2 occlusionTexCoords = TEXCOORD_OCCLUSION;
+    #ifdef HAS_OCCLUSION_TEXTURE_TRANSFORM
+    occlusionTexCoords = computeTextureTransform(occlusionTexCoords, u_occlusionTextureTransform);
+    #endif
+    material.occlusion = texture(u_occlusionTexture, occlusionTexCoords).r;
     #endif
 
     #ifdef HAS_EMISSIVE_TEXTURE
-        material.emissive = getEmissiveFromTexture();
+    material.emissive = getEmissiveFromTexture();
     #elif defined(HAS_EMISSIVE_FACTOR)
-        material.emissive = u_emissiveFactor;
+    material.emissive = u_emissiveFactor;
     #endif
 
     #if defined(LIGHTING_PBR) && defined(USE_SPECULAR_GLOSSINESS)
-        setSpecularGlossiness(material);
+    setSpecularGlossiness(material);
     #elif defined(LIGHTING_PBR)
-        float metalness = setMetallicRoughness(material);
-        #ifdef USE_SPECULAR
-            setSpecular(material, metalness);
-        #endif
-        #ifdef USE_ANISOTROPY
-            setAnisotropy(material, normalInfo);
-        #endif
-        #ifdef USE_CLEARCOAT
-            setClearcoat(material, attributes);
-        #endif
+    float metalness = setMetallicRoughness(material);
+    #ifdef USE_SPECULAR
+    setSpecular(material, metalness);
+    #endif
+    #ifdef USE_ANISOTROPY
+    setAnisotropy(material, normalInfo);
+    #endif
+    #ifdef USE_CLEARCOAT
+    setClearcoat(material, attributes);
+    #endif
     #endif
 }
+

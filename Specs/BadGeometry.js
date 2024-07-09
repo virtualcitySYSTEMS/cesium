@@ -1,4 +1,4 @@
-import { queryToObject, RuntimeError } from "@cesium/engine";
+import { queryToObject, RuntimeError } from "@vcmap-cesium/engine";
 
 function BadGeometry() {
   this._workerName = "../../Build/Specs/TestWorkers/createBadGeometry";
