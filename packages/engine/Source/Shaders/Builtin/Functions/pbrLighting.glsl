@@ -129,7 +129,7 @@ vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 
         vec3 lightColorHdr = czm_lightColorHdr;
     #endif
    #ifdef USE_VCS_CUSTOM_SHADING
-	    lightColorHdr *= 0.25;
+	    lightColorHdr *= 0.35;
 
 	    vec3 diffuseColor = material.diffuse;
 	    float u_lambertDiffuseMultiplier = 0.9;
@@ -187,7 +187,7 @@ vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 
 
 	    //direct specular light
 	    vec3 f0 = material.specular;
-	    float reflectance = max(max(f0.r, f0.g), f0.b);
+        float reflectance = czm_maximumComponent(f0);
 	    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
 	    vec3 F = fresnelSchlick2(f0, f90, VdotH);
 	    float alpha = material.roughness;
