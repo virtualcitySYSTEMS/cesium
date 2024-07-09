@@ -1,4 +1,4 @@
-import { createCommand } from "@cesium/widgets";
+import { createCommand } from "@vcmap-cesium/widgets";
 import assert from "node:assert";
 
 // NodeJS smoke screen test

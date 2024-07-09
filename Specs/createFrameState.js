@@ -7,7 +7,7 @@ import {
   CreditDisplay,
   FrameState,
   JobScheduler,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 function createFrameState(context, camera, frameNumber, time) {
   // Mock frame-state for testing.

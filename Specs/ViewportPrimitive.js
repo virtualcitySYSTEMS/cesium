@@ -1,4 +1,9 @@
-import { defined, destroyObject, Pass, RenderState } from "@cesium/engine";
+import {
+  defined,
+  destroyObject,
+  Pass,
+  RenderState,
+} from "@vcmap-cesium/engine";
 
 const ViewportPrimitive = function (fragmentShader) {
   this._fs = fragmentShader;

@@ -1,4 +1,4 @@
-import { clone, defaultValue, Context } from "@cesium/engine";
+import { clone, defaultValue, Context } from "@vcmap-cesium/engine";
 
 import createCanvas from "./createCanvas.js";
 import createFrameState from "./createFrameState.js";

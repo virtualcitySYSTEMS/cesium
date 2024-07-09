@@ -497,6 +497,8 @@ function makeModelOptions(tileset, tile, content, additionalOptions) {
     enableShowOutline: tileset._enableShowOutline,
     showOutline: tileset.showOutline,
     outlineColor: tileset.outlineColor,
+    useSRGBVertexColors: tileset.useSRGBVertexColors,
+    useSRGBColorFactors: tileset.useSRGBColorFactors,
   };
 
   return combine(additionalOptions, mainOptions);

@@ -4,7 +4,7 @@ import {
   destroyObject,
   EventHelper,
   JulianDate,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "./ThirdParty/knockout.js";
 
 /**
