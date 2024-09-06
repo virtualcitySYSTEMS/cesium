@@ -68,6 +68,25 @@ float smithVisibilityGGX(float alphaRoughness, float NdotL, float NdotV)
     return 0.0;
 }
 
+float smithVisibilityG1(float NdotV, float roughness)
+{
+    // this is the k value for direct lighting.
+    // for image based lighting it will be roughness^2 / 2
+    float k = (roughness + 1.0) * (roughness + 1.0) / 8.0;
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float smithVisibilityGGX_VCS(float roughness, float NdotL, float NdotV)
+{
+    // Avoid divide-by-zero errors
+    NdotL = clamp(NdotL, 0.001, 1.0);
+    NdotV += 0.001;
+    return (
+        smithVisibilityG1(NdotL, roughness) *
+        smithVisibilityG1(NdotV, roughness)
+    );
+}
+
 /**
  * Estimate the fraction of the microfacets in a surface that are aligned with
  * the halfway vector, which is aligned halfway between the directions from
@@ -191,7 +210,7 @@ vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 
 	    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
 	    vec3 F = fresnelSchlick2(f0, f90, VdotH);
         float alphaRoughness = material.roughness * material.roughness;
-	    float G = smithVisibilityGGX(alphaRoughness, NdotLclamped, NdotV);
+	    float G = smithVisibilityGGX_VCS(material.roughness, NdotLclamped, NdotV);
 	    float D = GGX(alphaRoughness, NdotH);
 	    vec3 directSpecularContribution = directLight * clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
 
