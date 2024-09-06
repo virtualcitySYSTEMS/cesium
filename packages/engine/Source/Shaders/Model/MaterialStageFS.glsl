@@ -149,7 +149,7 @@ vec3 getClearcoatNormalFromTexture(ProcessedAttributes attributes, vec3 geometry
 #ifdef HAS_NORMALS
 vec3 computeNormal(ProcessedAttributes attributes)
 {
-    // Geometry normal. This is already normalized 
+    // Geometry normal. This is already normalized
     vec3 normal = attributes.normalEC;
 
     #if defined(HAS_NORMAL_TEXTURE) && !defined(HAS_WIREFRAME)
@@ -177,7 +177,13 @@ vec4 getBaseColorFromTexture()
     vec4 baseColorWithAlpha = czm_srgbToLinear(texture(u_baseColorTexture, baseColorTexCoords));
 
     #ifdef HAS_BASE_COLOR_FACTOR
-        baseColorWithAlpha *= u_baseColorFactor;
+        // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBColorFactors set we
+        // handle the baseColorFactor as SRGB values instead of linear color
+        #ifdef USE_VCS_SRGB_COLOR_FACTORS
+            baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+        #else
+            baseColorWithAlpha *= u_baseColorFactor;
+        #endif
     #endif
 
     return baseColorWithAlpha;
@@ -441,7 +447,13 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
     #ifdef HAS_BASE_COLOR_TEXTURE
         baseColorWithAlpha = getBaseColorFromTexture();
     #elif defined(HAS_BASE_COLOR_FACTOR)
-        baseColorWithAlpha = u_baseColorFactor;
+        // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBColorFactors set we
+        // handle the baseColorFactor as SRGB values instead of linear color
+        #ifdef USE_VCS_SRGB_COLOR_FACTORS
+            baseColorWithAlpha *= czm_srgbToLinear(u_baseColorFactor);
+        #else
+            baseColorWithAlpha *= u_baseColorFactor;
+        #endif
     #endif
 
     #ifdef HAS_POINT_CLOUD_COLOR_STYLE
@@ -450,6 +462,10 @@ void materialStage(inout czm_modelMaterial material, ProcessedAttributes attribu
         vec4 color = attributes.color_0;
         // .pnts files store colors in the sRGB color space
         #ifdef HAS_SRGB_COLOR
+            color = czm_srgbToLinear(color);
+        #elif defined(USE_VCS_SRGB_VERTEX_COLORS)
+            // Custom VCS Color Handling, if VCS Shader is activated and the model has useSRGBAVertexColor set we
+            // handle the baseColorFactor as SRGB values instead of linear color
             color = czm_srgbToLinear(color);
         #endif
         baseColorWithAlpha *= color;

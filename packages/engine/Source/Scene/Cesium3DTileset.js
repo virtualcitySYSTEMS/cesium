@@ -129,6 +129,8 @@ import Ray from "../Core/Ray.js";
  * @property {boolean} [debugShowRenderingStatistics=false] For debugging only. When true, draws labels to indicate the number of commands, points, triangles and features for each tile.
  * @property {boolean} [debugShowMemoryUsage=false] For debugging only. When true, draws labels to indicate the texture and geometry memory in megabytes used by each tile.
  * @property {boolean} [debugShowUrl=false] For debugging only. When true, draws labels to indicate the url of each tile.
+ * @property {boolean} [options.useSRGBVertexColors=false] Whether to handle vertex colors in the GLTF as SRGBA values (this is against the GLTF Spec).
+ * @property {boolean} [options.useSRGBColorFactors=false] Whether to handle colorFactors in the GLTF as SRGBA values (this is against the GLTF Spec).
  */
 
 /**
@@ -1074,6 +1076,18 @@ function Cesium3DTileset(options) {
     instanceFeatureIdLabel = `instanceFeatureId_${instanceFeatureIdLabel}`;
   }
   this._instanceFeatureIdLabel = instanceFeatureIdLabel;
+
+  /**
+   * Whether to handle vertex colors in the GLTF as SRGBA values (this is against the GLTF Spec).
+   * @private
+   */
+  this.useSRGBVertexColors = defaultValue(options.useSRGBVertexColors, false);
+
+  /**
+   * Whether to handle colorFactors in the GLTF as SRGBA values (this is against the GLTF Spec).
+   * @private
+   */
+  this.useSRGBColorFactors = defaultValue(options.useSRGBColorFactors, false);
 }
 
 Object.defineProperties(Cesium3DTileset.prototype, {

@@ -1,4 +1,4 @@
-import { defined, defaultValue } from "@cesium/engine";
+import { defined, defaultValue } from "@vcmap-cesium/engine";
 import concatTypedArrays from "./concatTypedArrays.js";
 import MetadataTester from "./MetadataTester.js";
 

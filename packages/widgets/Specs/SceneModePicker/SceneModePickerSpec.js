@@ -1,4 +1,4 @@
-import { FeatureDetection } from "@cesium/engine";
+import { FeatureDetection } from "@vcmap-cesium/engine";
 
 import { SceneModePicker } from "../../index.js";
 

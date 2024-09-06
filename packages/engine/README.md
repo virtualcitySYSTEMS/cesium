@@ -1,14 +1,21 @@
-# @cesium/engine
+# @vcmap-cesium/engine
+
+> > **_Attention_**
+>
+> This is a custom CesiumJS fork to be used with the `VC Map`.
+> For the common CesiumJS module visit [this package](https://www.npmjs.com/package/@vcmap-cesium/engine).
+
+---
 
 [![Build Status](https://github.com/CesiumGS/cesium/actions/workflows/dev.yml/badge.svg)](https://github.com/CesiumGS/cesium/actions/workflows/dev.yml)
-[![npm](https://img.shields.io/npm/v/@cesium/engine)](https://www.npmjs.com/package/@cesium/engine)
+[![npm](https://img.shields.io/npm/v/@vcmap-cesium/engine)](https://www.npmjs.com/package/@vcmap-cesium/engine)
 [![Docs](https://img.shields.io/badge/docs-online-orange.svg)](https://cesium.com/learn/)
 
 ![Cesium](https://github.com/CesiumGS/cesium/wiki/logos/Cesium_Logo_Color.jpg)
 
 [CesiumJS](../../README.md) is a JavaScript library for creating 3D globes and 2D maps in a web browser without a plugin. It uses WebGL for hardware-accelerated graphics, and is cross-platform, cross-browser, and tuned for dynamic-data visualization.
 
-`@cesium/engine` includes cesiumJS's core, rendering, and data APIs. Here you'll find terrain and imagery engines, support for 3D Tiles and 3D models, geometries, and vector data.
+`@vcmap-cesium/engine` includes cesiumJS's core, rendering, and data APIs. Here you'll find terrain and imagery engines, support for 3D Tiles and 3D models, geometries, and vector data.
 
 ---
 
@@ -18,18 +25,18 @@
 
 ## Install
 
-`@cesium/engine` is published as ES modules with full typing support.
+`@vcmap-cesium/engine` is published as ES modules with full typing support.
 
 Install with npm:
 
 ```sh
-npm install @cesium/engine --save
+npm install @vcmap-cesium/engine --save
 ```
 
 Or, install with yarn:
 
 ```sh
-yarn add @cesium/engine
+yarn add @vcmap-cesium/engine
 ```
 
 ## Usage
@@ -37,8 +44,8 @@ yarn add @cesium/engine
 Import individual modules to benefit from tree shaking optimizations through most build tools:
 
 ```js
-import { CesiumWidget } from "@cesium/engine";
-import "@cesium/engine/Source/Widget/CesiumWidget.css";
+import { CesiumWidget } from "@vcmap-cesium/engine";
+import "@vcmap-cesium/engine/Source/Widget/CesiumWidget.css";
 
 const cesiumWidget = new CesiumWidget("cesiumContainer");
 ```

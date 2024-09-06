@@ -82,13 +82,14 @@ vec3 computePbrLighting(in czm_modelMaterial material, in vec3 position)
     vec3 normal = material.normalEC;
     vec3 lightDirection = normalize(czm_lightDirectionEC);
 
-    vec3 directLighting = czm_pbrLighting(viewDirection, normal, lightDirection, material);
-    vec3 directColor = lightColorHdr * directLighting;
+    vec3 directColor = czm_pbrLighting(position, viewDirection, normal, lightDirection, material);
 
     // Accumulate colors from base layer
     vec3 color = directColor + material.emissive;
-    #ifdef USE_IBL_LIGHTING
-        color += computeIBL(position, normal, lightDirection, lightColorHdr, material);
+    #ifndef USE_VCS_CUSTOM_SHADING
+        #ifdef USE_IBL_LIGHTING
+            color += computeIBL(position, normal, lightDirection, lightColorHdr, material);
+        #endif
     #endif
 
     #ifdef USE_CLEARCOAT
@@ -120,7 +121,10 @@ void lightingStage(inout czm_modelMaterial material, ProcessedAttributes attribu
         // tonemapping. However, if HDR is not enabled, we must tonemap else large
         // values may be clamped to 1.0
         #ifndef HDR
-            color = czm_pbrNeutralTonemapping(color);
+                #ifndef USE_VCS_CUSTOM_SHADING
+                    // Custom VCS Shading, if VCS Shading is activated we do not do toneMapping for models,
+                    color = czm_pbrNeutralTonemapping(color);
+                #endif
         #endif
     #else // unlit
         vec3 color = material.diffuse;
