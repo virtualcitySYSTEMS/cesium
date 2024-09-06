@@ -3746,7 +3746,17 @@ Scene.prototype.updateHeight = function (
   Check.typeOf.func("callback", callback);
   //>>includeEnd('debug');
 
+  let callbackWrapperCalledForFrameState = -1;
+  let removed = false;
+
   const callbackWrapper = () => {
+    if (
+      removed ||
+      this.frameState.frameNumber <= callbackWrapperCalledForFrameState
+    ) {
+      return;
+    }
+    callbackWrapperCalledForFrameState = this.frameState.frameNumber;
     Cartographic.clone(cartographic, updateHeightScratchCartographic);
 
     const height = this.getHeight(cartographic, heightReference);
@@ -3822,6 +3832,7 @@ Scene.prototype.updateHeight = function (
     tilesetRemoveCallbacks = {};
     removeAddedListener();
     removeRemovedListener();
+    removed = true;
   };
 
   return removeCallback;
