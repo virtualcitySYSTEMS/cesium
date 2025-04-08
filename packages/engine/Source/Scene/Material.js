@@ -36,6 +36,7 @@ import TextureMagnificationFilter from "../Renderer/TextureMagnificationFilter.j
 import TextureMinificationFilter from "../Renderer/TextureMinificationFilter.js";
 import WaterMaskMaterial from "../Shaders/Materials/WaterMaskMaterial.js";
 import WaterMaterial from "../Shaders/Materials/Water.js";
+import Event from "../Core/Event.js";
 
 /**
  * A Material defines surface appearance through a combination of diffuse, specular,
@@ -342,6 +343,12 @@ function Material(options) {
   if (!defined(Material._uniformList[this.type])) {
     Material._uniformList[this.type] = Object.keys(this._uniforms);
   }
+
+  /**
+   * Event raised when ever an image is loaded.
+   * @type {Event}
+   */
+  this.imageLoaded = new Event();
 }
 
 // Cached list of combined uniform names indexed by type.
@@ -488,6 +495,7 @@ Material.prototype.update = function (context) {
       uniformDimensions.x = texture._width;
       uniformDimensions.y = texture._height;
     }
+    this.imageLoaded.raiseEvent(uniformId);
   }
 
   loadedImages.length = 0;
