@@ -82,7 +82,7 @@ vec3 computePbrLighting(in czm_modelMaterial material, in vec3 position)
     vec3 normal = material.normalEC;
     vec3 lightDirection = normalize(czm_lightDirectionEC);
 
-    vec3 directColor = czm_pbrLighting(position, viewDirection, normal, lightDirection, material);
+    vec3 directColor = czm_pbrLighting(position, viewDirection, normal, lightDirection, lightColorHdr, material);
 
     // Accumulate colors from base layer
     vec3 color = directColor + material.emissive;

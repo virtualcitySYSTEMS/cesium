@@ -133,20 +133,16 @@ float computeDirectSpecularStrength(vec3 normal, vec3 lightDirection, vec3 viewD
  *
  * @name czm_pbrLighting
  * @glslFunction
- *
+ * @param {vec3} positionEC The position of the fragment in eye coordinates (custom vcs)
  * @param {vec3} viewDirectionEC Unit vector pointing from the fragment to the eye position
  * @param {vec3} normalEC The surface normal in eye coordinates
  * @param {vec3} lightDirectionEC Unit vector pointing to the light source in eye coordinates.
+ * @param {vec3} lightColorHdr The color of the light source in HDR (custom vcs)
  * @param {czm_modelMaterial} The material properties.
  * @return {vec3} The computed HDR color
  */
-vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC, czm_modelMaterial material)
+vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC, vec3 lightColorHdr, czm_modelMaterial material)
 {
-    #ifdef USE_CUSTOM_LIGHT_COLOR
-        vec3 lightColorHdr = model_lightColorHdr;
-    #else
-        vec3 lightColorHdr = czm_lightColorHdr;
-    #endif
    #ifdef USE_VCS_CUSTOM_SHADING
 	    lightColorHdr *= 0.35;
 
