@@ -9,7 +9,7 @@ import {
   GpxDataSource,
   KmlDataSource,
   wrapFunction,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 /**
  * A mixin which adds default drag and drop support for CZML files to the Viewer widget.
  * Rather than being called directly, this function is normally passed as

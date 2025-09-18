@@ -171,6 +171,8 @@ import ModelImagery from "./ModelImagery.js";
  * @privateParam {string|number} [options.instanceFeatureIdLabel="instanceFeatureId_0"] Label of the instance feature ID set used for picking and styling. If instanceFeatureIdLabel is set to an integer N, it is converted to the string "instanceFeatureId_N" automatically. If both per-primitive and per-instance feature IDs are present, the instance feature IDs take priority.
  * @privateParam {object} [options.pointCloudShading] Options for constructing a {@link PointCloudShading} object to control point attenuation based on geometric error and lighting.
  * @privateParam {ClassificationType} [options.classificationType] Determines whether terrain, 3D Tiles or both will be classified by this model. This cannot be set after the model has loaded.
+ * @privateParam {boolean} [options.useSRGBVertexColors=false] Whether to handle vertex colors in the GLTF as SRGBA values (this is against the GLTF Spec).
+ * @privateParam {boolean} [options.useSRGBColorFactors=false] Whether to handle colorFactors in the GLTF as SRGBA values (this is against the GLTF Spec).
  *
  *
  * @see Model.fromGltfAsync
@@ -498,6 +500,18 @@ function Model(options) {
    * @private
    */
   this.pickObject = options.pickObject;
+
+  /**
+   * Whether to handle vertex colors in the GLTF as SRGBA values (this is against the GLTF Spec).
+   * @private
+   */
+  this.useSRGBVertexColors = defaultValue(options.useSRGBVertexColors, false);
+
+  /**
+   * Whether to handle colorFactors in the GLTF as SRGBA values (this is against the GLTF Spec).
+   * @private
+   */
+  this.useSRGBColorFactors = defaultValue(options.useSRGBColorFactors, false);
 }
 
 function handleError(model, error) {
@@ -2962,6 +2976,8 @@ Model.prototype.destroyModelResources = function () {
  * @param {object} [options.pointCloudShading] Options for constructing a {@link PointCloudShading} object to control point attenuation and lighting.
  * @param {ClassificationType} [options.classificationType] Determines whether terrain, 3D Tiles or both will be classified by this model. This cannot be set after the model has loaded.
  * @param {Model.GltfCallback} [options.gltfCallback] A function that is called with the loaded gltf object once loaded.
+ * @param {boolean} [options.useSRGBVertexColors=false] Whether to handle vertex colors in the GLTF as SRGBA values (this is against the GLTF Spec).
+ * @param {boolean} [options.useSRGBColorFactors=false] Whether to handle colorFactors in the GLTF as SRGBA values (this is against the GLTF Spec).
  *
  * @returns {Promise<Model>} A promise that resolves to the created model when it is ready to render.
  *
@@ -3327,6 +3343,8 @@ function makeModelOptions(loader, modelType, options) {
     pointCloudShading: options.pointCloudShading,
     classificationType: options.classificationType,
     pickObject: options.pickObject,
+    useSRGBColorFactors: options.useSRGBColorFactors,
+    useSRGBVertexColors: options.useSRGBVertexColors,
   };
 }
 

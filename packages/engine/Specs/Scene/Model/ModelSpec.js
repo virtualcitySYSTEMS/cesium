@@ -2211,6 +2211,7 @@ describe(
     describe("height reference", function () {
       beforeEach(() => {
         scene.globe = new Globe();
+        scene.frameState.frameNumber = 0; // ensure we call updateHeight callbacks
       });
 
       afterEach(() => {

@@ -1,4 +1,4 @@
-import { Ellipsoid, Globe } from "@cesium/engine";
+import { Ellipsoid, Globe } from "@vcmap-cesium/engine";
 import { VoxelInspector } from "../../index.js";
 
 import createScene from "../../../../Specs/createScene.js";

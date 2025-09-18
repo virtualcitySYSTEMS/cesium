@@ -3944,7 +3944,17 @@ Scene.prototype.updateHeight = function (
   //>>includeEnd('debug');
 
   const ellipsoid = this._ellipsoid;
+  let callbackWrapperCalledForFrameState = -1;
+  let removed = false;
+
   const callbackWrapper = (clampedCartographic) => {
+    if (
+      removed ||
+      this.frameState.frameNumber <= callbackWrapperCalledForFrameState
+    ) {
+      return;
+    }
+    callbackWrapperCalledForFrameState = this.frameState.frameNumber;
     Cartographic.clone(cartographic, updateHeightScratchCartographic);
 
     let height;
@@ -4024,6 +4034,7 @@ Scene.prototype.updateHeight = function (
     tilesetRemoveCallbacks = {};
     removeAddedListener();
     removeRemovedListener();
+    removed = true;
   };
 
   return removeCallback;

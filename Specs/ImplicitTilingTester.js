@@ -1,4 +1,4 @@
-import { defined } from "@cesium/engine";
+import { defined } from "@vcmap-cesium/engine";
 import concatTypedArrays from "./concatTypedArrays.js";
 import MetadataTester from "./MetadataTester.js";
 

@@ -1,4 +1,4 @@
-import { JulianDate } from "@cesium/engine";
+import { defaultValue, JulianDate } from "@vcmap-cesium/engine";
 
 /**
  * @private

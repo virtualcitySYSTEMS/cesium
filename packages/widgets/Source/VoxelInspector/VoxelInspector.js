@@ -3,7 +3,8 @@ import {
   Check,
   destroyObject,
   getElement,
-} from "@cesium/engine";
+  VoxelShapeType,
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import InspectorShared from "../InspectorShared.js";
 import VoxelInspectorViewModel from "./VoxelInspectorViewModel.js";

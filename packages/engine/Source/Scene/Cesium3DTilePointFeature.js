@@ -364,6 +364,22 @@ Object.defineProperties(Cesium3DTilePointFeature.prototype, {
   },
 
   /**
+   * Gets or sets the scale for this feature.
+   * @memberof Cesium3DTilePointFeature.prototype
+   *
+   * @type {number}
+   */
+  scale: {
+    get: function () {
+      return this._billboard.scale;
+    },
+    set: function (value) {
+      this._label.scale = value;
+      this._billboard.scale = value;
+    },
+  },
+
+  /**
    * Gets or sets the near and far translucency properties for this feature.
    *
    * @memberof Cesium3DTilePointFeature.prototype
