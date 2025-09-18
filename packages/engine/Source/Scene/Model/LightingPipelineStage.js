@@ -64,7 +64,7 @@ LightingPipelineStage.process = function (renderResources, primitive) {
       shaderBuilder.addDefine(
         "USE_VCS_CUSTOM_SHADING",
         undefined,
-        ShaderDestination.FRAGMENT
+        ShaderDestination.FRAGMENT,
       );
     }
   } else {

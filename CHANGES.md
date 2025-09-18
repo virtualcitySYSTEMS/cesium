@@ -8,7 +8,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 - Give the [new version of Sandcastle](https://dev-sandcastle.cesium.com/) a try today!
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -34,7 +34,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.132 - 2025-08-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -62,7 +62,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.131 - 2025-07-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -77,7 +77,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.130.1 - 2025-06-16
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -86,7 +86,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.130 - 2025-06-02
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -112,7 +112,7 @@ vec3 voxelNormal = fsInput.attributes.normalEC;
 
 ## 1.129 - 2025-05-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -130,7 +130,7 @@ vec3 voxelNormal = fsInput.attributes.normalEC;
 
 ## 1.128 - 2025-04-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -159,7 +159,7 @@ vec3 voxelNormal = fsInput.attributes.normalEC;
 
 ## 1.127 - 2025-03-03
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -195,7 +195,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.126 - 2025-02-03
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -219,7 +219,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.125 - 2025-01-02
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -235,7 +235,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.124 - 2024-12-02
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -278,7 +278,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.123.1 - 2024-11-07
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -287,7 +287,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.123 - 2024-11-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -327,7 +327,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.122 - 2024-10-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -354,7 +354,7 @@ This is an npm-only release to extra source maps included in 1.121
 
 ## 1.121 - 2024-09-03
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -387,7 +387,7 @@ This is an npm-only release to extra source maps included in 1.121
 
 ## 1.120 - 2024-08-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -406,7 +406,7 @@ This is an npm-only release to extra source maps included in 1.121
 
 ## 1.119 - 2024-07-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -1078,7 +1078,7 @@ try {
     });
     ```
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 

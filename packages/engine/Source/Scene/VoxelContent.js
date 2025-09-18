@@ -1,4 +1,4 @@
-import { destroyObject } from "@cesium/engine";
+import { destroyObject } from "@vcmap-cesium/engine";
 import Check from "../Core/Check.js";
 import ComponentDatatype from "../Core/ComponentDatatype.js";
 import DeveloperError from "../Core/DeveloperError.js";

@@ -952,7 +952,7 @@ Object.defineProperties(Billboard.prototype, {
       } else if (defined(value.src)) {
         id = value.src;
       } else if (defined(value.id) && value.id !== "") {
-        id = value.id
+        id = value.id;
       } else {
         id = createGuid();
       }

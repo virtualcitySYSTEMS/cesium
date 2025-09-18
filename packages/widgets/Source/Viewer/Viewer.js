@@ -19,10 +19,7 @@ import {
   Property,
   ScreenSpaceEventType,
   IonGeocoderService,
-  TimeDynamicPointCloud,
-  VoxelPrimitive,
 } from "@vcmap-cesium/engine";
-import knockout from "../ThirdParty/knockout.js";
 import Animation from "../Animation/Animation.js";
 import AnimationViewModel from "../Animation/AnimationViewModel.js";
 import BaseLayerPicker from "../BaseLayerPicker/BaseLayerPicker.js";

@@ -137,7 +137,7 @@ GeometryPipelineStage.process = function (
     shaderBuilder.addDefine(
       "USE_VCS_SRGB_VERTEX_COLORS",
       undefined,
-      ShaderDestination.FRAGMENT
+      ShaderDestination.FRAGMENT,
     );
   }
 
@@ -146,7 +146,7 @@ GeometryPipelineStage.process = function (
     shaderBuilder.addDefine(
       "USE_VCS_SRGB_COLOR_FACTORS",
       undefined,
-      ShaderDestination.FRAGMENT
+      ShaderDestination.FRAGMENT,
     );
   }
 

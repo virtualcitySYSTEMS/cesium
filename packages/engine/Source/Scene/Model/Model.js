@@ -505,13 +505,13 @@ function Model(options) {
    * Whether to handle vertex colors in the GLTF as SRGBA values (this is against the GLTF Spec).
    * @private
    */
-  this.useSRGBVertexColors = defaultValue(options.useSRGBVertexColors, false);
+  this.useSRGBVertexColors = options.useSRGBVertexColors ?? false;
 
   /**
    * Whether to handle colorFactors in the GLTF as SRGBA values (this is against the GLTF Spec).
    * @private
    */
-  this.useSRGBColorFactors = defaultValue(options.useSRGBColorFactors, false);
+  this.useSRGBColorFactors = options.useSRGBColorFactors ?? false;
 }
 
 function handleError(model, error) {

@@ -356,19 +356,19 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       if (defined(style.pointOutlineColor)) {
         feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(
           feature,
-          scratchColor2
+          scratchColor2,
         );
       } else {
         feature.pointOutlineColor =
           Cesium3DTilePointFeature.defaultPointOutlineColor;
       }
-      
-    if (defined(style.pointOutlineColor)) {
-      feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(
-        feature,
-        scratchColor2,
-      );
-    }
+
+      if (defined(style.pointOutlineColor)) {
+        feature.pointOutlineColor = style.pointOutlineColor.evaluateColor(
+          feature,
+          scratchColor2,
+        );
+      }
 
       if (defined(style.pointOutlineWidth)) {
         feature.pointOutlineWidth = style.pointOutlineWidth.evaluate(feature);
@@ -380,7 +380,7 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       if (defined(style.labelColor)) {
         feature.labelColor = style.labelColor.evaluateColor(
           feature,
-          scratchColor3
+          scratchColor3,
         );
       } else {
         feature.labelColor = Color.WHITE;
@@ -389,7 +389,7 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       if (defined(style.labelOutlineColor)) {
         feature.labelOutlineColor = style.labelOutlineColor.evaluateColor(
           feature,
-          scratchColor4
+          scratchColor4,
         );
       } else {
         feature.labelOutlineColor = Color.WHITE;
@@ -422,7 +422,7 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       if (defined(style.backgroundColor)) {
         feature.backgroundColor = style.backgroundColor.evaluateColor(
           feature,
-          scratchColor5
+          scratchColor5,
         );
       } else {
         feature.backgroundColor = new Color(0.165, 0.165, 0.165, 0.8);
@@ -461,32 +461,35 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
         feature.scale = 1.0;
       }
 
-     
-    if (defined(style.translucencyByDistance)) {
-      const translucencyByDistanceCart4 =
-        style.translucencyByDistance.evaluate(feature);
-      if (defined(translucencyByDistanceCart4)) {
-        scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;
-        scratchTranslucencyByDistance.nearValue = translucencyByDistanceCart4.y;
-        scratchTranslucencyByDistance.far = translucencyByDistanceCart4.z;
-        scratchTranslucencyByDistance.farValue = translucencyByDistanceCart4.w;
-        feature.translucencyByDistance = scratchTranslucencyByDistance;
+      if (defined(style.translucencyByDistance)) {
+        const translucencyByDistanceCart4 =
+          style.translucencyByDistance.evaluate(feature);
+        if (defined(translucencyByDistanceCart4)) {
+          scratchTranslucencyByDistance.near = translucencyByDistanceCart4.x;
+          scratchTranslucencyByDistance.nearValue =
+            translucencyByDistanceCart4.y;
+          scratchTranslucencyByDistance.far = translucencyByDistanceCart4.z;
+          scratchTranslucencyByDistance.farValue =
+            translucencyByDistanceCart4.w;
+          feature.translucencyByDistance = scratchTranslucencyByDistance;
+        } else {
+          feature.translucencyByDistance = undefined;
+        }
       } else {
         feature.translucencyByDistance = undefined;
       }
-    } else {
-      feature.translucencyByDistance = undefined;
-    }
 
-    if (defined(style.distanceDisplayCondition)) {
-      const distanceDisplayConditionCart2 =
-        style.distanceDisplayCondition.evaluate(feature);
-      if (defined(distanceDisplayConditionCart2)) {
-        scratchDistanceDisplayCondition.near = distanceDisplayConditionCart2.x;
-        scratchDistanceDisplayCondition.far = distanceDisplayConditionCart2.y;
-        feature.distanceDisplayCondition = scratchDistanceDisplayCondition;
-      } else {
-        feature.distanceDisplayCondition = undefined;
+      if (defined(style.distanceDisplayCondition)) {
+        const distanceDisplayConditionCart2 =
+          style.distanceDisplayCondition.evaluate(feature);
+        if (defined(distanceDisplayConditionCart2)) {
+          scratchDistanceDisplayCondition.near =
+            distanceDisplayConditionCart2.x;
+          scratchDistanceDisplayCondition.far = distanceDisplayConditionCart2.y;
+          feature.distanceDisplayCondition = scratchDistanceDisplayCondition;
+        } else {
+          feature.distanceDisplayCondition = undefined;
+        }
       }
 
       if (defined(style.heightOffset)) {
@@ -504,7 +507,7 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       if (defined(style.anchorLineColor)) {
         feature.anchorLineColor = style.anchorLineColor.evaluateColor(
           feature,
-          scratchColor6
+          scratchColor6,
         );
       } else {
         feature.anchorLineColor = Color.WHITE;
@@ -517,9 +520,8 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       }
 
       if (defined(style.disableDepthTestDistance)) {
-        feature.disableDepthTestDistance = style.disableDepthTestDistance.evaluate(
-          feature
-        );
+        feature.disableDepthTestDistance =
+          style.disableDepthTestDistance.evaluate(feature);
       } else {
         feature.disableDepthTestDistance = 0.0;
       }
@@ -537,17 +539,15 @@ Vector3DTilePoints.prototype.applyStyle = function (style, features) {
       }
 
       if (defined(style.labelHorizontalOrigin)) {
-        feature.labelHorizontalOrigin = style.labelHorizontalOrigin.evaluate(
-          feature
-        );
+        feature.labelHorizontalOrigin =
+          style.labelHorizontalOrigin.evaluate(feature);
       } else {
         feature.labelHorizontalOrigin = HorizontalOrigin.LEFT;
       }
 
       if (defined(style.labelVerticalOrigin)) {
-        feature.labelVerticalOrigin = style.labelVerticalOrigin.evaluate(
-          feature
-        );
+        feature.labelVerticalOrigin =
+          style.labelVerticalOrigin.evaluate(feature);
       } else {
         feature.labelVerticalOrigin = VerticalOrigin.BASELINE;
       }
@@ -609,4 +609,5 @@ Vector3DTilePoints.prototype.destroy = function () {
     this._polylineCollection && this._polylineCollection.destroy();
   return destroyObject(this);
 };
+
 export default Vector3DTilePoints;

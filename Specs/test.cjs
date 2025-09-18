@@ -5,7 +5,7 @@ const {
   Cartographic,
   createWorldTerrainAsync,
   sampleTerrain,
-} = require("cesium");
+} = require("@vcmap/cesium");
 
 // NodeJS smoke screen test
 

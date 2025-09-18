@@ -1,4 +1,4 @@
-import { defaultValue, defined, DeveloperError } from "@vcmap-cesium/engine";
+import { defined, DeveloperError } from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import createCommand from "../createCommand.js";
 

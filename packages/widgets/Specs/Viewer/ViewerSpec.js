@@ -20,8 +20,6 @@ import {
   ShadowMode,
   IonGeocodeProviderType,
   IonGeocoderService,
-  TimeDynamicPointCloud,
-  VoxelPrimitive,
 } from "@vcmap-cesium/engine";
 
 import {
