@@ -51,8 +51,8 @@
     "./Specs/**/*"
   ],
   "dependencies": {
-    "@vcmap-cesium/engine": "^20.0.1",
-    "@vcmap-cesium/widgets": "^13.1.1"
+    "@vcmap-cesium/engine": "^20.0.2",
+    "@vcmap-cesium/widgets": "^13.1.2"
   },
   "devDependencies": {
     "@cesium/eslint-config": "^12.0.0",
