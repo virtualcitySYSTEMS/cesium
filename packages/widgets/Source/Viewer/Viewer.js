@@ -19,7 +19,7 @@ import {
   Property,
   ScreenSpaceEventType,
   IonGeocoderService,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import Animation from "../Animation/Animation.js";
 import AnimationViewModel from "../Animation/AnimationViewModel.js";
 import BaseLayerPicker from "../BaseLayerPicker/BaseLayerPicker.js";

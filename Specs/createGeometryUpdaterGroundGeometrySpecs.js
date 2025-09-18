@@ -9,7 +9,7 @@ import {
   GroundPrimitive,
   HeightReference,
   PrimitiveCollection,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 function createGeometryUpdaterGroundGeometrySpecs(
   Updater,

@@ -1,4 +1,4 @@
-import { defined, Math as CesiumMath } from "@cesium/engine";
+import { defined, Math as CesiumMath } from "@vcmap-cesium/engine";
 
 function createPackableSpecs(packable, instance, packedInstance, namePrefix) {
   namePrefix = namePrefix ?? "";

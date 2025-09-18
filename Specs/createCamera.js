@@ -5,7 +5,7 @@ import {
   GeographicProjection,
   Matrix4,
   Camera,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 function MockScene(canvas) {
   canvas = canvas ?? {

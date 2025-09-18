@@ -10,7 +10,7 @@ Use a prerelease tag—e.g. `ion`—to install a published prerelease.
 
 ```sh
 npm install cesium@<tag>
-npm install @cesium/engine@<tag>
+npm install @vcmap-cesium/engine@<tag>
 npm install @cesium/widgets@<tag>
 ```
 
@@ -71,7 +71,7 @@ npm version prerelease --preid <tag> --no-git-tag-version
 
 ## 1.123.1-ion.0 - 2025-07-15
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 ...
 ```

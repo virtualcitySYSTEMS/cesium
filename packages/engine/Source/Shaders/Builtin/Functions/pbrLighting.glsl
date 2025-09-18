@@ -68,8 +68,27 @@ float smithVisibilityGGX(float alphaRoughness, float NdotL, float NdotV)
     return 0.0;
 }
 
+float smithVisibilityG1(float NdotV, float roughness)
+{
+    // this is the k value for direct lighting.
+    // for image based lighting it will be roughness^2 / 2
+    float k = (roughness + 1.0) * (roughness + 1.0) / 8.0;
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float smithVisibilityGGX_VCS(float roughness, float NdotL, float NdotV)
+{
+    // Avoid divide-by-zero errors
+    NdotL = clamp(NdotL, 0.001, 1.0);
+    NdotV += 0.001;
+    return (
+        smithVisibilityG1(NdotL, roughness) *
+        smithVisibilityG1(NdotV, roughness)
+    );
+}
+
 /**
- * Estimate the fraction of the microfacets in a surface that are aligned with 
+ * Estimate the fraction of the microfacets in a surface that are aligned with
  * the halfway vector, which is aligned halfway between the directions from
  * the fragment to the camera and from the fragment to the light source.
  *
@@ -114,15 +133,93 @@ float computeDirectSpecularStrength(vec3 normal, vec3 lightDirection, vec3 viewD
  *
  * @name czm_pbrLighting
  * @glslFunction
- *
+ * @param {vec3} positionEC The position of the fragment in eye coordinates (custom vcs)
  * @param {vec3} viewDirectionEC Unit vector pointing from the fragment to the eye position
  * @param {vec3} normalEC The surface normal in eye coordinates
  * @param {vec3} lightDirectionEC Unit vector pointing to the light source in eye coordinates.
+ * @param {vec3} lightColorHdr The color of the light source in HDR (custom vcs)
  * @param {czm_modelMaterial} The material properties.
  * @return {vec3} The computed HDR color
  */
-vec3 czm_pbrLighting(vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC, czm_modelMaterial material)
+vec3 czm_pbrLighting(vec3 positionEC, vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC, vec3 lightColorHdr, czm_modelMaterial material)
 {
+   #ifdef USE_VCS_CUSTOM_SHADING
+	    lightColorHdr *= 0.35;
+
+	    vec3 diffuseColor = material.diffuse;
+	    float u_lambertDiffuseMultiplier = 0.9;
+		float u_vertexShadowDarkness = 0.3;
+
+		float ambientLuminanceNight = 0.05;
+		float ambientLuminanceDay = (1.0 - ambientLuminanceNight) * u_vertexShadowDarkness + ambientLuminanceNight;
+
+	 	float distance = length(positionEC);
+	    vec3 v = -normalize(positionEC);
+	    vec3 l = lightDirectionEC;
+	    vec3 h = normalize(v + l);
+	    vec3 n = normalEC;
+	    float NdotL = dot(n, l);
+	    float NdotLclamped = clamp(NdotL, 0.0001, 1.0);
+	    float NdotV = abs(dot(n, v)) + 0.001;
+	    float NdotH = clamp(dot(n, h), 0.0, 1.0);
+	    float VdotH = clamp(dot(v, h), 0.0, 1.0);
+
+	    float directLight = clamp(NdotL*50.0, 0.0, 1.0);
+
+	    vec3 positionWC = vec3(czm_inverseView * vec4(positionEC, 1.0));
+	    vec3 upWC = normalize(positionWC);
+	    vec3 lWC = normalize(czm_inverseViewRotation * l);
+	    vec3 nWC = normalize(czm_inverseViewRotation * n);
+	    float LdotZ = dot(lWC, -upWC);
+	    float NdotZ = dot(nWC, upWC);
+	    float sunAboveHorizon = clamp(-200.0 * LdotZ, 0.0, 1.0);
+
+	    // beginning of nautical twilight at 12 degrees below horizon (in radiens)
+	    float LdotZclamped = clamp(LdotZ, 0.0, 1.0);
+	    float m = 0.209439510239;
+	    float nn = (-LdotZclamped + m) / m;
+	    float beta = smoothstep(0.0, 1.0, nn);
+	    float ambientLightLuminance = mix(ambientLuminanceNight, ambientLuminanceDay, beta);
+
+		//modify hue of sunlight
+		vec3 directLightColorHdr = lightColorHdr;
+	    float gamma = clamp(-20.0 * LdotZ, 0.0, 1.0);
+
+	    float sun_minB =  0.5; //0.7;
+	    float sun_minG = sun_minB * 0.5 + 0.5;
+	    float sun_G = gamma*(1.0 - sun_minG) + sun_minG;
+	    float sun_B = gamma*(1.0 - sun_minB) + sun_minB;
+	    directLightColorHdr.g *= sun_G;
+	    directLightColorHdr.b *= sun_B;
+
+	    //ambient diffuse light
+	    float ambientModulationMinimum = 0.2;
+	    float ambientModulation = ambientModulationMinimum + (NdotZ*0.5 + 0.5)*(NdotL*0.2 + 0.8)*(1.0 - ambientModulationMinimum);
+	    vec3 ambientLightContribution = diffuseColor * lightColorHdr * ambientLightLuminance * ambientModulation;
+
+		// direct light
+	    vec3 directLightContribution = diffuseColor * directLightColorHdr * NdotLclamped * u_lambertDiffuseMultiplier * sunAboveHorizon;
+
+	    //direct specular light
+	    vec3 f0 = material.specular;
+        float reflectance = czm_maximumComponent(f0);
+	    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
+	    vec3 F = fresnelSchlick2(f0, f90, VdotH);
+        float alphaRoughness = material.roughness * material.roughness;
+	    float G = smithVisibilityGGX_VCS(material.roughness, NdotLclamped, NdotV);
+	    float D = GGX(alphaRoughness, NdotH);
+	    vec3 directSpecularContribution = directLight * clamp(F * G * D / (4.0 * NdotLclamped * NdotV) * sunAboveHorizon * directLightColorHdr, 0.0, 1.0);
+
+		//ambient specular light
+		const vec3 blueSkyDiffuseColor = vec3(0.7, 0.85, 0.9);
+		const vec3 REFLECTANCE_DIELECTRIC = vec3(0.04);
+		vec3 g0 = (f0 - REFLECTANCE_DIELECTRIC) / (1.0 - REFLECTANCE_DIELECTRIC) ;
+	    vec3 ambientSpecularContribution = g0 * blueSkyDiffuseColor * ambientLightLuminance * ambientModulation;
+
+	    vec3 finalColorRGB = ambientLightContribution + directLightContribution + directSpecularContribution + ambientSpecularContribution;
+        return finalColorRGB;
+	#else
+
     vec3 halfwayDirectionEC = normalize(viewDirectionEC + lightDirectionEC);
     float VdotH = clamp(dot(viewDirectionEC, halfwayDirectionEC), 0.0, 1.0);
     float NdotL = clamp(dot(normalEC, lightDirectionEC), 0.001, 1.0);
@@ -160,5 +257,6 @@ vec3 czm_pbrLighting(vec3 viewDirectionEC, vec3 normalEC, vec3 lightDirectionEC,
     vec3 diffuseContribution = (1.0 - F) * lambertianDiffuse(diffuseColor);
 
     // Lo = (diffuse + specular) * Li * NdotL
-    return (diffuseContribution + specularContribution) * NdotL;
+    return (diffuseContribution + specularContribution) * NdotL * lightColorHdr;
+	#endif
 }

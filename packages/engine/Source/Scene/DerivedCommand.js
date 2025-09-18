@@ -1,4 +1,4 @@
-import { MetadataComponentType } from "@cesium/engine";
+import { MetadataComponentType } from "@vcmap-cesium/engine";
 import defined from "../Core/defined.js";
 import DrawCommand from "../Renderer/DrawCommand.js";
 import RenderState from "../Renderer/RenderState.js";
@@ -264,13 +264,13 @@ function getPickShaderProgram(context, shaderProgram, pickId) {
 
   const hasFragData = sources.some((source) => source.includes("out_FragData"));
   const outputColorVariable = hasFragData ? "out_FragData_0" : "out_FragColor";
-  const newMain = `void main () 
-{ 
-    czm_non_pick_main(); 
-    if (${outputColorVariable}.a == 0.0) { 
-        discard; 
-    } 
-    ${outputColorVariable} = ${pickId}; 
+  const newMain = `void main ()
+{
+    czm_non_pick_main();
+    if (${outputColorVariable}.a == 0.0) {
+        discard;
+    }
+    ${outputColorVariable} = ${pickId};
 } `;
 
   const length = sources.length;

@@ -73,7 +73,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 - Give the [new version of Sandcastle](https://dev-sandcastle.cesium.com/) a try today!
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -99,7 +99,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.132 - 2025-08-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -127,7 +127,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.131 - 2025-07-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -142,7 +142,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.130.1 - 2025-06-16
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -151,7 +151,7 @@ This is an npm-only release to fix a dependency issue published in 1.133.0
 
 ## 1.130 - 2025-06-02
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -177,7 +177,7 @@ vec3 voxelNormal = fsInput.attributes.normalEC;
 
 ## 1.129 - 2025-05-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -195,7 +195,7 @@ vec3 voxelNormal = fsInput.attributes.normalEC;
 
 ## 1.128 - 2025-04-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -224,7 +224,7 @@ vec3 voxelNormal = fsInput.attributes.normalEC;
 
 ## 1.127 - 2025-03-03
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -260,7 +260,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.126 - 2025-02-03
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -284,7 +284,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.125 - 2025-01-02
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -300,7 +300,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.124 - 2024-12-02
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -343,7 +343,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.123.1 - 2024-11-07
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -352,7 +352,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.123 - 2024-11-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -392,7 +392,7 @@ CustomVoxelProvider.prototype.requestData = function (options) {
 
 ## 1.122 - 2024-10-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -419,7 +419,7 @@ This is an npm-only release to extra source maps included in 1.121
 
 ## 1.121 - 2024-09-03
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -452,7 +452,7 @@ This is an npm-only release to extra source maps included in 1.121
 
 ## 1.120 - 2024-08-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -471,7 +471,7 @@ This is an npm-only release to extra source maps included in 1.121
 
 ## 1.119 - 2024-07-01
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -514,7 +514,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.118 - 2024-06-03
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -534,7 +534,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.117 - 2024-05-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -547,7 +547,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 - Fixes Typescript definition for `Event.raiseEvent`. [#10498](https://github.com/CesiumGS/cesium/issues/10498)
 - Fixed a bug that Label position height may not be correctly updated when its HeightReference is relative. [#11929](https://github.com/CesiumGS/cesium/pull/11929)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Fixes :wrench:
 
@@ -555,7 +555,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.116 - 2024-04-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -579,7 +579,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.115 - 2024-03-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -607,7 +607,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 - `Cesium3DTileset.disableCollision` has been deprecated and will be removed in 1.116. Use `Cesium3DTileset.enableCollision` instead.
 
-### @cesium/widgets
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -615,7 +615,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.114 - 2024-02-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -654,7 +654,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 - Parts of the documentation have been updated to resolve potential issues with the generated TypedScript definitions. [#11776](https://github.com/CesiumGS/cesium/pull/11776)
 - Fixed type definition for `Camera.constrainedAxis`. [#11475](https://github.com/CesiumGS/cesium/issues/11475)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Fixes :wrench:
 
@@ -662,7 +662,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.113 - 2024-01-02
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -680,7 +680,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.112 - 2023-12-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -689,7 +689,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.111 - 2023-11-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -706,7 +706,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.110.1 - 2023-10-25
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -723,7 +723,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.110 - 2023-10-02
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -754,7 +754,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 ## 1.109 - 2023-09-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -772,7 +772,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 - The return type of `SingleTileImageryProvider.fromUrl` has been fixed to be `Promise.<SingleTileImageryProvider>` (was `void`). [#11432](https://github.com/CesiumGS/cesium/pull/11432)
 - Fixed request render mode when models are loading without `incrementallyLoadTextures`. [#11486](https://github.com/CesiumGS/cesium/pull/11486)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Additions :tada:
 
@@ -790,7 +790,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 
 - Starting with version 1.109, CesiumJS will require Firefox version 114 or higher for rendering. This is to [facilitate web worker loading and remove outdated dependencies](https://github.com/CesiumGS/cesium/pull/11400). Other browsers and node will be unaffected.
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -800,7 +800,7 @@ This is an npm-only release to fix a dependency issue published in 1.118
 - Fixed `CzmlDataSource` in cases of custom `Ellipsoid.WGS84` definitions. [#11190](https://github.com/CesiumGS/cesium/pull/11190)
 - Fixed mipmaps for textures using the `KHR_texture_transform` extension. [#11411](https://github.com/CesiumGS/cesium/pull/11411)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Fixes :wrench:
 
@@ -812,14 +812,14 @@ This is an npm-only release to fix a dependency issue published in 1.107.1
 
 ## 1.107.1 - 2023-07-13
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
 - Fixed a bug where `Model` would not respond to different alpha values in a `Cesium3DTileStyle`. [#11399](https://github.com/CesiumGS/cesium/pull/11399)
 - Fixed dimensions of `tangentEC` in custom shaders. [#11394](https://github.com/CesiumGS/cesium/pull/11394)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Fixes :wrench:
 
@@ -851,7 +851,7 @@ try {
 }
 ```
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Breaking Changes :mega:
 
@@ -926,7 +926,7 @@ try {
 
 - `Cesium3DTileset.maximumMemoryUsage` has been deprecated in CesiumJS 1.107. It will be removed in 1.110. Use `Cesium3DTileset.cacheBytes` and `Cesium3DTileset.maximumCacheOverflowBytes` instead. [#11310](https://github.com/CesiumGS/cesium/pull/11310)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Breaking Changes :mega:
 
@@ -938,7 +938,7 @@ This is an npm-only release to fix a dependency issue published in 1.106
 
 ## 1.106 - 2023-06-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Fixes :wrench:
 
@@ -954,7 +954,7 @@ This is an npm-only release to fix a dependency issue published in 1.106
 
 ## 1.105.1 - 2023-05-10
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -967,7 +967,7 @@ This is an npm-only release to fix a dependency issue published in 1.106
 
 ## 1.105 - 2023-05-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -995,7 +995,7 @@ This is an npm-only release to fix a dependency issue published in 1.106
 
 - `CreditDisplay.addCredit`, `CreditDisplay.addDefaultCredit`, and `CreditDisplay.removeDefaultCredit` have been deprecated in CesiumJS 1.105. They will be removed in 1.107. Use `CreditDisplay.addCreditToNextFrame`, `CreditDisplay.addStaticCredit`, and `CreditDisplay.removeStaticCredit` respectively instead. [#11241](https://github.com/CesiumGS/cesium/pull/11241)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Additions :tada:
 
@@ -1021,7 +1021,7 @@ try {
 }
 ```
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -1091,7 +1091,7 @@ try {
 - `Cesium3DTilesVoxelProvider` construction parameter `options.url`, `Cesium3DTilesVoxelProvider.ready`, and `Cesium3DTilesVoxelProvider.readyPromise` were deprecated in CesiumJS 1.104. They will be removed in 1.107. Use `Cesium3DTilesVoxelProvider.fromUrl` instead.
 - `Primitive.readyPromise`, `ClassificationPrimitive.readyPromise`, `GroundPrimitive.readyPromise`, and `GroundPolylinePrimitive.readyPromise` were deprecated in CesiumJS 1.104. They will be removed in 1.107. Wait for `Primitive.ready`, `ClassificationPrimitive.ready`, `GroundPrimitive.ready`, or `GroundPolylinePrimitive.ready` to return true instead.
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Fixes :wrench:
 
@@ -1104,7 +1104,7 @@ try {
 
 ## 1.103 - 2023-03-01
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -1121,7 +1121,7 @@ try {
 - Fixed Primitive.getGeometryInstanceAttributes cache acquisition speed. [#11066](https://github.com/CesiumGS/cesium/issues/11066)
 - Fixed requestWebgl1 hint error in context. [#11082](https://github.com/CesiumGS/cesium/issues/11082)
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Fixes :wrench:
 
@@ -1129,7 +1129,7 @@ try {
 
 ## 1.102 - 2023-02-01
 
-### Major Announcements :loudspeaker:
+#### @vcmap-cesium/engine
 
 - CesiumJS now defaults to using a WebGL2 context for rendering. WebGL2 is widely supported on all platforms and this results in better feature support across devices, especially mobile.
   - WebGL1 is supported. If WebGL2 is not available, CesiumJS will automatically fall back to WebGL1.
@@ -1143,7 +1143,7 @@ try {
     });
     ```
 
-### @cesium/engine
+### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -1174,7 +1174,7 @@ try {
     });
     ```
 
-### @cesium/engine
+#### @vcmap-cesium/engine
 
 #### Additions :tada:
 
@@ -1196,7 +1196,7 @@ try {
 
 - `ContextOptions.requestWebgl2` was deprecated in CesiumJS 1.101 and will be removed in 1.102. Instead, CesiumJS will default to using a WebGL2 context for rendering. Use `ContextOptions.requestWebgl1` to request a WebGL1 or WebGL2 context.
 
-### @cesium/widgets
+#### @vcmap-cesium/widgets
 
 #### Additions :tada:
 
@@ -1206,8 +1206,8 @@ try {
 
 ### Major Announcements :loudspeaker:
 
-- CesiumJS is now published alongside two smaller packages `@cesium/engine` and `@cesium/widgets` [#10824](https://github.com/CesiumGS/cesium/pull/10824):
-  - The source code has been partitioned into two folders: `packages/engine` and `packages/widgets`.
+- CesiumJS is now published alongside two smaller packages `@vcmap-cesium/engine` and `@vcmap-cesium/widgets` [#10824](https://github.com/CesiumGS/cesium/pull/10824):
+  - The source code has been paritioned into two folders: `packages/engine` and `packages/widgets`.
   - These workspaces packages will follow semantic versioning.
   - These workspaces packages will be published as ES modules with TypeScript definitions.
   - In the combined CesiumJS release, the `Source` folder only contains the following:
@@ -1226,8 +1226,8 @@ try {
 
 ### Major Announcements :loudspeaker:
 
-- Starting with version 1.100, CesiumJS will be published alongside two smaller packages `@cesium/engine` and `@cesium/widgets` [#10824](https://github.com/CesiumGS/cesium/pull/10824):
-  - The source code will been partitioned into two folders: `packages/engine` and `packages/widgets`.
+- Starting with version 1.100, CesiumJS will be published alongside two smaller packages `@vcmap-cesium/engine` and `@vcmap-cesium/widgets` [#10824](https://github.com/CesiumGS/cesium/pull/10824):
+  - The source code will been paritioned into two folders: `packages/engine` and `packages/widgets`.
   - These workspaces packages will follow semantic versioning.
   - These workspaces packages will be published as ES modules with TypeScript definitions.
   - The combined CesiumJS release will continue to be published, however, the `Source` folder will only contain the following:

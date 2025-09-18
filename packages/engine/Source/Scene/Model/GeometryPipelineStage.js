@@ -132,6 +132,24 @@ GeometryPipelineStage.process = function (
     );
   }
 
+  /** handles GLTF Vertext Colors as SRGB Values */
+  if (model.type !== ModelType.TILE_PNTS && model.useSRGBVertexColors) {
+    shaderBuilder.addDefine(
+      "USE_VCS_SRGB_VERTEX_COLORS",
+      undefined,
+      ShaderDestination.FRAGMENT,
+    );
+  }
+
+  /** handles GLTF baseColorFactor as SRGB Values */
+  if (model.type !== ModelType.TILE_PNTS && model.useSRGBColorFactors) {
+    shaderBuilder.addDefine(
+      "USE_VCS_SRGB_COLOR_FACTORS",
+      undefined,
+      ShaderDestination.FRAGMENT,
+    );
+  }
+
   // Attributes, structs, and functions will need to be modified for 2D / CV.
   const use2D =
     frameState.mode !== SceneMode.SCENE3D &&

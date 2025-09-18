@@ -26,9 +26,9 @@ import {
   createJsHintOptions,
 } from "./scripts/build.js";
 
-// Determines the scope of the workspace packages. If the scope is set to cesium, the workspaces should be @cesium/engine.
+// Determines the scope of the workspace packages. If the scope is set to cesium, the workspaces should be @vcmap-cesium/engine.
 // This should match the scope of the dependencies of the root level package.json.
-const scope = "cesium";
+const scope = "vcmap-cesium";
 
 const require = createRequire(import.meta.url);
 const packageJson = require("./package.json");

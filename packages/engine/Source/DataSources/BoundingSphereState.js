@@ -1,7 +1,6 @@
 /**
  * The state of a BoundingSphere computation being performed by a {@link Visualizer}.
  * @enum {number}
- * @private
  */
 const BoundingSphereState = Object.freeze({
   /**
