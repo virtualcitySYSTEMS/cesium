@@ -28,7 +28,7 @@
     "node": ">=20.19.0"
   },
   "dependencies": {
-    "@vcmap-cesium/engine": "^22.0.1",
+    "@vcmap-cesium/engine": "^22.0.0",
     "nosleep.js": "^0.12.0"
   },
   "type": "module",
