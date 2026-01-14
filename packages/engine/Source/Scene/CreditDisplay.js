@@ -163,7 +163,7 @@ function styleLightboxContainer(that) {
   }
 }
 
-function appendCss(container) {
+function appendCss(container, nonce) {
   const style = /*css*/ `
 .cesium-credit-lightbox-overlay {
   display: none;
@@ -278,6 +278,9 @@ function appendCss(container) {
     document.head
   );
   const styleElem = document.createElement("style");
+  if (defined(nonce)) {
+    styleElem.setAttribute("nonce", nonce);
+  }
   styleElem.innerHTML = style;
   shadowRootOrDocumentHead.appendChild(styleElem);
 }
@@ -288,6 +291,7 @@ function appendCss(container) {
  * @param {HTMLElement} container The HTML element where credits will be displayed
  * @param {string} [delimiter= '•'] The string to separate text credits
  * @param {HTMLElement} [viewport=document.body] The HTML element that will contain the credits popup
+ * @param {string} [nonce] A nonce to be added to the style tag for CSP compliance
  *
  * @alias CreditDisplay
  * @constructor
@@ -302,7 +306,7 @@ function appendCss(container) {
  * const credit = new Cesium.Credit('<a href="https://cesium.com/" target="_blank">Cesium</a>');
  * viewer.creditDisplay.addStaticCredit(credit);
  */
-function CreditDisplay(container, delimiter, viewport) {
+function CreditDisplay(container, delimiter, viewport, nonce) {
   //>>includeStart('debug', pragmas.debug);
   Check.defined("container", container);
   //>>includeEnd('debug');
@@ -356,7 +360,7 @@ function CreditDisplay(container, delimiter, viewport) {
   expandLink.textContent = "Data attribution";
   container.appendChild(expandLink);
 
-  appendCss(container);
+  appendCss(container, nonce);
   const cesiumCredit = Credit.clone(CreditDisplay.cesiumCredit);
 
   this._delimiter = defaultValue(delimiter, "•");
