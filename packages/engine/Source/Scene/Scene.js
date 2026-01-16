@@ -157,7 +157,7 @@ function Scene(options) {
   this._frameState = new FrameState(
     context,
     new CreditDisplay(creditContainer, "•", creditViewport),
-    this._jobScheduler
+    this._jobScheduler,
   );
   this._frameState.scene3DOnly = defaultValue(options.scene3DOnly, false);
   this._removeCreditContainer = !hasCreditContainer;
