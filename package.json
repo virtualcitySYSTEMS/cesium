@@ -51,8 +51,8 @@
     "./Specs/**/*"
   ],
   "dependencies": {
-    "@vcmap-cesium/engine": "^11.0.3",
-    "@vcmap-cesium/widgets": "^8.0.3"
+    "@vcmap-cesium/engine": "^11.0.4",
+    "@vcmap-cesium/widgets": "^8.0.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.1",
