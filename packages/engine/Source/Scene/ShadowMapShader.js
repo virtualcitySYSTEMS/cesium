@@ -383,7 +383,31 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
       "    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n";
   }
 
-  fsSource += "    out_FragColor.rgb *= visibility; \n" + "} \n";
+    fsSource +=
+      `    if (visibility <= ${viewshed.distance || "0.4"}) \n` +
+      `    { \n` +
+      `      out_FragColor.rgba *= vec4(${shadowColor.join(",")}); \n` +
+      `    } \n` +
+      `    else \n` +
+      `    { \n` +
+      `        out_FragColor.rgba *= vec4(${visibleColor.join(",")}); \n` +
+      `    } \n` +
+      `} \n`;
+  } else if (
+    "undefined" !== typeof globalThis &&
+    globalThis.useVcsCustomShading
+  ) {
+    fsSource +=
+      "    #ifdef HAS_NORMALS \n" +
+      "      vec3 shadowSub = 0.8 * (1.0 - visibility) * vec3(nDotL); \n" +
+      "      out_FragColor.rgb -= shadowSub; \n" +
+      "    #else \n" +
+      "      out_FragColor.rgb *= visibility; \n" +
+      "    #endif \n" +
+      "} \n";
+  } else {
+    fsSource += "    out_FragColor.rgb *= visibility; \n" + "} \n";
+  }
 
   sources.push(fsSource);
 
