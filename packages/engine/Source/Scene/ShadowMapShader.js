@@ -407,8 +407,13 @@ ShadowMapShader.createShadowReceiveFragmentShader = function (
     globalThis.useVcsCustomShading
   ) {
     fsSource +=
-      "    vec3 shadowSub = 0.8 * (1.0 - visibility) * vec3(nDotL); \n";
-    fsSource += "    out_FragColor.rgb -= shadowSub; \n" + "} \n";
+      "    #ifdef HAS_NORMALS \n" +
+      "      vec3 shadowSub = 0.8 * (1.0 - visibility) * vec3(nDotL); \n" +
+      "      out_FragColor.rgb -= shadowSub; \n" +
+      "    #else \n" +
+      "      out_FragColor.rgb *= visibility; \n" +
+      "    #endif \n" +
+      "} \n";
   } else {
     fsSource += "    out_FragColor.rgb *= visibility; \n" + "} \n";
   }
