@@ -1,5 +1,12 @@
 # CesiumJS
 
+## Attention
+
+> This is a custom CesiumJS fork to be used with the `VC Map`.
+> For the common CesiumJS module visit [this package](https://www.npmjs.com/package/cesium).
+
+---
+
 [![Build Status](https://github.com/CesiumGS/cesium/actions/workflows/dev.yml/badge.svg)](https://github.com/CesiumGS/cesium/actions/workflows/dev.yml)
 [![npm](https://img.shields.io/npm/v/cesium)](https://www.npmjs.com/package/cesium)
 [![Docs](https://img.shields.io/badge/docs-online-orange.svg)](https://cesium.com/learn/)

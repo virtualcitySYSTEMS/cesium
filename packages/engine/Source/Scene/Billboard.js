@@ -948,13 +948,20 @@ Object.defineProperties(Billboard.prototype, {
         return;
       }
 
-      this._computeImageTextureProperties(undefined, value);
-      this._imageTexture.loadImage(
-        this._imageId,
-        value,
-        this._imageWidth,
-        this._imageHeight,
-      );
+      let id;
+      if (typeof value === "string") {
+        id = value;
+      } else if (value instanceof Resource) {
+        id = value._url;
+      } else if (defined(value.src)) {
+        id = value.src;
+      } else if (defined(value.id) && value.id !== "") {
+        id = value.id;
+      } else {
+        id = createGuid();
+      }
+
+      this._imageTexture.loadImage(id, value);
     },
   },
 
