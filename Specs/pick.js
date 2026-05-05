@@ -8,7 +8,7 @@ import {
   FrameState,
   JobScheduler,
   PickFramebuffer,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 function executeCommands(context, passState, commands) {
   const length = commands.length;

@@ -94,11 +94,11 @@ export default defineConfig(async ({ command }) => {
         path: "/Source/Cesium.js",
         typesPath: "/Source/Cesium.d.ts",
       },
-      "@cesium/engine": {
+      "@vcmap-cesium/engine": {
         path: "/packages/engine/Build/Unminified/index.js",
         typesPath: "/packages/engine/index.d.ts",
       },
-      "@cesium/widgets": {
+      "@vcmap-cesium/widgets": {
         path: "/packages/widgets/Build/Unminified/index.js",
         typesPath: "/packages/widgets/index.d.ts",
       },

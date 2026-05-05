@@ -1,4 +1,4 @@
-import { Color, defined, JulianDate } from "@cesium/engine";
+import { Color, defined, JulianDate } from "@vcmap-cesium/engine";
 
 /**
  * @private

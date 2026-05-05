@@ -10,7 +10,7 @@ import {
   Primitive,
   QuadtreeTile,
   Math as CesiumMath,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 import { CesiumInspectorViewModel } from "../../index.js";
 

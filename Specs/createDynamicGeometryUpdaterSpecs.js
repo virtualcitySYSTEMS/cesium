@@ -5,7 +5,7 @@ import {
   EllipsoidGeometryUpdater,
   PrimitiveCollection,
   Math as CesiumMath,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 import createDynamicProperty from "./createDynamicProperty.js";
 import pollToPromise from "./pollToPromise.js";

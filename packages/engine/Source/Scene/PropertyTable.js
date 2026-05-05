@@ -4,7 +4,7 @@ import DeveloperError from "../Core/DeveloperError.js";
 import defined from "../Core/defined.js";
 import JsonMetadataTable from "./JsonMetadataTable.js";
 import addAllToArray from "../Core/addAllToArray.js";
-import { destroyObject } from "@cesium/engine";
+import { destroyObject } from "@vcmap-cesium/engine";
 
 /**
  * A property table for use with the <code>EXT_structural_metadata</code> extension or

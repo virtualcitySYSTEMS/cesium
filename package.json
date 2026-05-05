@@ -51,8 +51,8 @@
     "./Specs/**/*"
   ],
   "dependencies": {
-    "@cesium/engine": "^25.0.0",
-    "@cesium/widgets": "^15.0.0"
+    "@vcmap-cesium/engine": "^25.0.0",
+    "@vcmap-cesium/widgets": "^15.0.0"
   },
   "devDependencies": {
     "@ast-grep/cli": "^0.42.1",

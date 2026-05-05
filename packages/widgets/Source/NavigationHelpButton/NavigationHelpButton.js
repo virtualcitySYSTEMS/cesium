@@ -5,7 +5,7 @@ import {
   DeveloperError,
   FeatureDetection,
   getElement,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import NavigationHelpButtonViewModel from "./NavigationHelpButtonViewModel.js";
 

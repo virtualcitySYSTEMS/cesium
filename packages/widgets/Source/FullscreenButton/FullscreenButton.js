@@ -3,7 +3,7 @@ import {
   destroyObject,
   DeveloperError,
   getElement,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import FullscreenButtonViewModel from "./FullscreenButtonViewModel.js";
 

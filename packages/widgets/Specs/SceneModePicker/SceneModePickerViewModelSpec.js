@@ -1,4 +1,4 @@
-import { Ellipsoid, Globe, SceneMode } from "@cesium/engine";
+import { Ellipsoid, Globe, SceneMode } from "@vcmap-cesium/engine";
 
 import { SceneModePickerViewModel } from "../../index.js";
 

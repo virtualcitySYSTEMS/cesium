@@ -7,7 +7,7 @@ import {
   HeightmapTerrainData,
   RuntimeError,
   TerrainProvider,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 function MockTerrainProvider() {
   this.tilingScheme = new GeographicTilingScheme();

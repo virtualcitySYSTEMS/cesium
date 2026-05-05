@@ -1,5 +1,5 @@
 {
-  "name": "@cesium/sandcastle",
+  "name": "@vcmap-cesium/sandcastle",
   "private": true,
   "version": "0.3.0",
   "type": "module",

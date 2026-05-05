@@ -2,7 +2,7 @@ import {
   OrthographicFrustum,
   PerspectiveFrustum,
   SceneMode,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 import { ProjectionPickerViewModel } from "../../index.js";
 

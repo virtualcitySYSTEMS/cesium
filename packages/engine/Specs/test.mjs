@@ -1,4 +1,4 @@
-import { Cartographic, createWorldTerrainAsync, sampleTerrain } from "@cesium/engine";
+import { Cartographic, createWorldTerrainAsync, sampleTerrain } from "@vcmap-cesium/engine";
 import assert from "node:assert";
 
 // NodeJS smoke screen test
