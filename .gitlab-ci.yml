@@ -6,36 +6,9 @@ variables:
   GIT_STRATEGY: fetch
 
 stages:
-  - validate
   - build
   - version
   - publish
-
-autoRenameCesiumImports:
-  stage: validate
-  tags:
-    - linux-2.0
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-  before_script:
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo "$SSH_RUNNER_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan gitlab.virtualcitysystems.de >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - git config user.name "Gitlab Runner"
-    - git config user.email "gitlab-runner@vc.systems"
-  script:
-    - bash scripts/rename-cesium-imports.sh
-    - |
-      if ! git diff --quiet --exit-code; then
-        git add -A
-        git commit -m "chore: auto-rename @cesium imports [skip ci]"
-        git push git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/cesium.git HEAD:$CI_COMMIT_REF_NAME
-      else
-        echo "No @cesium import rename changes detected."
-      fi
 
 .template: &job_definition
   only:
