@@ -1,4 +1,4 @@
-import { Frozen } from "@cesium/engine";
+import { Frozen } from "@vcmap-cesium/engine";
 
 function createMouseEvent(type, options) {
   options = options ?? Frozen.EMPTY_OBJECT;

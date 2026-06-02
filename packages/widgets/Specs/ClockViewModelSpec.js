@@ -1,4 +1,4 @@
-import { Clock, ClockRange, ClockStep, JulianDate } from "@cesium/engine";
+import { Clock, ClockRange, ClockStep, JulianDate } from "@vcmap-cesium/engine";
 import { ClockViewModel } from "../index.js";
 
 describe("Widgets/ClockViewModel", function () {

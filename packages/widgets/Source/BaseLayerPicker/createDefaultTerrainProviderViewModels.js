@@ -3,7 +3,7 @@ import {
   createWorldTerrainAsync,
   Ellipsoid,
   EllipsoidTerrainProvider,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import ProviderViewModel from "./ProviderViewModel.js";
 
 /**

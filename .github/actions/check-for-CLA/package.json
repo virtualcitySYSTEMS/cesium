@@ -1,5 +1,5 @@
 {
-    "name": "@cesium/check-for-cla",
+    "name": "@vcmap-cesium/check-for-cla",
     "version": "0.1.0",
     "main": "index.js",
     "dependencies": {

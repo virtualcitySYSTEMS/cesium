@@ -5,7 +5,7 @@ import {
   GeographicTilingScheme,
   Resource,
   RuntimeError,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 
 function MockImageryProvider() {
   this.tilingScheme = new GeographicTilingScheme();

@@ -1,4 +1,4 @@
-import { defined } from "@cesium/engine";
+import { defined } from "@vcmap-cesium/engine";
 
 import { Animation, AnimationViewModel, ClockViewModel } from "../../index.js";
 

@@ -1,4 +1,4 @@
-import { MetadataComponentType } from "@cesium/engine";
+import { MetadataComponentType } from "@vcmap-cesium/engine";
 import defined from "../Core/defined.js";
 import DrawCommand from "../Renderer/DrawCommand.js";
 import RenderState from "../Renderer/RenderState.js";

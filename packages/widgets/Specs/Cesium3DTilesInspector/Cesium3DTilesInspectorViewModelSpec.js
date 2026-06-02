@@ -3,7 +3,7 @@ import {
   Cesium3DTileStyle,
   Globe,
   Math as CesiumMath,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import { Cesium3DTilesInspectorViewModel } from "../../index.js";
 import createScene from "../../../../Specs/createScene.js";
 

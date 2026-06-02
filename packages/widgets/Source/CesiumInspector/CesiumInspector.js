@@ -3,7 +3,7 @@ import {
   destroyObject,
   DeveloperError,
   getElement,
-} from "@cesium/engine";
+} from "@vcmap-cesium/engine";
 import knockout from "../ThirdParty/knockout.js";
 import InspectorShared from "../InspectorShared.js";
 import CesiumInspectorViewModel from "./CesiumInspectorViewModel.js";
