@@ -37,6 +37,12 @@ patchVersion:
     - npm version patch --workspaces
     - git add "package*.json"
     - git commit -m "patch workspaces [skip-ci]" --no-verify
+    - echo "=== git status after workspace commit ==="
+    - git status --porcelain=v1 -uall
+    - echo "=== unstaged diff ==="
+    - git diff --name-status
+    - echo "=== staged diff ==="
+    - git diff --cached --name-status
     - npm version --no-commit-hooks patch -m "%s [skip-ci]"
     - TAG=`git describe --abbrev=0`
     - git push git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/cesium.git $TAG
