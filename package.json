@@ -51,7 +51,7 @@
     "./Specs/**/*"
   ],
   "dependencies": {
-    "@vcmap-cesium/engine": "^11.0.4",
+    "@vcmap-cesium/engine": "^11.0.5",
     "@vcmap-cesium/widgets": "^8.0.4"
   },
   "devDependencies": {
