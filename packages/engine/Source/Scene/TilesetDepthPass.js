@@ -24,7 +24,6 @@ class TilesetDepthPass {
     this._passState = undefined;
     this.depthTexture = undefined;
 
-    // Cache of derived depth-only commands, one slot per source command.
     this._derivedCommands = [];
     this._clearCommand = new ClearCommand({ depth: 1.0 });
   }
@@ -32,7 +31,6 @@ class TilesetDepthPass {
   execute() {
     const { context, frameState, view } = this._scene;
 
-    // WEBGL_depth_texture (core in WebGL2). Bail out gracefully otherwise.
     if (!context.depthTexture) {
       return;
     }
@@ -40,7 +38,6 @@ class TilesetDepthPass {
     const width = context.drawingBufferWidth;
     const height = context.drawingBufferHeight;
 
-    // (Re)create the target when missing or when the drawing buffer resized.
     if (
       !this._fbo ||
       this.depthTexture.width !== width ||
@@ -59,13 +56,12 @@ class TilesetDepthPass {
       this._fbo = new Framebuffer({
         context,
         depthTexture: this.depthTexture,
-        destroyAttachments: false, // we own the texture's lifetime
+        destroyAttachments: false,
       });
       this._passState = new PassState(context);
       this._passState.framebuffer = this._fbo;
     }
 
-    // Collect the tileset's render commands into our private pass state.
     const commands = this._tilePass.commandList;
     commands.length = 0;
     this._tileset.updateForPass(frameState, this._tilePass);
@@ -81,8 +77,6 @@ class TilesetDepthPass {
 
     const derived = this._derivedCommands;
     for (let i = 0; i < commands.length; ++i) {
-      // Reuse Cesium's depth-only derivation: pass-through shader when safe,
-      // preserves discard / log-depth, and derives the render state per command.
       const result = DerivedCommand.createDepthOnlyDerivedCommand(
         this._scene,
         commands[i],
@@ -109,7 +103,6 @@ class TilesetDepthPass {
 
   destroy() {
     this._destroyResources();
-    // ... Cesium.destroyObject(this) if you want the standard pattern
   }
 }
 
